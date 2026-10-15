@@ -13,10 +13,10 @@ class Frontend:
         }
         
         self.sub_data = {
-            "Tirolesa": ["18:00"],
-            "Safari": ["10:00"],
-            "Palestra": ["14:00"],
-            "Jardineria": ["09:00"]
+            "Tirolesa": ["18:00", "17:00", "16:00"],
+            "Safari": ["10:00", "11:00", "12:00"],
+            "Palestra": ["14:00", "15:00", "16:00"],
+            "Jardineria": ["09:00", "10:00", "11:00"]
         }
         
         #Llamar al metodo para inicializar la interfaz de usuario
