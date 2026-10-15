@@ -32,6 +32,14 @@ class Frontend:
         for name, qty in self.items_data.items():
             self.listbox.insert(tk.END, f"{name}  ({qty})")
             
+    #Metodo para refrescar la lista
+    def refrescar_lista(self):
+            # Limpia la lista desactualizada
+            self.listbox.delete(0, tk.END)
+            #Inserta de vuelta los items para actualizarla
+            for name, qty in self.items_data.items():
+                self.listbox.insert(tk.END, f"{name}  ({qty})")
+    
     #Metodo para obtener la lista de items
     def obtener_lista_items(self):
         # Retorna solo los nombres de los items
