@@ -28,7 +28,7 @@ class Frontend:
         )
         self.listbox.pack(padx=10, pady=10)
         
-        # Inserta numeros con visualizacion para el cliente
+        # Inserta numeros con visualizacion para el cliente, estos estan separados en la logica de la aplicacion.
         for name, qty in self.items_data.items():
             self.listbox.insert(tk.END, f"{name}  ({qty})")
         
