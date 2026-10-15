@@ -27,6 +27,16 @@ class Frontend:
             height=4
         )
         self.listbox.pack(padx=10, pady=10)
+        #crear nueva listbox para la seleccion de horarios
+        self.sub_listbox = tk.Listbox(
+          self.root,
+          font=("Arial", 10),
+          bd=1,
+          relief="solid",
+          width=25,
+          height=4
+        )
+        self.sub_listbox.pack(padx=10, pady=5)
         
         # Inserta numeros con visualizacion para el cliente, estos estan separados en la logica de la aplicacion.
         for name, qty in self.items_data.items():
