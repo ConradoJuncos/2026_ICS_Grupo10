@@ -1,7 +1,7 @@
 import tkinter as tk
 from frontend import Frontend
 
-def test_selecting_main_item_updates_sub_listbox():
+def test_seleccion_lista_tirolesa_mostrar_horarios():
     # Inicializar app
     app = Frontend()
     
