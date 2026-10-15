@@ -31,7 +31,7 @@ class Frontend:
         # Inserta numeros con visualizacion para el cliente, estos estan separados en la logica de la aplicacion.
         for name, qty in self.items_data.items():
             self.listbox.insert(tk.END, f"{name}  ({qty})")
-        
+            
     #Metodo para obtener la lista de items
     def obtener_lista_items(self):
         # Retorna solo los nombres de los items
