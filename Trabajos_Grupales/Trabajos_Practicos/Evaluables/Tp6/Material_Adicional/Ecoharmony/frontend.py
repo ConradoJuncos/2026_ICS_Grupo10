@@ -11,7 +11,7 @@ class Frontend:
         self.listbox.pack(pady=10)
         
         #Añadir items a la lista de actividades
-        initial_items = ["Tirolesa", "Safari", "Palestra"]
+        initial_items = ["Tirolesa", "Safari", "Palestra", "Jardineria"]
         for item in initial_items:
             self.listbox.insert(tk.END, item)
     
