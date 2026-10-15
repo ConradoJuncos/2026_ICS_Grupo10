@@ -5,6 +5,11 @@ class Frontend:
         self.root = tk.Tk()
         self.count = 0
         self.label = tk.Label(self.root, text=f"Count: {self.count}")
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.listbox = tk.Listbox(self.root)
+        self.listbox.pack(pady=10)
 
     def get_label_text(self):
         return self.label.cget("text")
