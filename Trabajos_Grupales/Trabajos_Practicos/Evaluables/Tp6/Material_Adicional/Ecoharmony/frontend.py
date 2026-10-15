@@ -50,6 +50,9 @@ class Frontend:
         # Inserta numeros con visualizacion para el cliente, estos estan separados en la logica de la aplicacion.
         for name, qty in self.items_data.items():
             self.listbox.insert(tk.END, f"{name}  ({qty})")
+        
+        # Vincular el evento de seleccion a la actuaiizacion de la lista de horarios. Magia de python no la entiendo.
+        self.listbox.bind('<<ListboxSelect>>', lambda event: self.actualizar_sublista())
             
     def actualizar_sublista(self):
         # Revisar qué item esta selecciona en la lista de actividades
