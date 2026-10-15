@@ -1,0 +1,5 @@
+# VS Code configuracion local
+.vscode/
+Trabajos_Grupales/Trabajos_Practicos/Evaluables/Tp6/Material_Adicional/.pytest_cache/
+Trabajos_Grupales/Trabajos_Practicos/Evaluables/Tp6/Material_Adicional/tests/__pycache__
+Trabajos_Grupales/Trabajos_Practicos/Evaluables/Tp6/Material_Adicional/Ecoharmony/__pycache__
