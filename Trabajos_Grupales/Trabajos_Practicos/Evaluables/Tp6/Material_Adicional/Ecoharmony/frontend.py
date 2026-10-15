@@ -11,6 +11,14 @@ class Frontend:
             "Palestra": 5,
             "Jardineria": 3,
         }
+        
+        self.sub_data = {
+            "Tirolesa": ["18:00"],
+            "Safari": ["10:00"],
+            "Palestra": ["14:00"],
+            "Jardineria": ["09:00"]
+        }
+        
         #Llamar al metodo para inicializar la interfaz de usuario
         self.setup_ui()
 
@@ -42,6 +50,21 @@ class Frontend:
         # Inserta numeros con visualizacion para el cliente, estos estan separados en la logica de la aplicacion.
         for name, qty in self.items_data.items():
             self.listbox.insert(tk.END, f"{name}  ({qty})")
+            
+    def actualizar_sublista(self):
+        # Revisar qué item esta selecciona en la lista de actividades
+        seleccionado = self.listbox.curselection()
+        if seleccionado:
+            index = seleccionado[0]
+            nombre_actividad = list(self.items_data.keys())[index]
+            
+            # Borrar cualquier otro contenido previo en la sub-lista
+            self.sub_listbox.delete(0, tk.END)
+            
+            # Insertar los horarios asociados a la actividad seleccionada
+            sub_items = self.sub_data.get(nombre_actividad, [])
+            for item in sub_items:
+                self.sub_listbox.insert(tk.END, item)
             
     #Metodo para refrescar la lista
     def refrescar_lista(self):
