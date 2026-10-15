@@ -27,6 +27,7 @@ class Frontend:
             height=4
         )
         self.listbox.pack(padx=10, pady=10)
+        
         #crear nueva listbox para la seleccion de horarios
         self.sub_listbox = tk.Listbox(
           self.root,
