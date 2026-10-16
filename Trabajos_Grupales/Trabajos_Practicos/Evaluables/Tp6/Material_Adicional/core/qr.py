@@ -1,5 +1,5 @@
 import io
-import segno
+import segno #libreria utilizada para generar qrs
 
 class GenerarQr:
     def generate(self, data: str) -> bytes:

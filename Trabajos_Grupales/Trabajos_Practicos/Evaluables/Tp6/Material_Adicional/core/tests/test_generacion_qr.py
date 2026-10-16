@@ -1,11 +1,15 @@
 from django.test import TestCase
 from core.qr import GenerarQr # En la etapa RED esto no existe todavia
 
-class QrGenerationTest(TestCase):
-    def test_qr_generator_returns_png_bytes(self):
+class test_generacion_qr(TestCase):
+    def test_generacion_qr_es_imagen(self):
+        # Arrange, carga todo lo necesario para hacer el test
         qr = GenerarQr()
-        result = qr.generate("test")
+        # resultado mockeado, tan solo comprueba que funcione la generacion
+        resultado = qr.generate("test")
         
-        #magia de python para comprobar que todo esto funcione
-        assert isinstance(result, bytes)
-        assert result.startswith(b'\x89PNG')
+        # Assert, magia de python para comprobar que todo esto funcione
+        # revisa que sea instancia de bytes, y que el byte comience con
+        # los bytes de png usuales
+        assert isinstance(resultado, bytes)
+        assert resultado.startswith(b'\x89PNG')
