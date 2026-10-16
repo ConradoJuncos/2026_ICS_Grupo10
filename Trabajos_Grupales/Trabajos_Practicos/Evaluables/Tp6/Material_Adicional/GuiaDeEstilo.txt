@@ -1,2 +1,0 @@
-La guía de estilo se encuentra contenida en el siguiente docs de Google, se pega el link con la intencion de mantener el documento como principal fuente de verdad:
-https://docs.google.com/document/d/1THw7jzwSZgwMMlLw-vhODd9plATEMDUPNZW4amr8EIQ/edit?tab=t.0
