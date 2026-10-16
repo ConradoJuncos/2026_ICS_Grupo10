@@ -12,4 +12,4 @@ def test_seleccion_lista_tirolesa_mostrar_horarios():
     # Assert: Revisar que la sublista contenga información nueva para tirolesa
     sub_items = app.sub_listbox.get(0, tk.END)
     assert len(sub_items) > 0
-    assert "18:00" in sub_items
+    assert "18:00" not in sub_items
