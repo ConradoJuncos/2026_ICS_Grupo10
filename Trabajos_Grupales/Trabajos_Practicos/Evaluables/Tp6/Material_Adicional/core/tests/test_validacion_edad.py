@@ -31,3 +31,23 @@ def test_rechaza_palestra_para_visitante_de_11_anios() -> None:
 
     with pytest.raises(EdadNoPermitidaError):
         validar_edad_para_actividad(actividad, edad)
+
+
+def test_admite_palestra_para_visitante_de_12_anios() -> None:
+    """Admite la participación en Palestra desde los 12 años."""
+    actividad = "PALESTRA"
+    edad = 12
+
+    resultado = validar_edad_para_actividad(actividad, edad)
+
+    assert resultado is None
+
+
+@pytest.mark.parametrize("actividad", ["SAFARI", "JARDINERIA"])
+def test_admite_actividades_sin_edad_minima(actividad: str) -> None:
+    """Admite visitantes de 0 años en Safari y Jardinería."""
+    edad = 0
+
+    resultado = validar_edad_para_actividad(actividad, edad)
+
+    assert resultado is None
