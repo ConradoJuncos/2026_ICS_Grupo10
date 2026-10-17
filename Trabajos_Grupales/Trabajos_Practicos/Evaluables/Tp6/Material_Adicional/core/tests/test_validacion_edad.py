@@ -22,3 +22,12 @@ def test_admite_tirolesa_para_visitante_de_8_anios() -> None:
     resultado = validar_edad_para_actividad(actividad, edad)
 
     assert resultado is None
+
+
+def test_rechaza_palestra_para_visitante_de_11_anios() -> None:
+    """Rechaza la participación en Palestra antes de los 12 años."""
+    actividad = "PALESTRA"
+    edad = 11
+
+    with pytest.raises(EdadNoPermitidaError):
+        validar_edad_para_actividad(actividad, edad)
