@@ -73,3 +73,11 @@ def test_rechaza_edad_ausente(actividad: str) -> None:
 
     with pytest.raises(EdadInvalidaError):
         validar_edad_para_actividad(actividad, edad)
+
+
+@pytest.mark.parametrize("actividad", ["TIROLESA", "PALESTRA", "SAFARI", "JARDINERIA"])
+@pytest.mark.parametrize("edad", ["ocho", "8", "", 8.5, 8.0])
+def test_rechaza_edad_con_formato_invalido(actividad: str, edad: str | float) -> None:
+    """Exige una edad entera, sin convertir textos ni redondear decimales."""
+    with pytest.raises(EdadInvalidaError):
+        validar_edad_para_actividad(actividad, edad)
