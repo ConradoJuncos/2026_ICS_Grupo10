@@ -7,3 +7,4 @@ class EdadNoPermitidaError(ValueError):
 
 def validar_edad_para_actividad(actividad: str, edad: int) -> None:
     """Valida que la edad del visitante permita realizar la actividad."""
+    raise EdadNoPermitidaError("La edad del visitante no permite realizar la actividad.")
