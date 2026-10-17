@@ -23,9 +23,7 @@ def test_admite_tirolesa_para_visitante_de_8_anios() -> None:
     actividad = "TIROLESA"
     edad = 8
 
-    resultado = validar_edad_para_actividad(actividad, edad)
-
-    assert resultado is None
+    validar_edad_para_actividad(actividad, edad)
 
 
 def test_rechaza_palestra_para_visitante_de_11_anios() -> None:
@@ -42,19 +40,23 @@ def test_admite_palestra_para_visitante_de_12_anios() -> None:
     actividad = "PALESTRA"
     edad = 12
 
-    resultado = validar_edad_para_actividad(actividad, edad)
-
-    assert resultado is None
+    validar_edad_para_actividad(actividad, edad)
 
 
 @pytest.mark.parametrize("actividad", ["SAFARI", "JARDINERIA"])
-def test_admite_actividades_sin_edad_minima(actividad: str) -> None:
-    """Admite visitantes de 0 años en Safari y Jardinería."""
-    edad = 0
+@pytest.mark.parametrize("edad", [0, 60])
+def test_admite_actividades_sin_edad_minima(actividad: str, edad: int) -> None:
+    """Admite tanto bebés como adultos en Safari y Jardinería."""
+    validar_edad_para_actividad(actividad, edad)
 
-    resultado = validar_edad_para_actividad(actividad, edad)
 
-    assert resultado is None
+@pytest.mark.parametrize(
+    ("actividad", "edad"),
+    [("TIROLESA", 9), ("TIROLESA", 60), ("PALESTRA", 13), ("PALESTRA", 60)],
+)
+def test_admite_edades_superiores_a_la_minima(actividad: str, edad: int) -> None:
+    """Admite edades por encima del mínimo, sin imponer un máximo."""
+    validar_edad_para_actividad(actividad, edad)
 
 
 @pytest.mark.parametrize("actividad", ["TIROLESA", "PALESTRA", "SAFARI", "JARDINERIA"])
