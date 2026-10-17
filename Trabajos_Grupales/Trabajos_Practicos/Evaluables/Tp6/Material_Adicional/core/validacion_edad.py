@@ -13,8 +13,10 @@ class EdadInvalidaError(ValueError):
     """Indica que la edad ingresada no es un dato válido."""
 
 
-def validar_edad_para_actividad(actividad: str, edad: int) -> None:
+def validar_edad_para_actividad(actividad: str, edad: int | None) -> None:
     """Valida que la edad del visitante permita realizar la actividad."""
+    if edad is None:
+        raise EdadInvalidaError("Debe ingresar la edad del visitante.")
     if edad < EDAD_MINIMA_VALIDA:
         raise EdadInvalidaError("La edad no puede ser negativa.")
     if actividad == "TIROLESA" and edad < EDAD_MINIMA_TIROLESA:
