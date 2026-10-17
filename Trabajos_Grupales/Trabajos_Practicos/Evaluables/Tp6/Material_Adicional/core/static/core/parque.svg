@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 800" fill="none">
+<defs>
+ <pattern id="grain" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".7" fill="#183e32" opacity=".08"/></pattern>
+ <pattern id="spots" width="60" height="65" patternUnits="userSpaceOnUse"><path d="m10 6 25-4 12 18-9 20-25-4zM47 47l17-7 11 20-23 6z" fill="#a96737"/></pattern>
+</defs>
+<circle cx="460" cy="363" r="294" fill="#a7c957"/>
+<circle cx="693" cy="137" r="57" fill="#f2e8cf"/>
+<path d="M154 508c128-114 260-77 358-26s230-46 307 30v198H110Z" fill="#6a994e"/>
+<path d="M119 632c180-101 377-1 484-60s167-35 257 25v164H69Z" fill="#386641"/>
+<!-- distant trees -->
+<path d="M192 509V281m-4 78-59-48m64 12 63-62M733 487V314m-2 55 54-41" stroke="#527e47" stroke-width="13" stroke-linecap="round"/>
+<path d="M77 277c-11-48 54-87 92-65 33-58 111-30 115 10 64 2 80 77 17 95-53 16-88-2-112-13-46 22-98 8-112-27ZM674 309c-22-35 20-80 57-61 36-40 90-16 85 21 51 10 45 61-1 66-56 6-108 6-141-26Z" fill="#527e47"/>
+<!-- giraffe -->
+<path d="m491 584-12 129h-22l-6-142m112 8 33 134h-23l-44-121" fill="#ce994f"/>
+<path d="M431 499c-30 4-49 47-23 79 23 27 117 35 152 1l-8-83-19-261-53 1 3 245Z" fill="#e7b95f"/>
+<path d="M431 499c-30 4-49 47-23 79 23 27 117 35 152 1l-8-83-19-261-53 1 3 245Z" fill="url(#spots)"/>
+<path d="m477 263 9-70 59-14 34 51c9 20-15 37-36 27l-17-10-7 23Z" fill="#e7b95f"/>
+<path d="m488 203-18-27m64 18 11-26" stroke="#a96737" stroke-width="9" stroke-linecap="round"/>
+<circle cx="468" cy="173" r="8" fill="#684b32"/><circle cx="547" cy="164" r="8" fill="#684b32"/>
+<path d="M486 219c-34 1-43-20-44-29 29-9 40 3 44 29Zm53-12c12-30 30-34 43-28-1 25-24 33-43 28Z" fill="#ce994f"/>
+<circle cx="537" cy="222" r="5" fill="#244738"/><path d="m564 239 9 1" stroke="#a96737" stroke-width="4" stroke-linecap="round"/>
+<path d="M404 533c-39 17-30 45-49 54" stroke="#a96737" stroke-width="7" stroke-linecap="round"/><path d="m358 579-20 18 23-4" fill="#684b32"/>
+<!-- elephant -->
+<path d="m209 586-4 108h39l15-84m103-15 4 99h36l-7-122" fill="#8dada0"/>
+<path d="M175 542c-8-71 32-111 103-109 63 0 126 34 128 95l-7 80c-43 41-162 28-197-3Z" fill="#abc1ac"/>
+<path d="M356 472c-5-33 69-39 89-6 19 29 10 76 6 100l-5 55c-3 24 19 26 23 5l3-23 19 4-2 37c-6 45-68 44-73-1l-4-77-33-25Z" fill="#abc1ac"/>
+<path d="M372 475c-53-40-92 5-74 54 9 27 38 55 62 36 23-18 28-63 12-90Z" fill="#8dada0"/>
+<path d="M360 493c-30-23-43-1-34 28" stroke="#6e9585" stroke-width="3" stroke-linecap="round"/>
+<circle cx="422" cy="490" r="5" fill="#244738"/><path d="M425 533c6 19 14 24 30 16-7 21-30 16-35-5" fill="#f2e8cf"/>
+<path d="M184 526c-31 17-23 39-29 54" stroke="#8dada0" stroke-width="8" stroke-linecap="round"/>
+<!-- foreground leaves -->
+<path d="M92 766c15-77 2-134-28-180m33 108c28-49 61-69 92-78m-89 107c-19-30-39-44-72-45M774 765c-17-114 11-208 41-268m-43 176c-52-43-71-87-72-130m80 147c34-30 62-44 94-43" stroke="#183e32" stroke-width="12" stroke-linecap="round"/>
+<path d="M68 623C5 612 6 563 19 528c47 10 68 42 49 95Zm33 75c-13-64 38-107 89-101 6 53-34 91-89 101Zm-10 41C30 751 0 718 5 680c39-13 73 9 86 59ZM789 591c-14-70 23-125 67-130 27 66-16 117-67 130Zm-17 72c-67-2-103-55-83-113 51 1 85 54 83 113Zm11 59c1-70 48-103 101-88-1 56-47 92-101 88Z" fill="#183e32"/>
+<path d="M119 779c-5-43 19-87 46-99-1 53-11 73-27 101m546-13c-8-31-25-60-43-71-8 38 4 63 19 78" fill="#a7c957"/>
+<!-- birds -->
+<path d="M293 153q17-13 32 3 17-16 33-2M354 112q11-9 22 2 10-11 21-2" stroke="#386641" stroke-width="5" stroke-linecap="round"/>
+<path d="M632 351q18-12 30 4 16-14 29-2" stroke="#386641" stroke-width="5" stroke-linecap="round"/>
+<path d="M83 742h742v35H83Z" fill="url(#grain)"/>
+</svg>

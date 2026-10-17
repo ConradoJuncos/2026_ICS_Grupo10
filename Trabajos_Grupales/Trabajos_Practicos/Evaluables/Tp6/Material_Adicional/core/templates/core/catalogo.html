@@ -1,0 +1,78 @@
+{% load static %}
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#386641">
+  <meta name="description" content="Conocé las actividades de EcoHarmony Park: safari, tirolesa, palestra y jardinería.">
+  <title>Actividades | EcoHarmony Park</title>
+  <link rel="icon" href="{% static 'core/huella.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'core/parque.css' %}">
+  <script src="{% static 'core/parque.js' %}" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#actividades">Ir a las actividades</a>
+<header class="site-header">
+  <a class="brand" href="{% url 'catalogo' %}" aria-label="EcoHarmony Park, inicio">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M13 29c-2-11 16-22 23-10 5 9 7 21-3 22-7 0-9-6-15-3-6 2-9-3-5-9Z" fill="currentColor"/><ellipse cx="10" cy="17" rx="5" ry="7" transform="rotate(-25 10 17)" fill="currentColor"/><ellipse cx="22" cy="9" rx="5" ry="7" fill="currentColor"/><ellipse cx="35" cy="10" rx="5" ry="7" transform="rotate(20 35 10)" fill="currentColor"/></svg>
+    <span>EcoHarmony<span class="brand-park">Park</span></span>
+  </a>
+  <nav aria-label="Navegación principal">
+    <a href="#actividades" class="nav-activities">Actividades</a>
+    <a href="#tu-visita">Tu visita <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <div class="park-label"><span class="leaf-mark" aria-hidden="true">✳</span> Un día en EcoHarmony</div>
+      <h1 id="hero-title">Seguí tu<br>lado salvaje.</h1>
+      <p>Entre árboles, animales y nuevas aventuras.<br class="desktop-break"> ¿Por dónde empezamos?</p>
+      <a class="button button-dark" href="#actividades">Explorar actividades <span aria-hidden="true">↘</span></a>
+      <div class="hero-footnote"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21S4 13 4 8a8 8 0 1 1 16 0c0 5-8 13-8 13Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5"/></svg> Nos encontramos afuera.</div>
+    </div>
+    <div class="hero-scene">
+      <span class="scene-caption">Hay mucho por descubrir</span>
+      <img src="{% static 'core/parque.svg' %}" alt="Una jirafa y un elefante entre los árboles del parque" width="900" height="800" fetchpriority="high">
+      <svg class="flying-bird" viewBox="0 0 60 30" aria-hidden="true"><path d="M3 23Q17 3 30 19 43 3 57 23" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>
+      <div class="scene-stamp" aria-hidden="true"><span>Más naturaleza</span><svg viewBox="0 0 60 55"><path d="M30 48V22M30 33C8 32 4 18 10 9c15 0 22 9 20 24Zm0-6C30 9 43 1 53 7c1 13-9 21-23 20Z" fill="none" stroke="currentColor" stroke-width="3"/></svg><span>Más recuerdos</span></div>
+    </div>
+  </section>
+  <div class="park-strip" aria-label="Información del parque"><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>De 08:30 a 19:00</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v15H5zM8 2v6m8-6v6M5 10h14"/></svg>Martes a domingo</span><a href="#tu-visita">Prepará tu visita <span aria-hidden="true">↗</span></a></div>
+  <section class="activities section-wrap" id="actividades" aria-labelledby="activities-title">
+    <div class="section-heading"><h2 id="activities-title">¿Qué hacemos hoy?</h2><span class="handwritten-note">Elegí tu aventura <svg viewBox="0 0 70 30" aria-hidden="true"><path d="M2 3c17 25 44 23 62 11m-15-2 16 1-8 13"/></svg></span></div>
+    <div class="activity-grid">
+    {% for actividad in actividades %}
+      <article class="activity-card {{ actividad.ilustracion }}" id="{{ actividad.ilustracion }}">
+        <div class="art-frame">{% include 'core/ilustracion.html' %}<span class="age-tag">{% if actividad.edad_minima %}Desde {{ actividad.edad_minima }} años{% else %}Todas las edades{% endif %}</span></div>
+        <div class="card-body">
+          <h3>{{ actividad.nombre }}</h3>
+          <p class="card-hook">{{ actividad.titulo }}</p>
+          <p class="card-description">{{ actividad.descripcion }}</p>
+          <div class="card-details"><span>{% if actividad.requiere_talle %}Requiere talle de vestimenta{% else %}Sin vestimenta especial{% endif %}</span>{% if actividad.cupo != None %}<span>{{ actividad.cupo }} personas por turno</span>{% endif %}</div>
+          <a href="#consulta" class="activity-link" data-activity="{{ actividad.codigo }}">Consultar edad <span aria-hidden="true">↗</span></a>
+        </div>
+      </article>
+    {% endfor %}
+    </div>
+  </section>
+  <section class="eligibility section-wrap" id="consulta" aria-labelledby="consulta-title">
+    <div class="eligibility-intro"><svg class="sprout" viewBox="0 0 60 70" aria-hidden="true"><path d="M30 65V24M30 44C5 44 2 24 8 15c20 0 25 16 22 29Zm0-12C29 9 44 1 56 6c2 16-10 27-26 26Z" fill="none" stroke="currentColor" stroke-width="3"/></svg><h2 id="consulta-title">Una aventura<br>a tu medida.</h2><p>Consultá la edad para cada actividad.</p></div>
+    <form method="post" action="{% url 'catalogo' %}#consulta" class="age-form" novalidate>
+      {% csrf_token %}
+      <div class="form-fields"><div class="field"><label for="id_actividad">Actividad</label><select name="actividad" id="id_actividad" {% if formulario.actividad.errors %}aria-invalid="true" aria-describedby="actividad-error"{% endif %}>{% for actividad in actividades %}<option value="{{ actividad.codigo }}" {% if formulario.actividad.value == actividad.codigo %}selected{% endif %}>{{ actividad.nombre }}</option>{% endfor %}</select>{% if formulario.actividad.errors %}<p class="field-error" id="actividad-error">{{ formulario.actividad.errors.0 }}</p>{% endif %}</div>
+      <div class="field field-age"><label for="id_edad">Edad en años</label><input id="id_edad" name="edad" type="number" min="0" step="1" inputmode="numeric" placeholder="Ej. 12" value="{{ formulario.edad.value|default_if_none:'' }}" required {% if formulario.edad.errors %}aria-invalid="true" aria-describedby="edad-error"{% endif %}>{% if formulario.edad.errors %}<p class="field-error" id="edad-error">{{ formulario.edad.errors.0 }}</p>{% endif %}</div></div>
+      <button class="button button-dark" type="submit">Consultar edad <span aria-hidden="true">↗</span></button>
+      {% if resultado %}<div class="result {% if puede_participar %}result-success{% else %}result-warning{% endif %}" role="status" tabindex="-1"><strong>{% if puede_participar %}¡Vamos!{% else %}Todavía falta un poquito{% endif %}</strong><p>{{ resultado }}</p>{% if puede_participar %}<p class="result-note">Esta consulta no genera una reserva.</p>{% endif %}</div>{% endif %}
+      <p class="reservation-note">Las reservas online todavía no están habilitadas.</p>
+    </form>
+  </section>
+  <section class="visit section-wrap" id="tu-visita" aria-labelledby="visit-title">
+    <div class="visit-title"><span aria-hidden="true" class="sun">☼</span><h2 id="visit-title">Nos vemos<br>en el parque.</h2></div>
+    <div class="visit-info"><div><h3>Cuándo venir</h3><p>Martes a domingo<br>De 08:30 a 19:00</p><p class="muted">Cerrado los lunes, el 1 de enero<br>y el 25 de diciembre.</p></div><div><h3>Las actividades</h3><p>Turnos de una hora<br>De 09:00 a 17:00</p><p class="muted">La capacidad es por turno.<br>Consultá las edades antes de venir.</p></div></div>
+  </section>
+</main>
+<footer><a class="footer-brand" href="#">EcoHarmony Park <span aria-hidden="true">✳</span></a><span>Un lugar para conectar con la naturaleza.</span><a href="#hero-title" class="back-top">Volver arriba ↑</a></footer>
+</body>
+</html>
