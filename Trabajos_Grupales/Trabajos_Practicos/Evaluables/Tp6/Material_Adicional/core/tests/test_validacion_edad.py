@@ -81,3 +81,11 @@ def test_rechaza_edad_con_formato_invalido(actividad: str, edad: str | float) ->
     """Exige una edad entera, sin convertir textos ni redondear decimales."""
     with pytest.raises(EdadInvalidaError):
         validar_edad_para_actividad(actividad, edad)
+
+
+@pytest.mark.parametrize("actividad", ["TIROLESA", "PALESTRA", "SAFARI", "JARDINERIA"])
+@pytest.mark.parametrize("edad", [True, False])
+def test_rechaza_edad_booleana(actividad: str, edad: bool) -> None:
+    """Rechaza booleanos aunque Python los considere subtipos de entero."""
+    with pytest.raises(EdadInvalidaError):
+        validar_edad_para_actividad(actividad, edad)
