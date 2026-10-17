@@ -64,3 +64,12 @@ def test_rechaza_edad_negativa(actividad: str) -> None:
 
     with pytest.raises(EdadInvalidaError):
         validar_edad_para_actividad(actividad, edad)
+
+
+@pytest.mark.parametrize("actividad", ["TIROLESA", "PALESTRA", "SAFARI", "JARDINERIA"])
+def test_rechaza_edad_ausente(actividad: str) -> None:
+    """Exige ingresar la edad del visitante en cualquier actividad."""
+    edad = None
+
+    with pytest.raises(EdadInvalidaError):
+        validar_edad_para_actividad(actividad, edad)
