@@ -1,8 +1,9 @@
-"""Define la validación de edad para participar en una actividad."""
+# core/validacion_edad.py
 
 EDAD_MINIMA_PALESTRA = 12
 EDAD_MINIMA_TIROLESA = 8
 EDAD_MINIMA_VALIDA = 0
+
 EDADES_MINIMAS_POR_ACTIVIDAD = {
     "TIROLESA": EDAD_MINIMA_TIROLESA,
     "PALESTRA": EDAD_MINIMA_PALESTRA,
@@ -27,7 +28,11 @@ def validar_edad_para_actividad(actividad: str, edad: object) -> None:
         raise EdadInvalidaError("La edad debe ser un número entero.")
     if edad < EDAD_MINIMA_VALIDA:
         raise EdadInvalidaError("La edad no puede ser negativa.")
-    edad_minima = EDADES_MINIMAS_POR_ACTIVIDAD.get(actividad, EDAD_MINIMA_VALIDA)
+    
+    # Convert to uppercase safely to match the dictionary keys
+    actividad_key = actividad.upper() if isinstance(actividad, str) else ""
+    
+    edad_minima = EDADES_MINIMAS_POR_ACTIVIDAD.get(actividad_key, EDAD_MINIMA_VALIDA)
     if edad < edad_minima:
         raise EdadNoPermitidaError(
             "La edad del visitante no permite realizar la actividad."
