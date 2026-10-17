@@ -2,7 +2,11 @@
 
 import pytest
 
-from core.validacion_edad import EdadNoPermitidaError, validar_edad_para_actividad
+from core.validacion_edad import (
+    EdadInvalidaError,
+    EdadNoPermitidaError,
+    validar_edad_para_actividad,
+)
 
 
 def test_rechaza_tirolesa_para_visitante_de_7_anios() -> None:
@@ -51,3 +55,12 @@ def test_admite_actividades_sin_edad_minima(actividad: str) -> None:
     resultado = validar_edad_para_actividad(actividad, edad)
 
     assert resultado is None
+
+
+@pytest.mark.parametrize("actividad", ["TIROLESA", "PALESTRA", "SAFARI", "JARDINERIA"])
+def test_rechaza_edad_negativa(actividad: str) -> None:
+    """Rechaza edades negativas como datos inválidos en cualquier actividad."""
+    edad = -1
+
+    with pytest.raises(EdadInvalidaError):
+        validar_edad_para_actividad(actividad, edad)

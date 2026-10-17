@@ -8,6 +8,10 @@ class EdadNoPermitidaError(ValueError):
     """Indica que la edad del visitante no permite realizar la actividad."""
 
 
+class EdadInvalidaError(ValueError):
+    """Indica que la edad ingresada no es un dato válido."""
+
+
 def validar_edad_para_actividad(actividad: str, edad: int) -> None:
     """Valida que la edad del visitante permita realizar la actividad."""
     if actividad == "TIROLESA" and edad < EDAD_MINIMA_TIROLESA:
