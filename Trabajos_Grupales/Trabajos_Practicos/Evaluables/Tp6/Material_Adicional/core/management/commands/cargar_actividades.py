@@ -17,3 +17,4 @@ class Command(BaseCommand):
         Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
         Actividad.objects.create(nombre="SAFARI", cupo_maximo=8)
         Actividad.objects.create(nombre="PALESTRA", cupo_maximo=12)
+        Actividad.objects.create(nombre="JARDINERIA", cupo_maximo=12)
