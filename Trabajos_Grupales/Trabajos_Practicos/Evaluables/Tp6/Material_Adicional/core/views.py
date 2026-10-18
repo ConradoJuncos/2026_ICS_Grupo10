@@ -1,16 +1,11 @@
-"""Catálogo público y consulta de edad para las actividades del parque."""
+"""Catálogo público de actividades del parque."""
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_GET
 
-from core.forms import ConsultaEdadForm
 from core.models import Actividad
-from core.validacion_edad import (
-    EDADES_MINIMAS_POR_ACTIVIDAD,
-    EdadNoPermitidaError,
-    validar_edad_para_actividad,
-)
+from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD
 
 DESCRIPCIONES = {
     "SAFARI": ("Un encuentro salvaje.", "Recorré el parque y descubrí su fauna de cerca.", "safari"),
@@ -20,9 +15,9 @@ DESCRIPCIONES = {
 }
 
 
-@require_http_methods(["GET", "POST"])
+@require_GET
 def catalogo(request: HttpRequest) -> HttpResponse:
-    """Presenta actividades y reutiliza la validación de edad del dominio."""
+    """Presenta las actividades disponibles y sus enlaces de inscripción."""
     capacidades = dict(Actividad.objects.values_list("nombre", "cupo_maximo"))
     nombres = dict(Actividad.OPCIONES_ACTIVIDAD)
     actividades = [
@@ -38,29 +33,10 @@ def catalogo(request: HttpRequest) -> HttpResponse:
         }
         for codigo, contenido in DESCRIPCIONES.items()
     ]
-    formulario = ConsultaEdadForm(request.POST if request.method == "POST" else None)
-    resultado = ""
-    puede_participar = False
-    if request.method == "POST" and formulario.is_valid():
-        actividad = formulario.cleaned_data["actividad"]
-        try:
-            validar_edad_para_actividad(actividad, formulario.cleaned_data["edad"])
-        except EdadNoPermitidaError:
-            resultado = (
-                f"{nombres[actividad]} es para mayores de "
-                f"{EDADES_MINIMAS_POR_ACTIVIDAD[actividad]} años (inclusive)."
-            )
-        else:
-            puede_participar = True
-            resultado = "Tenés la edad para participar."
     return render(
         request,
         "core/catalogo.html",
         {
             "actividades": actividades,
-            "formulario": formulario,
-            "resultado": resultado,
-            "puede_participar": puede_participar,
-            "es_consulta": request.method == "POST",
         },
     )
