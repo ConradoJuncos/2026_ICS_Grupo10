@@ -111,7 +111,8 @@
       const isVisible = participantNumber <= requestedCount && participantNumber <= capacity;
       participant.hidden = !isVisible;
       participant.querySelectorAll("input, select").forEach((field) => {
-        field.disabled = !isVisible;
+        const sizingField = field.closest("[data-sizing-field]");
+        field.disabled = !isVisible || (sizingField !== null && sizingField.hidden);
       });
     });
     if (requestedCount > 0) {
