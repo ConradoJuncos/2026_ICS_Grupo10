@@ -7,11 +7,14 @@ from core.models import Actividad
 
 
 @pytest.mark.django_db
-def test_cargar_actividades_crea_tirolesa_con_su_capacidad() -> None:
-    """Prepara Tirolesa con la capacidad establecida por el dominio."""
+@pytest.mark.parametrize("nombre, capacidad", [("TIROLESA", 10), ("SAFARI", 8)])
+def test_cargar_actividades_crea_actividad_con_su_capacidad(
+    nombre: str, capacidad: int
+) -> None:
+    """Prepara cada actividad con la capacidad establecida por el dominio."""
     assert not Actividad.objects.exists()
 
     call_command("cargar_actividades")
 
-    actividad = Actividad.objects.get(nombre="TIROLESA")
-    assert actividad.cupo_maximo == 10
+    actividad = Actividad.objects.get(nombre=nombre)
+    assert actividad.cupo_maximo == capacidad
