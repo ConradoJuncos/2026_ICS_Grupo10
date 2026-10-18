@@ -17,3 +17,7 @@ class Actividad(models.Model):
 
     def __str__(self):
         return self.get_nombre_display()
+
+
+class Horario(models.Model):
+    pass
