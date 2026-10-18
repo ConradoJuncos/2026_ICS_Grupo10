@@ -14,7 +14,9 @@ class Command(BaseCommand):
 
     def handle(self, *args: Any, **options: Any) -> None:
         """Ejecuta la preparacion del catalogo."""
-        Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
-        Actividad.objects.create(nombre="SAFARI", cupo_maximo=8)
-        Actividad.objects.create(nombre="PALESTRA", cupo_maximo=12)
-        Actividad.objects.create(nombre="JARDINERIA", cupo_maximo=12)
+        Actividad.objects.get_or_create(nombre="TIROLESA", defaults={"cupo_maximo": 10})
+        Actividad.objects.get_or_create(nombre="SAFARI", defaults={"cupo_maximo": 8})
+        Actividad.objects.get_or_create(nombre="PALESTRA", defaults={"cupo_maximo": 12})
+        Actividad.objects.get_or_create(
+            nombre="JARDINERIA", defaults={"cupo_maximo": 12}
+        )

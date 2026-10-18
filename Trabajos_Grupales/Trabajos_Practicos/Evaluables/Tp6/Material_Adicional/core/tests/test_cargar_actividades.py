@@ -36,7 +36,9 @@ def test_repetir_carga_conserva_el_catalogo_sin_duplicados() -> None:
     assert Actividad.objects.count() == 4
     assert (
         list(
-            Actividad.objects.order_by("nombre").values_list("pk", "nombre", "cupo_maximo")
+            Actividad.objects.order_by("nombre").values_list(
+                "pk", "nombre", "cupo_maximo"
+            )
         )
         == catalogo_inicial
     )
