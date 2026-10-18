@@ -1,0 +1,158 @@
+{% load static %}
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#386641">
+  <meta name="description" content="Elegí una actividad y prepará tu inscripción a EcoHarmony Park.">
+  <title>Inscripción | EcoHarmony Park</title>
+  <link rel="icon" href="{% static 'core/huella.svg' %}" type="image/svg+xml">
+  <link rel="stylesheet" href="{% static 'core/parque.css' %}">
+  <link rel="stylesheet" href="{% static 'core/inscripcion.css' %}">
+  <script src="{% static 'core/inscripcion.js' %}" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#formulario-inscripcion">Ir al formulario</a>
+<header class="site-header">
+  <a class="brand" href="{% url 'catalogo' %}" aria-label="EcoHarmony Park, inicio">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M13 29c-2-11 16-22 23-10 5 9 7 21-3 22-7 0-9-6-15-3-6 2-9-3-5-9Z" fill="currentColor"/><ellipse cx="10" cy="17" rx="5" ry="7" transform="rotate(-25 10 17)" fill="currentColor"/><ellipse cx="22" cy="9" rx="5" ry="7" fill="currentColor"/><ellipse cx="35" cy="10" rx="5" ry="7" transform="rotate(20 35 10)" fill="currentColor"/></svg>
+    <span>EcoHarmony<span class="brand-park">Park</span></span>
+  </a>
+  <nav aria-label="Navegación principal">
+    <a href="{% url 'catalogo' %}">Volver a actividades <span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+<main class="registration-page" id="formulario-inscripcion">
+  <div class="registration-heading">
+    <p class="registration-eyebrow"><span aria-hidden="true">✳</span> Tu próxima aventura</p>
+    <h1 id="registration-title">Inscripción a una actividad.</h1>
+    <p id="registration-description">Elegí una actividad para ver sus horarios, cupos y condiciones.</p>
+    <div class="registration-capacity" id="registration-capacity" hidden><span>Cupo disponible de muestra por turno</span><strong id="capacity-value"></strong></div>
+  </div>
+
+  <form class="registration-form" id="registration-form">
+    <section class="registration-section" aria-labelledby="actividad-title">
+      <div class="registration-section-heading">
+        <span class="step-number" aria-hidden="true">01</span>
+        <div><h2 id="actividad-title">Elegí una actividad</h2><p>Podés cambiarla cuando quieras desde esta lista.</p></div>
+      </div>
+      <div class="registration-field registration-activity">
+        <label for="actividad">Actividad <span aria-hidden="true">*</span></label>
+        <select id="actividad" name="actividad" required>
+          <option value="" selected disabled>Seleccioná una actividad</option>
+          {% for opcion in actividades %}
+          <option value="{{ opcion.codigo }}" data-capacity="{{ opcion.cupo }}" data-min-age="{{ opcion.edad_minima }}" data-requires-size="{{ opcion.requiere_talle|yesno:'true,false' }}" data-description="{{ opcion.descripcion }}" data-terms="{{ opcion.terminos }}">{{ opcion.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </section>
+
+    <div id="activity-form-content" class="registration-form" hidden>
+    <section class="registration-section" aria-labelledby="turno-title">
+      <div class="registration-section-heading">
+        <span class="step-number" aria-hidden="true">02</span>
+        <div><h2 id="turno-title">Elegí la fecha y el turno</h2><p>El parque abre de martes a domingo. Los turnos duran una hora, de 09:00 a 18:00.</p></div>
+      </div>
+      <div class="registration-field-grid">
+        <div class="registration-field">
+          <label for="fecha-visita">Fecha de la actividad <span aria-hidden="true">*</span></label>
+          <input id="fecha-visita" name="fecha" type="date" required>
+          <small id="date-guidance">Podés elegir fechas hasta un mes por adelantado. No se admiten reservas con más de 24 horas de anticipación.</small>
+          <p class="field-feedback" id="date-feedback" aria-live="polite"></p>
+        </div>
+        <div class="registration-field">
+          <label for="horario">Horario <span aria-hidden="true">*</span></label>
+          <select id="horario" name="horario" required>
+            <option value="" selected disabled>Seleccioná una fecha primero</option>
+          </select>
+          <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
+        </div>
+        <div class="registration-field">
+          <label for="cantidad-personas">Cantidad de participantes <span aria-hidden="true">*</span></label>
+          <input id="cantidad-personas" name="cantidad_personas" type="number" min="1" step="1" inputmode="numeric" placeholder="Seleccioná la actividad primero" required>
+          <small id="participant-capacity-note">El cupo del turno se muestra como referencia; la disponibilidad real no está conectada.</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="registration-section" aria-labelledby="participantes-title">
+      <div class="registration-section-heading">
+        <span class="step-number" aria-hidden="true">03</span>
+        <div><h2 id="participantes-title">Datos de participantes</h2><p>Completá un bloque por cada persona indicada arriba. El nombre de quien coordina la actividad es opcional.</p></div>
+      </div>
+      <div class="registration-field activity-contact">
+        <label for="nombre-actividad">Nombre de la persona a cargo de la actividad <span class="optional-label">(opcional)</span></label>
+        <input id="nombre-actividad" name="nombre_actividad" type="text" autocomplete="name" placeholder="Nombre y apellido">
+      </div>
+      <div class="participant-list">
+        {% for numero in participantes %}
+        <fieldset class="participant-card" data-participant="{{ numero }}" hidden>
+          <legend>Participante {{ numero }}</legend>
+          <div class="registration-field-grid">
+            <div class="registration-field">
+              <label for="nombre-{{ numero }}">Nombre y apellido <span aria-hidden="true">*</span></label>
+              <input id="nombre-{{ numero }}" name="participante_{{ numero }}_nombre" type="text" autocomplete="name" placeholder="Nombre completo" required>
+            </div>
+            <div class="registration-field">
+              <label for="dni-{{ numero }}">DNI <span aria-hidden="true">*</span></label>
+              <input id="dni-{{ numero }}" name="participante_{{ numero }}_dni" type="text" inputmode="numeric" autocomplete="off" placeholder="Número de documento" required>
+            </div>
+            <div class="registration-field">
+              <label for="edad-{{ numero }}">Edad <span aria-hidden="true">*</span></label>
+              <input id="edad-{{ numero }}" name="participante_{{ numero }}_edad" type="number" min="0" step="1" inputmode="numeric" placeholder="Edad en años" required>
+            </div>
+            <div class="registration-field sizing-field" data-sizing-field hidden>
+              <label for="talle-{{ numero }}">Talle de vestimenta <span aria-hidden="true">*</span></label>
+              <select id="talle-{{ numero }}" name="participante_{{ numero }}_talle" required disabled>
+                <option value="" selected disabled>Seleccioná un talle</option>
+                <option value="XS">XS</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="XXL">XXL</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="registration-section" aria-labelledby="contacto-title">
+      <div class="registration-section-heading">
+        <span class="step-number" aria-hidden="true">04</span>
+        <div><h2 id="contacto-title">¿A dónde enviamos la información?</h2><p>El correo de confirmación incluirá el resumen de la inscripción y su código QR.</p></div>
+      </div>
+      <div class="registration-field registration-email">
+        <label for="correo">Correo electrónico <span aria-hidden="true">*</span></label>
+        <input id="correo" name="correo" type="email" autocomplete="email" placeholder="nombre@correo.com" required>
+      </div>
+    </section>
+
+    <section class="registration-section fare-reference" aria-labelledby="fare-title">
+      <div class="registration-section-heading">
+        <span class="step-number" aria-hidden="true">05</span>
+        <div><h2 id="fare-title">Precios de entradas al parque</h2><p>Información de referencia; el pago de entradas no se realiza en esta pantalla.</p></div>
+      </div>
+      <div class="fare-grid">
+        <p><span>Entrada común</span><strong>$10.000</strong></p>
+        <p><span>Entrada VIP</span><strong>$20.000</strong></p>
+      </div>
+      <p class="fare-discounts">Descuentos por edad: hasta 3 años, sin cargo; de 4 a 15 años, 50% de descuento; desde los 60 años, 50% de descuento.</p>
+    </section>
+
+    <section class="terms-box" aria-labelledby="terminos-title">
+      <p class="registration-eyebrow">Antes de finalizar</p>
+      <h2 id="terminos-title">Términos y condiciones de <span id="terms-activity-name"></span></h2>
+      <p class="terms-draft-note">Condiciones preliminares para esta maqueta. El texto definitivo se incorporará antes de habilitar las inscripciones.</p>
+      <p id="activity-terms"></p>
+      <label class="terms-acceptance"><input type="checkbox" name="acepta_terminos" required> <span>Leí y acepto los términos y condiciones de <span id="terms-acceptance-name"></span>. <span aria-hidden="true">*</span></span></label>
+    </section>
+
+    <div class="registration-submit">
+      <button class="button button-dark" type="button" disabled>Finalizar inscripción <span aria-hidden="true">↗</span></button>
+      <p>El envío de inscripciones, el correo y el código QR todavía no están habilitados.</p>
+    </div>
+    </div>
+  </form>
+</main>
+<footer><a class="footer-brand" href="{% url 'catalogo' %}">EcoHarmony Park <span aria-hidden="true">✳</span></a><span>Un lugar para conectar con la naturaleza.</span><a href="#formulario-inscripcion" class="back-top">Volver arriba ↑</a></footer>
+</body>
+</html>

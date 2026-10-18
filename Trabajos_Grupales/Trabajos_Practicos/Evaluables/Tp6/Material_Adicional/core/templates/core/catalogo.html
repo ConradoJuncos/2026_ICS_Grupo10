@@ -50,7 +50,7 @@
           <p class="card-hook">{{ actividad.titulo }}</p>
           <p class="card-description">{{ actividad.descripcion }}</p>
           <div class="card-details"><span>{% if actividad.requiere_talle %}Requiere talle de vestimenta{% else %}Sin vestimenta especial{% endif %}</span>{% if actividad.cupo != None %}<span>{{ actividad.cupo }} personas por turno</span>{% endif %}</div>
-          <a href="/inscripcion/" class="button button-dark">Inscribirme <span aria-hidden="true">↗</span></a>
+          <a href="{% url 'inscripcion' %}?actividad={{ actividad.codigo|lower }}" class="button button-dark">Inscribirme <span aria-hidden="true">↗</span></a>
         </div>
       </article>
     {% endfor %}
