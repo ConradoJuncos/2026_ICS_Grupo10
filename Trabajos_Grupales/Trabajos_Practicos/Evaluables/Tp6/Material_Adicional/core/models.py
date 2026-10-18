@@ -20,4 +20,6 @@ class Actividad(models.Model):
 
 
 class Horario(models.Model):
-    pass
+    fecha = models.DateField()
+    hora = models.TimeField()
+    actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE)
