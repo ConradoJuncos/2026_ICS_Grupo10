@@ -23,3 +23,6 @@ class Horario(models.Model):
     fecha = models.DateField()
     hora = models.TimeField()
     actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE)
+    
+    def cupos_disponibles(self):
+        return self.actividad.cupo_maximo
