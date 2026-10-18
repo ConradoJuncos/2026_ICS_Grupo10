@@ -7,7 +7,9 @@ from core.models import Actividad
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("nombre, capacidad", [("TIROLESA", 10), ("SAFARI", 8)])
+@pytest.mark.parametrize(
+    "nombre, capacidad", [("TIROLESA", 10), ("SAFARI", 8), ("PALESTRA", 12)]
+)
 def test_cargar_actividades_crea_actividad_con_su_capacidad(
     nombre: str, capacidad: int
 ) -> None:
