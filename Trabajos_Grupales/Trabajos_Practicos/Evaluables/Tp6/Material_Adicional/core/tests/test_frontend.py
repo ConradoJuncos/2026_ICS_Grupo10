@@ -33,6 +33,7 @@ def test_catalogo_muestra_capacidad_por_actividad(client: Client) -> None:
     assert contenido.count("12 personas por turno") == 2
 
 
+@pytest.mark.django_db
 def test_formulario_muestra_fecha_horarios_y_precios(client: Client) -> None:
     respuesta = client.get("/inscripcion/?actividad=safari")
     contenido = respuesta.content.decode()
@@ -49,6 +50,7 @@ def test_formulario_muestra_fecha_horarios_y_precios(client: Client) -> None:
     assert "Solo se puede reservar dentro de las 24 horas previas" in javascript
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "codigo",
     [

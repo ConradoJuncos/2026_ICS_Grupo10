@@ -63,12 +63,13 @@ def catalogo(request: HttpRequest) -> HttpResponse:
 def inscripcion(request: HttpRequest) -> HttpResponse:
     """Renderiza el formulario visual común para todas las actividades."""
     nombres = dict(Actividad.OPCIONES_ACTIVIDAD)
+    cupos = dict(Actividad.objects.values_list("nombre", "cupo_maximo"))
     actividades = [
         {
             "codigo": codigo.lower(),
             "nombre": nombres[codigo],
             "descripcion": contenido[0],
-            "cupo": CUPO_MAXIMO_POR_ACTIVIDAD[codigo],
+            "cupo": cupos.get(codigo, CUPO_MAXIMO_POR_ACTIVIDAD[codigo]),
             "edad_minima": EDADES_MINIMAS_POR_ACTIVIDAD[codigo],
             "requiere_talle": codigo in {"TIROLESA", "PALESTRA"},
             "terminos": TERMINOS_POR_ACTIVIDAD[codigo],
