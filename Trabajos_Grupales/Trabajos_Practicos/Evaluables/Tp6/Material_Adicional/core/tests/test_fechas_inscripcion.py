@@ -194,3 +194,33 @@ def test_formulario_permite_consultar_turnos_por_get(client: Client) -> None:
     assert "selected" in opcion_actividad.group()
     assert seccion_actividad is not None
     assert "hidden" not in seccion_actividad.group()
+
+
+@pytest.mark.django_db
+def test_selector_muestra_cupos_restantes_del_turno(client: Client) -> None:
+    """Cada opción de horario informa los lugares que quedan en ese turno."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    horario = Horario.objects.create(
+        actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9)
+    )
+    horario.registrar_inscripcion("Ana")
+    horario.registrar_inscripcion("Beto")
+    horario.registrar_inscripcion("Carla")
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(
+            2026, 10, 20, 16, 30, tzinfo=timezone.get_current_timezone()
+        ),
+    ):
+        respuesta = client.get(
+            "/inscripcion/", {"actividad": "tirolesa", "fecha": "2026-10-21"}
+        )
+
+    opcion = re.search(
+        rf'<option\b[^>]*\bvalue="{horario.pk}"[^>]*>(?P<texto>.*?)</option>',
+        respuesta.content.decode(),
+        flags=re.DOTALL,
+    )
+    assert opcion is not None
+    assert "7 lugares disponibles" in opcion["texto"]
