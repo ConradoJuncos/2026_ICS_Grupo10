@@ -33,23 +33,16 @@ python manage.py check
 python manage.py makemigrations --check --dry-run
 python -m black --check .
 python -m ruff check .
+python -m mypy .
 ```
 
 Las pruebas usan la base de test de Django; no requieren migrar la SQLite de
 desarrollo ni iniciar un servidor SMTP. `--migrations` explicita que se verifica
 el esquema instalado desde migraciones.
 
-Hay incumplimientos de estilo previos: instalar las herramientas no los corrige
-ni significa que los controles globales ya pasan. La configuracion y el alcance
-global de mypy siguen pendientes de acuerdo. Como comprobacion limitada de los
-archivos de la correccion de unicidad se puede ejecutar:
-
-```bash
-python -m mypy --follow-imports=silent --ignore-missing-imports core/tests/test_migraciones_actividad.py core/migrations/0002_alter_actividad_nombre.py
-```
-
-Ese comando omite el analisis de imports y los errores por librerias sin tipos;
-no certifica el tipado de Django ni el del proyecto completo.
+`mypy.ini` ignora los imports sin tipos (Django y Segno no los publican) y
+excluye las migraciones generadas, por lo que mypy no verifica el tipado
+interno de Django.
 
 ## Arranque local
 
