@@ -1,5 +1,6 @@
 """Comprueba las fechas reservables que recibe el formulario de inscripción."""
 
+import re
 from datetime import UTC, date, datetime, time
 from unittest.mock import patch
 
@@ -77,3 +78,26 @@ def test_inscripcion_informa_cuando_no_hay_turnos_reservables(client: Client) ->
     assert respuesta.context["horarios_disponibles"] == []
     assert "No hay turnos reservables para esta actividad y fecha." in contenido
     assert 'id="horario" name="horario" required disabled' in contenido
+
+
+@pytest.mark.django_db
+def test_calendario_limita_la_seleccion_a_fechas_reservables(client: Client) -> None:
+    """El campo de fecha usa los límites de los turnos reservables de la BD."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(17))
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9))
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 22), hora=time(9))
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+    ):
+        respuesta = client.get("/inscripcion/?actividad=tirolesa")
+
+    campo_fecha = re.search(
+        r'<input\b[^>]*\bid="fecha-visita"[^>]*>', respuesta.content.decode()
+    )
+    assert respuesta.status_code == 200
+    assert campo_fecha is not None
+    assert 'min="2026-10-20"' in campo_fecha.group()
+    assert 'max="2026-10-21"' in campo_fecha.group()
