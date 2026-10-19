@@ -1,8 +1,10 @@
+from typing import ClassVar
+
 from django.db import models
 
 
 class Actividad(models.Model):
-    OPCIONES_ACTIVIDAD = [
+    OPCIONES_ACTIVIDAD: ClassVar[list[tuple[str, str]]] = [
         ("TIROLESA", "Tirolesa"),
         ("SAFARI", "Safari"),
         ("PALESTRA", "Palestra"),
