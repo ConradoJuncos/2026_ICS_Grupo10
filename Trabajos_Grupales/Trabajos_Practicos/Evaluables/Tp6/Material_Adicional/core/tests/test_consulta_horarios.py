@@ -162,3 +162,21 @@ def test_consulta_interpreta_los_turnos_en_la_hora_del_parque() -> None:
         horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
 
     assert horarios == [horario]
+
+
+@pytest.mark.django_db
+def test_consulta_excluye_turnos_sin_cupo() -> None:
+    """Excluye el turno completo y conserva otro con lugares disponibles."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=1)
+    fecha = date(2026, 10, 20)
+    horario_completo = Horario.objects.create(
+        actividad=tirolesa, fecha=fecha, hora=time(9)
+    )
+    horario_libre = Horario.objects.create(
+        actividad=tirolesa, fecha=fecha, hora=time(10)
+    )
+    horario_completo.registrar_inscripcion("Ana")
+
+    horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
+
+    assert horarios == [horario_libre]
