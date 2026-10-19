@@ -71,6 +71,12 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
         else []
     )
     fechas_disponibles = sorted({horario.fecha for horario in horarios})
+    fecha_seleccionada = request.GET.get("fecha")
+    horarios_disponibles = [
+        horario
+        for horario in horarios
+        if horario.fecha.isoformat() == fecha_seleccionada
+    ]
     nombres = dict(Actividad.OPCIONES_ACTIVIDAD)
     cupos = dict(Actividad.objects.values_list("nombre", "cupo_maximo"))
     actividades = [
@@ -91,6 +97,7 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
         {
             "actividades": actividades,
             "fechas_disponibles": fechas_disponibles,
+            "horarios_disponibles": horarios_disponibles,
             "participantes": range(1, max(CUPO_MAXIMO_POR_ACTIVIDAD.values()) + 1),
         },
     )
