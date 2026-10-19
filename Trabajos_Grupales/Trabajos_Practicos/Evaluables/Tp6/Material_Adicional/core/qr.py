@@ -1,4 +1,5 @@
 import io
+
 import segno  # libreria utilizada para generar qrs
 
 

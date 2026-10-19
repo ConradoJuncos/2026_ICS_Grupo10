@@ -1,4 +1,5 @@
 from django.test import TestCase
+
 from core.models import Actividad  # This model doesn't exist yet
 
 

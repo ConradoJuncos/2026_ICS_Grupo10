@@ -1,6 +1,8 @@
-from django.test import TestCase
-from core.models import Actividad, Horario, Inscripcion
 from datetime import date, time
+
+from django.test import TestCase
+
+from core.models import Actividad, Horario, Inscripcion
 
 
 class CuposTest(TestCase):

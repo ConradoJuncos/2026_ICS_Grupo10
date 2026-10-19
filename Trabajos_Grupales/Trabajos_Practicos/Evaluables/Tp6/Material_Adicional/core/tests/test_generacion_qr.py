@@ -1,4 +1,5 @@
 from django.test import TestCase
+
 from core.qr import GenerarQr  # En la etapa RED esto no existe todavia
 
 
