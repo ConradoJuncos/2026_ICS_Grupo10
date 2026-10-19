@@ -1,11 +1,23 @@
 """Comprueba la consulta de horarios desde la base de datos."""
 
-from datetime import date, time
+from collections.abc import Iterator
+from datetime import UTC, date, datetime, time
+from unittest.mock import patch
 
 import pytest
 
 from core.consulta_horarios import consultar_horarios_por_actividad
 from core.models import Actividad, Horario
+
+
+@pytest.fixture(autouse=True)
+def reloj_controlado() -> Iterator[None]:
+    """Fija el reloj para que las consultas no dependan del día de ejecución."""
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 8, tzinfo=UTC),
+    ):
+        yield
 
 
 @pytest.mark.django_db
@@ -78,3 +90,17 @@ def test_consulta_excluye_horas_de_inicio_no_permitidas(hora_invalida: time) -> 
     horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
 
     assert horarios == [horario_valido]
+
+
+@pytest.mark.django_db
+def test_consulta_excluye_turnos_a_mas_de_24_horas() -> None:
+    """Conserva un turno a una hora y excluye otro a veinticinco horas."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    horario_cercano = Horario.objects.create(
+        actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(9)
+    )
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9))
+
+    horarios = consultar_horarios_por_actividad(tirolesa)
+
+    assert horarios == [horario_cercano]
