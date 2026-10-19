@@ -25,4 +25,9 @@ class Horario(models.Model):
     actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE)
     
     def cupos_disponibles(self):
-        return self.actividad.cupo_maximo
+        inscritos = self.inscripciones.count() # Cuenta cuántas inscripciones tiene este horario
+        return self.actividad.cupo_maximo - inscritos
+    
+class Inscripcion(models.Model):
+    horario = models.ForeignKey(Horario, on_delete=models.CASCADE, related_name='inscripciones')
+    nombre_participante = models.CharField(max_length=100)

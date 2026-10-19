@@ -1,5 +1,5 @@
 from django.test import TestCase
-from core.models import Actividad, Horario
+from core.models import Actividad, Horario, Inscripcion
 from datetime import date, time
 
 class CuposTest(TestCase):
