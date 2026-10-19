@@ -55,3 +55,26 @@ def test_consulta_excluye_horarios_en_dias_de_cierre(fecha_cierre: date) -> None
     horarios = consultar_horarios_por_actividad(tirolesa)
 
     assert horarios == []
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "hora_invalida",
+    [
+        pytest.param(time(8), id="antes_del_primer_turno"),
+        pytest.param(time(18), id="despues_del_ultimo_turno"),
+        pytest.param(time(9, 30), id="hora_fraccionada"),
+    ],
+)
+def test_consulta_excluye_horas_de_inicio_no_permitidas(hora_invalida: time) -> None:
+    """Conserva el turno de las 17:00 y excluye los inicios no permitidos."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    fecha = date(2026, 10, 20)
+    horario_valido = Horario.objects.create(
+        actividad=tirolesa, fecha=fecha, hora=time(17)
+    )
+    Horario.objects.create(actividad=tirolesa, fecha=fecha, hora=hora_invalida)
+
+    horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
+
+    assert horarios == [horario_valido]
