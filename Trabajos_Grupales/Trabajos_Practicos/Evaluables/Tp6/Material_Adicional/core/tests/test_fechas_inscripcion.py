@@ -56,3 +56,24 @@ def test_inscripcion_ofrece_horarios_de_la_actividad_y_fecha_elegidas(
 
     assert respuesta.status_code == 200
     assert respuesta.context.get("horarios_disponibles", []) == [horario_elegido]
+
+
+@pytest.mark.django_db
+def test_inscripcion_informa_cuando_no_hay_turnos_reservables(client: Client) -> None:
+    """Informa la ausencia de turnos y deshabilita su selección."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(9))
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+    ):
+        respuesta = client.get(
+            "/inscripcion/", {"actividad": "tirolesa", "fecha": "2026-10-20"}
+        )
+
+    contenido = respuesta.content.decode()
+    assert respuesta.status_code == 200
+    assert respuesta.context["horarios_disponibles"] == []
+    assert "No hay turnos reservables para esta actividad y fecha." in contenido
+    assert 'id="horario" name="horario" required disabled' in contenido
