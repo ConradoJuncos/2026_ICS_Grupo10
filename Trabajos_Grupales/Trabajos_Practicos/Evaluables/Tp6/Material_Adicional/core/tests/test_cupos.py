@@ -16,3 +16,9 @@ class CuposTest(TestCase):
         # El cupo disponible debería ser igual al cupo máximo de la actividad
         self.assertEqual(self.horario.cupos_disponibles(), 10)
 
+    def test_reserva_reduce_disponibilidad(self):
+        # Creamos una inscripción para ese horario
+        Inscripcion.objects.create(horario=self.horario, nombre_participante="Ana")
+        
+        # Ahora el cupo debería ser 9
+        self.assertEqual(self.horario.cupos_disponibles(), 9)
