@@ -9,4 +9,7 @@ def consultar_horarios_por_actividad(
     actividad: Actividad, fecha: date | None = None
 ) -> list[Horario]:
     """Devuelve los horarios asociados a la actividad seleccionada."""
-    return list(Horario.objects.filter(actividad=actividad))
+    horarios = Horario.objects.filter(actividad=actividad)
+    if fecha is not None:
+        horarios = horarios.filter(fecha=fecha)
+    return list(horarios)
