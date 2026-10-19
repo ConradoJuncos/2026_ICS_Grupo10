@@ -101,3 +101,41 @@ def test_calendario_limita_la_seleccion_a_fechas_reservables(client: Client) -> 
     assert campo_fecha is not None
     assert 'min="2026-10-20"' in campo_fecha.group()
     assert 'max="2026-10-21"' in campo_fecha.group()
+
+
+@pytest.mark.django_db
+def test_formulario_muestra_turnos_reales_y_conserva_fecha(client: Client) -> None:
+    """El selector ofrece el turno persistido y conserva la fecha consultada."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    safari = Actividad.objects.create(nombre="SAFARI", cupo_maximo=8)
+    horario_elegido = Horario.objects.create(
+        actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9)
+    )
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(17))
+    Horario.objects.create(actividad=safari, fecha=date(2026, 10, 21), hora=time(10))
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+    ):
+        respuesta = client.get(
+            "/inscripcion/", {"actividad": "tirolesa", "fecha": "2026-10-21"}
+        )
+
+    contenido = respuesta.content.decode()
+    selector = re.search(
+        r'<select\b(?P<atributos>[^>]*\bid="horario"[^>]*)>'
+        r"(?P<opciones>.*?)</select>",
+        contenido,
+        flags=re.DOTALL,
+    )
+    campo_fecha = re.search(r'<input\b[^>]*\bid="fecha-visita"[^>]*>', contenido)
+    assert respuesta.status_code == 200
+    assert selector is not None
+    assert re.findall(r'<option\b[^>]*\bvalue="([^"]+)"', selector["opciones"]) == [
+        str(horario_elegido.pk)
+    ]
+    assert "09:00" in selector["opciones"]
+    assert "disabled" not in selector["atributos"]
+    assert campo_fecha is not None
+    assert 'value="2026-10-21"' in campo_fecha.group()
