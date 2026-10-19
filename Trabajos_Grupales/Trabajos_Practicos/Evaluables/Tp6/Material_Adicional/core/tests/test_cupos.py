@@ -17,10 +17,7 @@ class CuposTest(TestCase):
         self.assertEqual(self.horario.cupos_disponibles(), 10)
 
     def test_reserva_reduce_disponibilidad(self):
-        # Creamos una inscripción para ese horario
-        Inscripcion.objects.create(horario=self.horario, nombre_participante="Ana")
-        
-        # Ahora el cupo debería ser 9
+        self.horario.registrar_inscripcion("Ana")
         self.assertEqual(self.horario.cupos_disponibles(), 9)
 
     def test_no_se_puede_reservar_si_no_hay_cupo(self):
