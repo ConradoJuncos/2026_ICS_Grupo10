@@ -36,3 +36,22 @@ def test_consulta_devuelve_solo_horarios_de_la_fecha_seleccionada() -> None:
     horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha_seleccionada)
 
     assert horarios == [horario_seleccionado]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "fecha_cierre",
+    [
+        pytest.param(date(2026, 10, 19), id="lunes"),
+        pytest.param(date(2027, 1, 1), id="anio_nuevo"),
+        pytest.param(date(2026, 12, 25), id="navidad"),
+    ],
+)
+def test_consulta_excluye_horarios_en_dias_de_cierre(fecha_cierre: date) -> None:
+    """No ofrece horarios persistidos en días en que el parque está cerrado."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    Horario.objects.create(actividad=tirolesa, fecha=fecha_cierre, hora=time(9))
+
+    horarios = consultar_horarios_por_actividad(tirolesa)
+
+    assert horarios == []
