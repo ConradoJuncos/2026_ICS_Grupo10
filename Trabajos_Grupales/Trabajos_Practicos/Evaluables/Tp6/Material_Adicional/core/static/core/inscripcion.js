@@ -31,20 +31,6 @@
     return `${year}-${month}-${day}`;
   }
 
-  function setCalendarRange() {
-    const today = new Date();
-    const lastDate = new Date(
-      today.getFullYear(),
-      today.getMonth() + 1,
-      Math.min(
-        today.getDate(),
-        new Date(today.getFullYear(), today.getMonth() + 2, 0).getDate(),
-      ),
-    );
-    dateInput.min = formatDate(today);
-    dateInput.max = formatDate(lastDate);
-  }
-
   function resetTimeOptions(placeholder) {
     timeSelect.replaceChildren(new Option(placeholder, "", true, true));
     timeSelect.options[0].disabled = true;
@@ -165,7 +151,6 @@
     refreshTimeOptions();
   }
 
-  setCalendarRange();
   if (options.some((option) => option.value === initialActivity)) {
     activitySelect.value = initialActivity;
   }

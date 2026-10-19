@@ -60,8 +60,8 @@
       <div class="registration-field-grid">
         <div class="registration-field">
           <label for="fecha-visita">Fecha de la actividad <span aria-hidden="true">*</span></label>
-          <input id="fecha-visita" name="fecha" type="date" required>
-          <small id="date-guidance">Podés elegir fechas hasta un mes por adelantado. No se admiten reservas con más de 24 horas de anticipación.</small>
+          <input id="fecha-visita" name="fecha" type="date" required{% if fechas_disponibles %} min="{{ fechas_disponibles.0|date:'Y-m-d' }}" max="{{ fechas_disponibles|last|date:'Y-m-d' }}"{% else %} disabled{% endif %}>
+          <small id="date-guidance">Elegí una fecha con turnos disponibles. No se admiten reservas con más de 24 horas de anticipación.</small>
           <p class="field-feedback" id="date-feedback" aria-live="polite"></p>
         </div>
         <div class="registration-field">
