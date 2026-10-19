@@ -21,3 +21,18 @@ def test_consulta_devuelve_solo_horarios_de_la_actividad_seleccionada() -> None:
     horarios = consultar_horarios_por_actividad(tirolesa)
 
     assert horarios == [horario_tirolesa]
+
+
+@pytest.mark.django_db
+def test_consulta_devuelve_solo_horarios_de_la_fecha_seleccionada() -> None:
+    """Excluye horarios de la misma actividad en otra fecha."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    fecha_seleccionada = date(2026, 10, 20)
+    horario_seleccionado = Horario.objects.create(
+        actividad=tirolesa, fecha=fecha_seleccionada, hora=time(9)
+    )
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9))
+
+    horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha_seleccionada)
+
+    assert horarios == [horario_seleccionado]
