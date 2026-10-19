@@ -37,15 +37,19 @@ def test_consulta_devuelve_solo_horarios_de_la_actividad_seleccionada() -> None:
 
 @pytest.mark.django_db
 def test_consulta_devuelve_solo_horarios_de_la_fecha_seleccionada() -> None:
-    """Excluye horarios de la misma actividad en otra fecha."""
+    """Excluye otra fecha aunque ambos turnos estén dentro de la ventana."""
     tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
     fecha_seleccionada = date(2026, 10, 20)
     horario_seleccionado = Horario.objects.create(
-        actividad=tirolesa, fecha=fecha_seleccionada, hora=time(9)
+        actividad=tirolesa, fecha=fecha_seleccionada, hora=time(11)
     )
     Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9))
 
-    horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha_seleccionada)
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 10, tzinfo=UTC),
+    ):
+        horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha_seleccionada)
 
     assert horarios == [horario_seleccionado]
 
@@ -60,11 +64,15 @@ def test_consulta_devuelve_solo_horarios_de_la_fecha_seleccionada() -> None:
     ],
 )
 def test_consulta_excluye_horarios_en_dias_de_cierre(fecha_cierre: date) -> None:
-    """No ofrece horarios persistidos en días en que el parque está cerrado."""
+    """Excluye días cerrados aunque el turno esté a una hora del presente."""
     tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
     Horario.objects.create(actividad=tirolesa, fecha=fecha_cierre, hora=time(9))
 
-    horarios = consultar_horarios_por_actividad(tirolesa)
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime.combine(fecha_cierre, time(8), tzinfo=UTC),
+    ):
+        horarios = consultar_horarios_por_actividad(tirolesa)
 
     assert horarios == []
 
