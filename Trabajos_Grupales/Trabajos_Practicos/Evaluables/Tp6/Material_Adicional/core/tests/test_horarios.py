@@ -20,9 +20,7 @@ def test_tabla_horarios_tiene_fecha_hora_y_actividad_asociada() -> None:
                 cursor, "core_horario"
             )
         }
-        restricciones = connection.introspection.get_constraints(
-            cursor, "core_horario"
-        )
+        restricciones = connection.introspection.get_constraints(cursor, "core_horario")
 
     assert {"fecha", "hora", "actividad_id"} <= columnas
     assert any(

@@ -7,23 +7,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('core', '0003_horario'),
+        ("core", "0003_horario"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='horario',
-            name='actividad',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.actividad'),
+            model_name="horario",
+            name="actividad",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="core.actividad"
+            ),
         ),
         migrations.AddField(
-            model_name='horario',
-            name='fecha',
+            model_name="horario",
+            name="fecha",
             field=models.DateField(),
         ),
         migrations.AddField(
-            model_name='horario',
-            name='hora',
+            model_name="horario",
+            name="hora",
             field=models.TimeField(),
         ),
     ]

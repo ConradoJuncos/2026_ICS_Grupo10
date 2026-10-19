@@ -16,10 +16,26 @@ CUPO_MAXIMO_POR_ACTIVIDAD = {
 }
 
 DESCRIPCIONES = {
-    "SAFARI": ("Un encuentro salvaje.", "Recorré el parque y descubrí su fauna de cerca.", "safari"),
-    "TIROLESA": ("El bosque, desde arriba.", "Cambiá de perspectiva entre las copas de los árboles.", "tirolesa"),
-    "PALESTRA": ("Un poco más alto.", "Encontrá tu camino hacia la cima, una presa a la vez.", "palestra"),
-    "JARDINERIA": ("Manos a la tierra.", "Acercate al mundo de las plantas y a sus pequeños habitantes.", "jardineria"),
+    "SAFARI": (
+        "Un encuentro salvaje.",
+        "Recorré el parque y descubrí su fauna de cerca.",
+        "safari",
+    ),
+    "TIROLESA": (
+        "El bosque, desde arriba.",
+        "Cambiá de perspectiva entre las copas de los árboles.",
+        "tirolesa",
+    ),
+    "PALESTRA": (
+        "Un poco más alto.",
+        "Encontrá tu camino hacia la cima, una presa a la vez.",
+        "palestra",
+    ),
+    "JARDINERIA": (
+        "Manos a la tierra.",
+        "Acercate al mundo de las plantas y a sus pequeños habitantes.",
+        "jardineria",
+    ),
 }
 
 TERMINOS_POR_ACTIVIDAD = {
