@@ -3,12 +3,15 @@
 from collections.abc import Iterator
 from datetime import date, datetime, time
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 
 import pytest
 from django.utils import timezone
 
 from core.consulta_horarios import consultar_horarios_por_actividad
 from core.models import Actividad, Horario
+
+ZONA_HORARIA_PARQUE = ZoneInfo("America/Argentina/Cordoba")
 
 
 @pytest.fixture(autouse=True)
@@ -143,3 +146,19 @@ def test_consulta_excluye_turnos_con_inscripcion_cerrada(hora_cerrada: time) -> 
         horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
 
     assert horarios == [horario_abierto]
+
+
+@pytest.mark.django_db
+def test_consulta_interpreta_los_turnos_en_la_hora_del_parque() -> None:
+    """Ofrece el turno de las 09:00 cuando en el parque son las 08:40."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    fecha = date(2026, 10, 20)
+    horario = Horario.objects.create(actividad=tirolesa, fecha=fecha, hora=time(9))
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 8, 40, tzinfo=ZONA_HORARIA_PARQUE),
+    ):
+        horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
+
+    assert horarios == [horario]
