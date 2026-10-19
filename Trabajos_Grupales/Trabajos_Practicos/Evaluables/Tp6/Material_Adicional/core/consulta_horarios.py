@@ -32,4 +32,5 @@ def consultar_horarios_por_actividad(
         and limite_cierre
         <= timezone.make_aware(datetime.combine(horario.fecha, horario.hora))
         <= limite_anticipacion
+        and horario.cupos_disponibles() > 0
     ]
