@@ -31,7 +31,7 @@
     {% if sin_turnos %}
     <p class="field-feedback" role="status">No hay turnos reservables para esta actividad y fecha.</p>
     {% endif %}
-    <div class="registration-capacity" id="registration-capacity" hidden><span>Cupo disponible de muestra por turno</span><strong id="capacity-value"></strong></div>
+    <div class="registration-capacity" id="registration-capacity" hidden><span>Lugares disponibles en el turno</span><strong id="capacity-value"></strong></div>
   </div>
 
   <form id="consulta-turnos" method="get" action="{% url 'inscripcion' %}"></form>
@@ -71,7 +71,7 @@
           <select id="horario" name="horario" required{% if sin_turnos %} disabled{% endif %}>
             <option value="" selected disabled>{% if horarios_disponibles %}Seleccioná un horario{% else %}Seleccioná una fecha primero{% endif %}</option>
             {% for horario in horarios_disponibles %}
-            <option value="{{ horario.pk }}">{{ horario.hora|time:'H:i' }} · {{ horario.cupos_disponibles }} lugares disponibles</option>
+            <option value="{{ horario.pk }}" data-cupos="{{ horario.cupos_disponibles }}">{{ horario.hora|time:'H:i' }} · {{ horario.cupos_disponibles }} lugares disponibles</option>
             {% endfor %}
           </select>
           <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
@@ -79,7 +79,7 @@
         <div class="registration-field">
           <label for="cantidad-personas">Cantidad de participantes <span aria-hidden="true">*</span></label>
           <input id="cantidad-personas" name="cantidad_personas" type="number" min="1" step="1" inputmode="numeric" placeholder="Seleccioná la actividad primero" required>
-          <small id="participant-capacity-note">El cupo del turno se muestra como referencia; la disponibilidad real no está conectada.</small>
+          <small id="participant-capacity-note">Elegí un horario para ver los lugares disponibles.</small>
         </div>
       </div>
     </section>

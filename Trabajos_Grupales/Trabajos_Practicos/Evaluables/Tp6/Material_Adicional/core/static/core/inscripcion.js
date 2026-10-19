@@ -43,11 +43,31 @@
         field.disabled = !isVisible || (sizingField !== null && sizingField.hidden);
       });
     });
-    if (requestedCount > 0) {
-      capacityNote.textContent = `${requestedCount} de ${capacity} cupos máximos seleccionados. Disponibilidad real no conectada.`;
+    if (!timeSelect.value) {
+      capacityNote.textContent = "Elegí un horario para ver los lugares disponibles.";
+    } else if (requestedCount > 0) {
+      capacityNote.textContent = `${requestedCount} de ${capacity} lugares disponibles seleccionados.`;
     } else {
-      capacityNote.textContent = `Hasta ${capacity} personas por turno. Disponibilidad de muestra; no hay reservas registradas.`;
+      capacityNote.textContent = `Quedan ${capacity} lugares en este turno.`;
     }
+  }
+
+  function setCapacity(capacity) {
+    participantCount.max = String(capacity);
+    participantCount.placeholder = `Entre 1 y ${capacity}`;
+    updateParticipants(capacity);
+  }
+
+  function showTimeAvailability() {
+    const selectedTime = timeSelect.selectedOptions[0];
+    if (!selectedTime || !selectedTime.dataset.cupos) {
+      capacityBadge.hidden = true;
+      return;
+    }
+    const availableSeats = Number(selectedTime.dataset.cupos);
+    capacityBadge.hidden = false;
+    capacityValue.textContent = `${availableSeats} lugares`;
+    setCapacity(availableSeats);
   }
 
   function showActivity(option) {
@@ -66,12 +86,9 @@
     const ageGuidance = minimumAge ? `Edad mínima: ${minimumAge} años.` : "Apta para todas las edades.";
 
     activityContent.hidden = false;
-    capacityBadge.hidden = false;
+    capacityBadge.hidden = true;
     title.textContent = `Inscripción a ${activityName}.`;
     description.textContent = `${option.dataset.description} ${ageGuidance}`;
-    capacityValue.textContent = `${capacity} lugares`;
-    participantCount.max = String(capacity);
-    participantCount.placeholder = `Entre 1 y ${capacity}`;
     termsName.textContent = activityName;
     acceptanceName.textContent = activityName;
     terms.textContent = option.dataset.terms;
@@ -88,7 +105,8 @@
       select.disabled = !requiresSize;
     });
     participantCount.value = "";
-    updateParticipants(capacity);
+    setCapacity(capacity);
+    showTimeAvailability();
   }
 
   if (options.some((option) => option.value === initialActivity)) {
@@ -113,7 +131,11 @@
     refreshTimeOptions();
   });
 
-  dateInput.addEventListener("change", refreshTimeOptions);
+  dateInput.addEventListener("change", () => {
+    refreshTimeOptions();
+    showTimeAvailability();
+  });
+  timeSelect.addEventListener("change", showTimeAvailability);
   participantCount.addEventListener("input", () => {
     updateParticipants(Number(participantCount.max));
   });
