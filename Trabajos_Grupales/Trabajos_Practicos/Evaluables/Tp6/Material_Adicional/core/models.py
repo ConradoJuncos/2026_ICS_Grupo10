@@ -29,6 +29,9 @@ class Horario(models.Model):
         return self.actividad.cupo_maximo - inscritos
     
     def registrar_inscripcion(self, nombre_participante):
+        if self.cupos_disponibles() <= 0:
+            raise ValueError("No hay cupos disponibles para este horario.")
+
         return self.inscripciones.create(
             nombre_participante=nombre_participante
         )
