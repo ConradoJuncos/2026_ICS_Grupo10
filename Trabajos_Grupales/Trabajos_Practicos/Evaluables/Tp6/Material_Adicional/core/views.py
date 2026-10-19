@@ -102,6 +102,9 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
         {
             "actividades": actividades,
             "fechas_disponibles": fechas_disponibles,
+            "actividad_seleccionada": (
+                codigo_actividad.lower() if actividad_seleccionada is not None else ""
+            ),
             "fecha_seleccionada": fecha_seleccionada or "",
             "horarios_disponibles": horarios_disponibles,
             "sin_turnos": sin_turnos,
