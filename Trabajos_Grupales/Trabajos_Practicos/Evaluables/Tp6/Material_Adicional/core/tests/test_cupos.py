@@ -22,3 +22,16 @@ class CuposTest(TestCase):
         
         # Ahora el cupo debería ser 9
         self.assertEqual(self.horario.cupos_disponibles(), 9)
+
+    def test_no_se_puede_reservar_si_no_hay_cupo(self):
+        # Llenamos el cupo (supongamos que es 1 para este test)
+        actividad_pequena = Actividad.objects.create(nombre='PALESTRA', cupo_maximo=1)
+        h1 = Horario.objects.create(actividad=actividad_pequena, fecha=date(2024, 10, 10), hora=time(12, 0))
+        
+        Inscripcion.objects.create(horario=h1, nombre_participante="Ana")
+        
+        # El siguiente intento debería fallar (podemos lanzar una excepción personalizada)
+        with self.assertRaises(ValueError): 
+            # Aquí llamaremos a un método que "valide y guarde"
+            h1.registrar_inscripcion("Juan")
+            
