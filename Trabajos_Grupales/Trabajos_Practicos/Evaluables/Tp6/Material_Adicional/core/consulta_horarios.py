@@ -1,11 +1,12 @@
 """Consulta los horarios persistidos de las actividades."""
 
-from datetime import date
+from datetime import date, time
 
 from core.models import Actividad, Horario
 
 DIA_LUNES = 0
 FERIADOS_DE_CIERRE = {(1, 1), (12, 25)}
+HORAS_DE_INICIO_PERMITIDAS = {time(hora) for hora in range(9, 18)}
 
 
 def consultar_horarios_por_actividad(
@@ -20,4 +21,5 @@ def consultar_horarios_por_actividad(
         for horario in horarios
         if horario.fecha.weekday() != DIA_LUNES
         and (horario.fecha.month, horario.fecha.day) not in FERIADOS_DE_CIERRE
+        and horario.hora in HORAS_DE_INICIO_PERMITIDAS
     ]
