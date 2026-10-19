@@ -20,74 +20,16 @@
 
   const options = [...activitySelect.options];
   const initialActivity = new URLSearchParams(window.location.search).get("actividad");
-  const dayInMilliseconds = 24 * 60 * 60 * 1000;
-  const bookingCutoffMilliseconds = 15 * 60 * 1000;
-  const shifts = Array.from({ length: 9 }, (_, index) => 9 + index);
-
-  function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
 
   function resetTimeOptions(placeholder) {
     timeSelect.replaceChildren(new Option(placeholder, "", true, true));
     timeSelect.options[0].disabled = true;
   }
 
-  function isClosedDate(date) {
-    const isMonday = date.getDay() === 1;
-    const isHoliday =
-      (date.getMonth() === 11 && date.getDate() === 25) ||
-      (date.getMonth() === 0 && date.getDate() === 1);
-    return isMonday || isHoliday;
-  }
-
   function refreshTimeOptions() {
     resetTimeOptions("Seleccioná una fecha primero");
-    dateFeedback.textContent = "";
-    if (!dateInput.value) return;
-
-    const selectedDate = new Date(`${dateInput.value}T00:00:00`);
-    if (isClosedDate(selectedDate)) {
-      dateFeedback.textContent = "El parque está cerrado los lunes, el 25 de diciembre y el 1 de enero. Elegí otra fecha.";
-      dateInput.value = "";
-      return;
-    }
-
-    const now = new Date();
-    const nowTimestamp = now.getTime();
-    const dateIsToday = dateInput.value === formatDate(now);
-    let availableShifts = 0;
-
-    shifts.forEach((hour) => {
-      const start = new Date(selectedDate);
-      start.setHours(hour, 0, 0, 0);
-      const startTimestamp = start.getTime();
-      const bookingWindowOpens = startTimestamp - dayInMilliseconds;
-      const bookingCloses = startTimestamp - bookingCutoffMilliseconds;
-      const sameDayPurchaseAllowed =
-        !dateIsToday || now.getHours() * 60 + now.getMinutes() <= 17 * 60 + 30;
-
-      if (
-        nowTimestamp >= bookingWindowOpens &&
-        nowTimestamp <= bookingCloses &&
-        sameDayPurchaseAllowed
-      ) {
-        const endHour = String(hour + 1).padStart(2, "0");
-        const startHour = String(hour).padStart(2, "0");
-        timeSelect.add(new Option(`${startHour}:00 a ${endHour}:00`, `${startHour}:00`));
-        availableShifts += 1;
-      }
-    });
-
-    if (availableShifts) {
-      timeSelect.options[0].textContent = "Seleccioná un horario";
-    } else {
-      resetTimeOptions("No hay turnos disponibles para esta fecha");
-      dateFeedback.textContent = "Solo se puede reservar dentro de las 24 horas previas al turno y hasta 15 minutos antes de su inicio.";
-    }
+    timeSelect.disabled = true;
+    dateFeedback.textContent = "Solo se puede reservar dentro de las 24 horas previas al turno y hasta 15 minutos antes de su inicio.";
   }
 
   function updateParticipants(capacity) {
@@ -147,8 +89,6 @@
     });
     participantCount.value = "";
     updateParticipants(capacity);
-    dateInput.value = "";
-    refreshTimeOptions();
   }
 
   if (options.some((option) => option.value === initialActivity)) {
@@ -161,12 +101,16 @@
     url.searchParams.set("actividad", activitySelect.value);
     window.history.pushState({}, "", url);
     showActivity(activitySelect.selectedOptions[0]);
+    dateInput.value = "";
+    refreshTimeOptions();
   });
 
   window.addEventListener("popstate", () => {
     const activity = new URLSearchParams(window.location.search).get("actividad");
     activitySelect.value = options.some((option) => option.value === activity) ? activity : "";
     showActivity(activitySelect.selectedOptions[0]);
+    dateInput.value = "";
+    refreshTimeOptions();
   });
 
   dateInput.addEventListener("change", refreshTimeOptions);

@@ -102,6 +102,7 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
         {
             "actividades": actividades,
             "fechas_disponibles": fechas_disponibles,
+            "fecha_seleccionada": fecha_seleccionada or "",
             "horarios_disponibles": horarios_disponibles,
             "sin_turnos": sin_turnos,
             "participantes": range(1, max(CUPO_MAXIMO_POR_ACTIVIDAD.values()) + 1),

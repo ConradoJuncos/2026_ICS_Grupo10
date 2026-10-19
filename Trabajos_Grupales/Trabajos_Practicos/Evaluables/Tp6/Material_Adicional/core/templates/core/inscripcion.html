@@ -60,14 +60,17 @@
       <div class="registration-field-grid">
         <div class="registration-field">
           <label for="fecha-visita">Fecha de la actividad <span aria-hidden="true">*</span></label>
-          <input id="fecha-visita" name="fecha" type="date" required{% if fechas_disponibles %} min="{{ fechas_disponibles.0|date:'Y-m-d' }}" max="{{ fechas_disponibles|last|date:'Y-m-d' }}"{% else %} disabled{% endif %}>
+          <input id="fecha-visita" name="fecha" type="date" required value="{{ fecha_seleccionada }}"{% if fechas_disponibles %} min="{{ fechas_disponibles.0|date:'Y-m-d' }}" max="{{ fechas_disponibles|last|date:'Y-m-d' }}"{% else %} disabled{% endif %}>
           <small id="date-guidance">Elegí una fecha con turnos disponibles. No se admiten reservas con más de 24 horas de anticipación.</small>
           <p class="field-feedback" id="date-feedback" aria-live="polite"></p>
         </div>
         <div class="registration-field">
           <label for="horario">Horario <span aria-hidden="true">*</span></label>
           <select id="horario" name="horario" required{% if sin_turnos %} disabled{% endif %}>
-            <option value="" selected disabled>Seleccioná una fecha primero</option>
+            <option value="" selected disabled>{% if horarios_disponibles %}Seleccioná un horario{% else %}Seleccioná una fecha primero{% endif %}</option>
+            {% for horario in horarios_disponibles %}
+            <option value="{{ horario.pk }}">{{ horario.hora|time:'H:i' }}</option>
+            {% endfor %}
           </select>
           <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
         </div>
