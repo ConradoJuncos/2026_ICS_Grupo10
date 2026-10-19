@@ -1,11 +1,12 @@
 """Comprueba las fechas reservables que recibe el formulario de inscripción."""
 
 import re
-from datetime import UTC, date, datetime, time
+from datetime import date, datetime, time
 from unittest.mock import patch
 
 import pytest
 from django.test import Client
+from django.utils import timezone
 
 from core.models import Actividad, Horario
 
@@ -23,7 +24,9 @@ def test_inscripcion_ofrece_fechas_reservables_ordenadas_sin_repetir(
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+        return_value=datetime(
+            2026, 10, 20, 16, 30, tzinfo=timezone.get_current_timezone()
+        ),
     ):
         respuesta = client.get("/inscripcion/?actividad=tirolesa")
 
@@ -49,7 +52,9 @@ def test_inscripcion_ofrece_horarios_de_la_actividad_y_fecha_elegidas(
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+        return_value=datetime(
+            2026, 10, 20, 16, 30, tzinfo=timezone.get_current_timezone()
+        ),
     ):
         respuesta = client.get(
             "/inscripcion/", {"actividad": "tirolesa", "fecha": "2026-10-21"}
@@ -67,7 +72,9 @@ def test_inscripcion_informa_cuando_no_hay_turnos_reservables(client: Client) ->
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+        return_value=datetime(
+            2026, 10, 20, 16, 30, tzinfo=timezone.get_current_timezone()
+        ),
     ):
         respuesta = client.get(
             "/inscripcion/", {"actividad": "tirolesa", "fecha": "2026-10-20"}
@@ -90,7 +97,9 @@ def test_calendario_limita_la_seleccion_a_fechas_reservables(client: Client) -> 
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+        return_value=datetime(
+            2026, 10, 20, 16, 30, tzinfo=timezone.get_current_timezone()
+        ),
     ):
         respuesta = client.get("/inscripcion/?actividad=tirolesa")
 
@@ -116,7 +125,9 @@ def test_formulario_muestra_turnos_reales_y_conserva_fecha(client: Client) -> No
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+        return_value=datetime(
+            2026, 10, 20, 16, 30, tzinfo=timezone.get_current_timezone()
+        ),
     ):
         respuesta = client.get(
             "/inscripcion/", {"actividad": "tirolesa", "fecha": "2026-10-21"}
@@ -149,7 +160,9 @@ def test_formulario_permite_consultar_turnos_por_get(client: Client) -> None:
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+        return_value=datetime(
+            2026, 10, 20, 16, 30, tzinfo=timezone.get_current_timezone()
+        ),
     ):
         respuesta = client.get("/inscripcion/?actividad=tirolesa")
 

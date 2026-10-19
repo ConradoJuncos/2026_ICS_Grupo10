@@ -1,10 +1,11 @@
 """Comprueba la consulta de horarios desde la base de datos."""
 
 from collections.abc import Iterator
-from datetime import UTC, date, datetime, time
+from datetime import date, datetime, time
 from unittest.mock import patch
 
 import pytest
+from django.utils import timezone
 
 from core.consulta_horarios import consultar_horarios_por_actividad
 from core.models import Actividad, Horario
@@ -15,7 +16,7 @@ def reloj_controlado() -> Iterator[None]:
     """Fija el reloj para que las consultas no dependan del día de ejecución."""
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 8, tzinfo=UTC),
+        return_value=datetime(2026, 10, 20, 8, tzinfo=timezone.get_current_timezone()),
     ):
         yield
 
@@ -47,7 +48,7 @@ def test_consulta_devuelve_solo_horarios_de_la_fecha_seleccionada() -> None:
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 10, tzinfo=UTC),
+        return_value=datetime(2026, 10, 20, 10, tzinfo=timezone.get_current_timezone()),
     ):
         horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha_seleccionada)
 
@@ -70,7 +71,9 @@ def test_consulta_excluye_horarios_en_dias_de_cierre(fecha_cierre: date) -> None
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime.combine(fecha_cierre, time(8), tzinfo=UTC),
+        return_value=datetime.combine(
+            fecha_cierre, time(8), tzinfo=timezone.get_current_timezone()
+        ),
     ):
         horarios = consultar_horarios_por_actividad(tirolesa)
 
@@ -133,7 +136,9 @@ def test_consulta_excluye_turnos_con_inscripcion_cerrada(hora_cerrada: time) -> 
 
     with patch(
         "django.utils.timezone.now",
-        return_value=datetime(2026, 10, 20, 9, 50, tzinfo=UTC),
+        return_value=datetime(
+            2026, 10, 20, 9, 50, tzinfo=timezone.get_current_timezone()
+        ),
     ):
         horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
 
