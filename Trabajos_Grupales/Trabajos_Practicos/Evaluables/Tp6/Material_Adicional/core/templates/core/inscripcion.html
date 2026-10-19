@@ -28,6 +28,9 @@
     <p class="registration-eyebrow"><span aria-hidden="true">✳</span> Tu próxima aventura</p>
     <h1 id="registration-title">Inscripción a una actividad.</h1>
     <p id="registration-description">Elegí una actividad para ver sus horarios, cupos y condiciones.</p>
+    {% if sin_turnos %}
+    <p class="field-feedback" role="status">No hay turnos reservables para esta actividad y fecha.</p>
+    {% endif %}
     <div class="registration-capacity" id="registration-capacity" hidden><span>Cupo disponible de muestra por turno</span><strong id="capacity-value"></strong></div>
   </div>
 
@@ -63,7 +66,7 @@
         </div>
         <div class="registration-field">
           <label for="horario">Horario <span aria-hidden="true">*</span></label>
-          <select id="horario" name="horario" required>
+          <select id="horario" name="horario" required{% if sin_turnos %} disabled{% endif %}>
             <option value="" selected disabled>Seleccioná una fecha primero</option>
           </select>
           <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
