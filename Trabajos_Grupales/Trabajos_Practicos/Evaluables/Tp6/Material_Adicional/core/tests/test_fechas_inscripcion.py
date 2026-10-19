@@ -1,0 +1,33 @@
+"""Comprueba las fechas reservables que recibe el formulario de inscripción."""
+
+from datetime import UTC, date, datetime, time
+from unittest.mock import patch
+
+import pytest
+from django.test import Client
+
+from core.models import Actividad, Horario
+
+
+@pytest.mark.django_db
+def test_inscripcion_ofrece_fechas_reservables_ordenadas_sin_repetir(
+    client: Client,
+) -> None:
+    """Entrega al template fechas con turnos reservables, únicas y ordenadas."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9))
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(17))
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(10))
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 22), hora=time(9))
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+    ):
+        respuesta = client.get("/inscripcion/?actividad=tirolesa")
+
+    assert respuesta.status_code == 200
+    assert respuesta.context.get("fechas_disponibles", []) == [
+        date(2026, 10, 20),
+        date(2026, 10, 21),
+    ]
