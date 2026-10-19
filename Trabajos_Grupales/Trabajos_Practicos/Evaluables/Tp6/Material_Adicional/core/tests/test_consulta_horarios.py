@@ -104,3 +104,29 @@ def test_consulta_excluye_turnos_a_mas_de_24_horas() -> None:
     horarios = consultar_horarios_por_actividad(tirolesa)
 
     assert horarios == [horario_cercano]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "hora_cerrada",
+    [
+        pytest.param(time(9), id="turno_pasado"),
+        pytest.param(time(10), id="faltan_diez_minutos"),
+    ],
+)
+def test_consulta_excluye_turnos_con_inscripcion_cerrada(hora_cerrada: time) -> None:
+    """Excluye turnos pasados o próximos y conserva otro con margen suficiente."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    fecha = date(2026, 10, 20)
+    horario_abierto = Horario.objects.create(
+        actividad=tirolesa, fecha=fecha, hora=time(11)
+    )
+    Horario.objects.create(actividad=tirolesa, fecha=fecha, hora=hora_cerrada)
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 9, 50, tzinfo=UTC),
+    ):
+        horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
+
+    assert horarios == [horario_abierto]
