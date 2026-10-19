@@ -34,4 +34,12 @@ class CuposTest(TestCase):
         with self.assertRaises(ValueError): 
             # Aquí llamaremos a un método que "valide y guarde"
             h1.registrar_inscripcion("Juan")
-            
+
+    def test_registrar_inscripcion_guarda_participante(self):
+        self.horario.registrar_inscripcion("Juan")
+
+        self.assertEqual(self.horario.inscripciones.count(), 1)
+        self.assertEqual(
+            self.horario.inscripciones.get().nombre_participante,
+            "Juan",
+        )
