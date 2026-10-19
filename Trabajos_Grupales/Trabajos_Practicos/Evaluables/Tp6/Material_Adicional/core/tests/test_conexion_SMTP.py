@@ -8,7 +8,7 @@ from core.email import enviar_mail_confirmacion_registro_a_actividad
 class ServicioEmailTest(TestCase):
     @patch("core.email.smtplib.SMTP")
     def test_enviar_mail_envia_imagen_inline(self, mock_smtp):
-        # mockeo del servidor SMTP, magia que no comprendo
+        # SMTP se usa como context manager: el servidor es lo que devuelve __enter__.
         mock_server = MagicMock()
         mock_smtp.return_value.__enter__.return_value = mock_server
 

@@ -1,10 +1,9 @@
 import io
 
-import segno  # libreria utilizada para generar qrs
+import segno
 
 
 class GenerarQr:
-    # Añadidos parametros basicos en caso de no ser pasados
     def __init__(self, scale: int = 10, error: str = "m"):
         self.scale = scale
         self.error = error
