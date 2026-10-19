@@ -139,3 +139,45 @@ def test_formulario_muestra_turnos_reales_y_conserva_fecha(client: Client) -> No
     assert "disabled" not in selector["atributos"]
     assert campo_fecha is not None
     assert 'value="2026-10-21"' in campo_fecha.group()
+
+
+@pytest.mark.django_db
+def test_formulario_permite_consultar_turnos_por_get(client: Client) -> None:
+    """Permite consultar turnos sin completar ni enviar la inscripción."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(17))
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 16, 30, tzinfo=UTC),
+    ):
+        respuesta = client.get("/inscripcion/?actividad=tirolesa")
+
+    contenido = respuesta.content.decode()
+    formulario = re.search(r'<form\b[^>]*\bid="consulta-turnos"[^>]*>', contenido)
+    selector_actividad = re.search(r'<select\b[^>]*\bid="actividad"[^>]*>', contenido)
+    campo_fecha = re.search(r'<input\b[^>]*\bid="fecha-visita"[^>]*>', contenido)
+    campo_correo = re.search(r'<input\b[^>]*\bname="correo"[^>]*>', contenido)
+    boton_consulta = re.search(
+        r'<button\b[^>]*\bform="consulta-turnos"[^>]*>', contenido
+    )
+    opcion_actividad = re.search(r'<option\b[^>]*\bvalue="tirolesa"[^>]*>', contenido)
+    seccion_actividad = re.search(
+        r'<div\b[^>]*\bid="activity-form-content"[^>]*>', contenido
+    )
+    assert respuesta.status_code == 200
+    assert formulario is not None
+    assert 'method="get"' in formulario.group()
+    assert 'action="/inscripcion/"' in formulario.group()
+    assert selector_actividad is not None
+    assert 'form="consulta-turnos"' in selector_actividad.group()
+    assert campo_fecha is not None
+    assert 'form="consulta-turnos"' in campo_fecha.group()
+    assert campo_correo is not None
+    assert 'form="consulta-turnos"' not in campo_correo.group()
+    assert boton_consulta is not None
+    assert 'type="submit"' in boton_consulta.group()
+    assert opcion_actividad is not None
+    assert "selected" in opcion_actividad.group()
+    assert seccion_actividad is not None
+    assert "hidden" not in seccion_actividad.group()
