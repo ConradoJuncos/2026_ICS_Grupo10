@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
+from core.consulta_horarios import consultar_horarios_por_actividad
 from core.models import Actividad
 from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD
 
@@ -62,6 +63,25 @@ def catalogo(request: HttpRequest) -> HttpResponse:
 @require_GET
 def inscripcion(request: HttpRequest) -> HttpResponse:
     """Renderiza el formulario visual común para todas las actividades."""
+    codigo_actividad = request.GET.get("actividad", "").upper()
+    actividad_seleccionada = Actividad.objects.filter(nombre=codigo_actividad).first()
+    horarios = (
+        consultar_horarios_por_actividad(actividad_seleccionada)
+        if actividad_seleccionada is not None
+        else []
+    )
+    fechas_disponibles = sorted({horario.fecha for horario in horarios})
+    fecha_seleccionada = request.GET.get("fecha")
+    horarios_disponibles = [
+        horario
+        for horario in horarios
+        if horario.fecha.isoformat() == fecha_seleccionada
+    ]
+    sin_turnos = (
+        actividad_seleccionada is not None
+        and bool(fecha_seleccionada)
+        and not horarios_disponibles
+    )
     nombres = dict(Actividad.OPCIONES_ACTIVIDAD)
     cupos = dict(Actividad.objects.values_list("nombre", "cupo_maximo"))
     actividades = [
@@ -81,6 +101,13 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
         "core/inscripcion.html",
         {
             "actividades": actividades,
+            "fechas_disponibles": fechas_disponibles,
+            "actividad_seleccionada": (
+                codigo_actividad.lower() if actividad_seleccionada is not None else ""
+            ),
+            "fecha_seleccionada": fecha_seleccionada or "",
+            "horarios_disponibles": horarios_disponibles,
+            "sin_turnos": sin_turnos,
             "participantes": range(1, max(CUPO_MAXIMO_POR_ACTIVIDAD.values()) + 1),
         },
     )

@@ -28,9 +28,13 @@
     <p class="registration-eyebrow"><span aria-hidden="true">✳</span> Tu próxima aventura</p>
     <h1 id="registration-title">Inscripción a una actividad.</h1>
     <p id="registration-description">Elegí una actividad para ver sus horarios, cupos y condiciones.</p>
+    {% if sin_turnos %}
+    <p class="field-feedback" role="status">No hay turnos reservables para esta actividad y fecha.</p>
+    {% endif %}
     <div class="registration-capacity" id="registration-capacity" hidden><span>Cupo disponible de muestra por turno</span><strong id="capacity-value"></strong></div>
   </div>
 
+  <form id="consulta-turnos" method="get" action="{% url 'inscripcion' %}"></form>
   <form class="registration-form" id="registration-form">
     <section class="registration-section" aria-labelledby="actividad-title">
       <div class="registration-section-heading">
@@ -39,16 +43,17 @@
       </div>
       <div class="registration-field registration-activity">
         <label for="actividad">Actividad <span aria-hidden="true">*</span></label>
-        <select id="actividad" name="actividad" required>
-          <option value="" selected disabled>Seleccioná una actividad</option>
+        <select id="actividad" name="actividad" required form="consulta-turnos">
+          <option value=""{% if not actividad_seleccionada %} selected{% endif %} disabled>Seleccioná una actividad</option>
           {% for opcion in actividades %}
-          <option value="{{ opcion.codigo }}" data-capacity="{{ opcion.cupo }}" data-min-age="{{ opcion.edad_minima }}" data-requires-size="{{ opcion.requiere_talle|yesno:'true,false' }}" data-description="{{ opcion.descripcion }}" data-terms="{{ opcion.terminos }}">{{ opcion.nombre }}</option>
+          <option value="{{ opcion.codigo }}" data-capacity="{{ opcion.cupo }}" data-min-age="{{ opcion.edad_minima }}" data-requires-size="{{ opcion.requiere_talle|yesno:'true,false' }}" data-description="{{ opcion.descripcion }}" data-terms="{{ opcion.terminos }}"{% if opcion.codigo == actividad_seleccionada %} selected{% endif %}>{{ opcion.nombre }}</option>
           {% endfor %}
         </select>
       </div>
+      <button class="button button-dark" type="submit" form="consulta-turnos" formnovalidate>Consultar fechas y horarios <span aria-hidden="true">↗</span></button>
     </section>
 
-    <div id="activity-form-content" class="registration-form" hidden>
+    <div id="activity-form-content" class="registration-form"{% if not actividad_seleccionada %} hidden{% endif %}>
     <section class="registration-section" aria-labelledby="turno-title">
       <div class="registration-section-heading">
         <span class="step-number" aria-hidden="true">02</span>
@@ -57,14 +62,17 @@
       <div class="registration-field-grid">
         <div class="registration-field">
           <label for="fecha-visita">Fecha de la actividad <span aria-hidden="true">*</span></label>
-          <input id="fecha-visita" name="fecha" type="date" required>
-          <small id="date-guidance">Podés elegir fechas hasta un mes por adelantado. No se admiten reservas con más de 24 horas de anticipación.</small>
+          <input id="fecha-visita" name="fecha" type="date" required form="consulta-turnos" value="{{ fecha_seleccionada }}"{% if fechas_disponibles %} min="{{ fechas_disponibles.0|date:'Y-m-d' }}" max="{{ fechas_disponibles|last|date:'Y-m-d' }}"{% else %} disabled{% endif %}>
+          <small id="date-guidance">Elegí una fecha con turnos disponibles. No se admiten reservas con más de 24 horas de anticipación.</small>
           <p class="field-feedback" id="date-feedback" aria-live="polite"></p>
         </div>
         <div class="registration-field">
           <label for="horario">Horario <span aria-hidden="true">*</span></label>
-          <select id="horario" name="horario" required>
-            <option value="" selected disabled>Seleccioná una fecha primero</option>
+          <select id="horario" name="horario" required{% if sin_turnos %} disabled{% endif %}>
+            <option value="" selected disabled>{% if horarios_disponibles %}Seleccioná un horario{% else %}Seleccioná una fecha primero{% endif %}</option>
+            {% for horario in horarios_disponibles %}
+            <option value="{{ horario.pk }}">{{ horario.hora|time:'H:i' }}</option>
+            {% endfor %}
           </select>
           <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
         </div>
