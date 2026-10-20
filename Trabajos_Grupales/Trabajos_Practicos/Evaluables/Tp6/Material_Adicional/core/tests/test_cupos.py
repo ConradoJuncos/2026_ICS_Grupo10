@@ -30,3 +30,20 @@ def test_reserva_reduce_disponibilidad(horario_tirolesa: Horario) -> None:
     )
 
     assert horario_tirolesa.cupos_disponibles() == 9
+
+
+@pytest.mark.django_db
+def test_cada_participante_ocupa_un_lugar(horario_tirolesa: Horario) -> None:
+    """Una inscripción grupal ocupa un lugar por integrante."""
+    inscripcion = Inscripcion.objects.create(horario=horario_tirolesa)
+    inscripcion.participantes.create(
+        nombre="Ana Pérez", dni="30111222", edad=35, talle="M"
+    )
+    inscripcion.participantes.create(
+        nombre="Beto Gómez", dni="31222333", edad=40, talle="L"
+    )
+    inscripcion.participantes.create(
+        nombre="Carla Díaz", dni="32333444", edad=28, talle="S"
+    )
+
+    assert horario_tirolesa.cupos_disponibles() == 7
