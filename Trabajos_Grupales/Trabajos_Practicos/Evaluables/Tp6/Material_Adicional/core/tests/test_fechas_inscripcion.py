@@ -84,7 +84,7 @@ def test_inscripcion_informa_cuando_no_hay_turnos_reservables(client: Client) ->
     assert respuesta.status_code == 200
     assert respuesta.context["horarios_disponibles"] == []
     assert "No hay turnos reservables para esta actividad y fecha." in contenido
-    assert 'id="horario" name="horario" required disabled' in contenido
+    assert 'name="horario"' not in contenido
 
 
 @pytest.mark.django_db
@@ -133,9 +133,9 @@ def test_formulario_muestra_turnos_reales_y_conserva_fecha(client: Client) -> No
         )
 
     contenido = respuesta.content.decode()
-    selector = re.search(
-        r'<select\b(?P<atributos>[^>]*\bid="horario"[^>]*)>'
-        r"(?P<opciones>.*?)</select>",
+    turnos = re.findall(
+        r'<label class="choice-chip time-chip">\s*<input\b[^>]*\bname="horario" '
+        r'value="([^"]+)"[^>]*>(.*?)</label>',
         contenido,
         flags=re.DOTALL,
     )
@@ -143,12 +143,8 @@ def test_formulario_muestra_turnos_reales_y_conserva_fecha(client: Client) -> No
         r'<input\b[^>]*\bname="fecha" value="2026-10-21"[^>]*>', contenido
     )
     assert respuesta.status_code == 200
-    assert selector is not None
-    assert re.findall(r'<option\b[^>]*\bvalue="([^"]+)"', selector["opciones"]) == [
-        str(horario_elegido.pk)
-    ]
-    assert "09:00" in selector["opciones"]
-    assert "disabled" not in selector["atributos"]
+    assert [valor for valor, _ in turnos] == [str(horario_elegido.pk)]
+    assert "09:00" in turnos[0][1]
     assert campo_fecha is not None
     assert "checked" in campo_fecha.group()
 
@@ -226,9 +222,9 @@ def test_selector_muestra_cupos_restantes_del_turno(client: Client) -> None:
         )
 
     opcion = re.search(
-        rf'<option\b[^>]*\bvalue="{horario.pk}"[^>]*>(?P<texto>.*?)</option>',
+        rf'<input\b[^>]*\bvalue="{horario.pk}"[^>]*>(?P<texto>.*?)</label>',
         respuesta.content.decode(),
         flags=re.DOTALL,
     )
     assert opcion is not None
-    assert "7 lugares disponibles" in opcion["texto"]
+    assert "7 lugares" in opcion["texto"]

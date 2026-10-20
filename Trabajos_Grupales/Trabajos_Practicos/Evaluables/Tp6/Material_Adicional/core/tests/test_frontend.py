@@ -1,5 +1,6 @@
 """Prueba la integración HTTP del catálogo y sus enlaces de inscripción."""
 
+import re
 from collections.abc import Iterator
 from datetime import date, datetime, time
 from unittest.mock import MagicMock, patch
@@ -121,7 +122,7 @@ def test_una_pagina_de_inscripcion_preselecciona_actividad_por_query(
         f'name="actividad" value="{codigo}" form="consulta-turnos" required checked>'
         in contenido
     )
-    assert 'name="horario" required' in contenido
+    assert "Elegí una fecha para ver los turnos." in contenido
     assert 'id="fecha-visita"' in contenido
     assert 'name="cantidad_personas"' in contenido
     assert 'name="participante_1_talle"' in contenido
@@ -144,7 +145,14 @@ def test_selector_ofrece_el_ultimo_turno_del_dia(client: Client) -> None:
     ):
         respuesta = client.get(URL_FORMULARIO_TIROLESA)
 
-    assert "17:00 · 10 lugares disponibles" in respuesta.content.decode()
+    turno = re.search(
+        r'<label class="choice-chip time-chip">.*?</label>',
+        respuesta.content.decode(),
+        flags=re.DOTALL,
+    )
+    assert turno is not None
+    assert "17:00" in turno.group()
+    assert "10 lugares" in turno.group()
 
 
 @pytest.mark.django_db
@@ -256,7 +264,10 @@ def test_formulario_rechazado_conserva_el_horario_elegido(
     """Mantiene seleccionado el turno que había elegido el visitante."""
     contenido = envio_rechazado(client, horario_tirolesa)
 
-    assert f'value="{horario_tirolesa.pk}" data-cupos="10" selected>' in contenido
+    assert (
+        f'name="horario" value="{horario_tirolesa.pk}" data-cupos="10" required checked>'
+        in contenido
+    )
 
 
 @pytest.mark.django_db
