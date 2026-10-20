@@ -228,3 +228,26 @@ def test_selector_muestra_cupos_restantes_del_turno(client: Client) -> None:
     )
     assert opcion is not None
     assert "7 lugares" in opcion["texto"]
+
+
+@pytest.mark.django_db
+def test_formulario_preselecciona_la_unica_fecha_reservable(client: Client) -> None:
+    """Muestra los turnos sin pedir que se elija la única fecha posible."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    horario = Horario.objects.create(
+        actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(17)
+    )
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(
+            2026, 10, 20, 9, 30, tzinfo=timezone.get_current_timezone()
+        ),
+    ):
+        respuesta = client.get("/inscripcion/?actividad=tirolesa")
+
+    assert respuesta.context["horarios_disponibles"] == [horario]
+    assert (
+        'name="fecha" value="2026-10-20" form="consulta-turnos" required checked>'
+        in (respuesta.content.decode())
+    )
