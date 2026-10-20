@@ -9,7 +9,7 @@ import pytest
 from django.utils import timezone
 
 from core.consulta_horarios import consultar_horarios_por_actividad
-from core.models import Actividad, Horario
+from core.models import Actividad, Horario, Inscripcion
 
 ZONA_HORARIA_PARQUE = ZoneInfo("America/Argentina/Cordoba")
 
@@ -175,7 +175,9 @@ def test_consulta_excluye_turnos_sin_cupo() -> None:
     horario_libre = Horario.objects.create(
         actividad=tirolesa, fecha=fecha, hora=time(10)
     )
-    horario_completo.registrar_inscripcion("Ana")
+    Inscripcion.objects.create(horario=horario_completo).participantes.create(
+        nombre="Ana Pérez", dni="30111222", edad=35, talle="M"
+    )
 
     horarios = consultar_horarios_por_actividad(tirolesa, fecha=fecha)
 

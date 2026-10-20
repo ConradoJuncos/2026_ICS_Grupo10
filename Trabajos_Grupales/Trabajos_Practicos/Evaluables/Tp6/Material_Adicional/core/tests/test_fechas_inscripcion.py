@@ -8,7 +8,7 @@ import pytest
 from django.test import Client
 from django.utils import timezone
 
-from core.models import Actividad, Horario
+from core.models import Actividad, Horario, Inscripcion
 
 
 @pytest.mark.django_db
@@ -203,9 +203,15 @@ def test_selector_muestra_cupos_restantes_del_turno(client: Client) -> None:
     horario = Horario.objects.create(
         actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9)
     )
-    horario.registrar_inscripcion("Ana")
-    horario.registrar_inscripcion("Beto")
-    horario.registrar_inscripcion("Carla")
+    Inscripcion.objects.create(horario=horario).participantes.create(
+        nombre="Ana Pérez", dni="30111222", edad=35, talle="M"
+    )
+    Inscripcion.objects.create(horario=horario).participantes.create(
+        nombre="Beto Gómez", dni="31222333", edad=40, talle="L"
+    )
+    Inscripcion.objects.create(horario=horario).participantes.create(
+        nombre="Carla Díaz", dni="32333444", edad=28, talle="S"
+    )
 
     with patch(
         "django.utils.timezone.now",
