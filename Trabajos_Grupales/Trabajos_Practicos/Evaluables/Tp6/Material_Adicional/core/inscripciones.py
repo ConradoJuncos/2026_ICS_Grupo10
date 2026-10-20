@@ -40,6 +40,10 @@ class CupoInsuficienteError(ValueError):
     """Indica que el horario no tiene lugares para todos los participantes."""
 
 
+class DniRepetidoError(ValueError):
+    """Indica que una misma persona figura dos veces en la inscripción."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""

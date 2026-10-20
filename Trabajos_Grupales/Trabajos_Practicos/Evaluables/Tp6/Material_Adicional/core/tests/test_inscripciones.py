@@ -12,6 +12,7 @@ from core.inscripciones import (
     CupoInsuficienteError,
     DatosParticipante,
     DniInvalidoError,
+    DniRepetidoError,
     HorarioNoReservableError,
     InscripcionSinParticipantesError,
     TalleInvalidoError,
@@ -278,5 +279,19 @@ def test_rechaza_inscripcion_sin_cupo_suficiente(
             horario,
             correo="ana@ejemplo.com",
             participantes=participantes,
+            acepta_terminos=True,
+        )
+
+
+@pytest.mark.django_db
+def test_rechaza_inscripcion_con_dni_repetido(horario_tirolesa: Horario) -> None:
+    """No permite inscribir dos veces a la misma persona en un grupo."""
+    misma_persona = replace(PARTICIPANTE_VALIDO, nombre="Ana M. Pérez")
+
+    with pytest.raises(DniRepetidoError):
+        registrar_inscripcion(
+            horario_tirolesa,
+            correo="ana@ejemplo.com",
+            participantes=[PARTICIPANTE_VALIDO, misma_persona],
             acepta_terminos=True,
         )
