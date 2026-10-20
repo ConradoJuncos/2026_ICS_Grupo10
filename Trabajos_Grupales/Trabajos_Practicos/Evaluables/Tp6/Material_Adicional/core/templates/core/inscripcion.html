@@ -28,9 +28,6 @@
     <p class="registration-eyebrow"><span aria-hidden="true">✳</span> Tu próxima aventura</p>
     <h1 id="registration-title">Inscripción a una actividad.</h1>
     <p id="registration-description">Elegí una actividad para ver sus horarios, cupos y condiciones.</p>
-    {% if sin_turnos %}
-    <p class="field-feedback" role="status">No hay turnos reservables para esta actividad y fecha.</p>
-    {% endif %}
     {% if error %}
     <p class="field-feedback" role="alert">{{ error }}</p>
     {% endif %}
@@ -83,16 +80,25 @@
           {% endif %}
           <small id="date-guidance">No se admiten reservas con más de 24 horas de anticipación.</small>
         </fieldset>
-        <div class="registration-field">
-          <label for="horario">Horario <span aria-hidden="true">*</span></label>
-          <select id="horario" name="horario" required{% if sin_turnos %} disabled{% endif %}>
-            <option value=""{% if not envio.horario %} selected{% endif %} disabled>{% if horarios_disponibles %}Seleccioná un horario{% else %}Seleccioná una fecha primero{% endif %}</option>
+        <fieldset class="registration-field choice-field" id="horario">
+          <legend>Turno <span aria-hidden="true">*</span></legend>
+          {% if horarios_disponibles %}
+          <div class="choice-group time-group">
             {% for horario in horarios_disponibles %}
-            <option value="{{ horario.pk }}" data-cupos="{{ horario.cupos_disponibles }}"{% if envio.horario == horario.pk|stringformat:"d" %} selected{% endif %}>{{ horario.hora|time:'H:i' }} · {{ horario.cupos_disponibles }} lugares disponibles</option>
+            <label class="choice-chip time-chip">
+              <input type="radio" name="horario" value="{{ horario.pk }}" data-cupos="{{ horario.cupos_disponibles }}" required{% if envio.horario == horario.pk|stringformat:"d" %} checked{% endif %}>
+              <span class="choice-title">{{ horario.hora|time:'H:i' }}</span>
+              <span class="choice-detail">{{ horario.cupos_disponibles }} lugar{{ horario.cupos_disponibles|pluralize:"es" }}</span>
+            </label>
             {% endfor %}
-          </select>
+          </div>
+          {% elif sin_turnos %}
+          <p class="choice-empty">No hay turnos reservables para esta actividad y fecha.</p>
+          {% else %}
+          <p class="choice-empty">Elegí una fecha para ver los turnos.</p>
+          {% endif %}
           <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
-        </div>
+        </fieldset>
         <div class="registration-field">
           <label for="cantidad-personas">Cantidad de participantes <span aria-hidden="true">*</span></label>
           <input id="cantidad-personas" name="cantidad_personas" type="number" value="{{ envio.cantidad_personas }}" min="1" step="1" inputmode="numeric" placeholder="Seleccioná la actividad primero" required>
