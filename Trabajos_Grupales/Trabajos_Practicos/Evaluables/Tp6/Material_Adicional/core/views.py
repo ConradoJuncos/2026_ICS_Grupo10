@@ -10,6 +10,7 @@ from core.consulta_horarios import consultar_horarios_por_actividad
 from core.email import enviar_mail_confirmacion_registro_a_actividad
 from core.inscripciones import (
     ACTIVIDADES_CON_TALLE,
+    TALLES_DISPONIBLES,
     DatosParticipante,
     InscripcionSinParticipantesError,
 )
@@ -112,6 +113,20 @@ def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
             talle=datos.get(f"participante_{numero}_talle", ""),
         )
         for numero in range(1, cantidad + 1)
+    ]
+
+
+def _valores_de_participantes(envio: QueryDict) -> list[dict[str, object]]:
+    """Prepara un bloque por cada lugar posible con los datos ya enviados."""
+    return [
+        {
+            "numero": numero,
+            "nombre": envio.get(f"participante_{numero}_nombre", ""),
+            "dni": envio.get(f"participante_{numero}_dni", ""),
+            "edad": envio.get(f"participante_{numero}_edad", ""),
+            "talle": envio.get(f"participante_{numero}_talle", ""),
+        }
+        for numero in range(1, max(CUPO_MAXIMO_POR_ACTIVIDAD.values()) + 1)
     ]
 
 
@@ -222,6 +237,7 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
             "sin_turnos": sin_turnos,
             "error": error,
             "envio": request.POST,
-            "participantes": range(1, max(CUPO_MAXIMO_POR_ACTIVIDAD.values()) + 1),
+            "participantes": _valores_de_participantes(request.POST),
+            "talles": TALLES_DISPONIBLES,
         },
     )

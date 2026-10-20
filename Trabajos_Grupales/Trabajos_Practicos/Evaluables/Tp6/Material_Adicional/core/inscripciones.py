@@ -10,7 +10,7 @@ from core.validacion_edad import validar_edad_para_actividad
 
 FORMATO_DNI = re.compile(r"\d{7,8}")
 ACTIVIDADES_CON_TALLE = {"TIROLESA", "PALESTRA"}
-TALLES_DISPONIBLES = {"XS", "S", "M", "L", "XL", "XXL"}
+TALLES_DISPONIBLES = ("XS", "S", "M", "L", "XL", "XXL")
 
 
 class InscripcionSinParticipantesError(ValueError):

@@ -94,27 +94,27 @@
         <div><h2 id="participantes-title">Datos de participantes</h2><p>Completá un bloque por cada persona indicada arriba.</p></div>
       </div>
       <div class="participant-list">
-        {% for numero in participantes %}
-        <fieldset class="participant-card" data-participant="{{ numero }}" hidden>
-          <legend>Participante {{ numero }}</legend>
+        {% for participante in participantes %}
+        <fieldset class="participant-card" data-participant="{{ participante.numero }}" hidden>
+          <legend>Participante {{ participante.numero }}</legend>
           <div class="registration-field-grid">
             <div class="registration-field">
-              <label for="nombre-{{ numero }}">Nombre y apellido <span aria-hidden="true">*</span></label>
-              <input id="nombre-{{ numero }}" name="participante_{{ numero }}_nombre" type="text" autocomplete="name" placeholder="Nombre completo" required>
+              <label for="nombre-{{ participante.numero }}">Nombre y apellido <span aria-hidden="true">*</span></label>
+              <input id="nombre-{{ participante.numero }}" name="participante_{{ participante.numero }}_nombre" type="text" value="{{ participante.nombre }}" autocomplete="name" placeholder="Nombre completo" required>
             </div>
             <div class="registration-field">
-              <label for="dni-{{ numero }}">DNI <span aria-hidden="true">*</span></label>
-              <input id="dni-{{ numero }}" name="participante_{{ numero }}_dni" type="text" inputmode="numeric" autocomplete="off" placeholder="Número de documento" required>
+              <label for="dni-{{ participante.numero }}">DNI <span aria-hidden="true">*</span></label>
+              <input id="dni-{{ participante.numero }}" name="participante_{{ participante.numero }}_dni" type="text" value="{{ participante.dni }}" inputmode="numeric" autocomplete="off" placeholder="Número de documento" required>
             </div>
             <div class="registration-field">
-              <label for="edad-{{ numero }}">Edad <span aria-hidden="true">*</span></label>
-              <input id="edad-{{ numero }}" name="participante_{{ numero }}_edad" type="number" min="0" step="1" inputmode="numeric" placeholder="Edad en años" required>
+              <label for="edad-{{ participante.numero }}">Edad <span aria-hidden="true">*</span></label>
+              <input id="edad-{{ participante.numero }}" name="participante_{{ participante.numero }}_edad" type="number" value="{{ participante.edad }}" min="0" step="1" inputmode="numeric" placeholder="Edad en años" required>
             </div>
             <div class="registration-field sizing-field" data-sizing-field hidden>
-              <label for="talle-{{ numero }}">Talle de vestimenta <span aria-hidden="true">*</span></label>
-              <select id="talle-{{ numero }}" name="participante_{{ numero }}_talle" required disabled>
-                <option value="" selected disabled>Seleccioná un talle</option>
-                <option value="XS">XS</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="XXL">XXL</option>
+              <label for="talle-{{ participante.numero }}">Talle de vestimenta <span aria-hidden="true">*</span></label>
+              <select id="talle-{{ participante.numero }}" name="participante_{{ participante.numero }}_talle" required disabled>
+                <option value=""{% if not participante.talle %} selected{% endif %} disabled>Seleccioná un talle</option>
+                {% for talle in talles %}<option value="{{ talle }}"{% if talle == participante.talle %} selected{% endif %}>{{ talle }}</option>{% endfor %}
               </select>
             </div>
           </div>
