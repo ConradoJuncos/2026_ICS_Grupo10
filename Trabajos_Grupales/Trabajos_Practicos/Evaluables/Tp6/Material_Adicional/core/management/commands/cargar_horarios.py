@@ -1,4 +1,4 @@
-"""Carga horarios de muestra para los próximos siete días abiertos."""
+"""Carga horarios de muestra para los siete días abiertos desde hoy."""
 
 from datetime import time, timedelta
 from typing import Any
@@ -12,12 +12,12 @@ from core.models import Actividad, Horario
 class Command(BaseCommand):
     """Genera horarios de muestra respetando los días y horas de apertura."""
 
-    help = "Carga horarios de muestra para los próximos siete días abiertos."
+    help = "Carga horarios de muestra para los siete días abiertos desde hoy."
 
     def handle(self, *args: Any, **options: Any) -> None:
         call_command("cargar_actividades")
         actividades = Actividad.objects.all()
-        fecha = timezone.localdate() + timedelta(days=1)
+        fecha = timezone.localdate()
         dias_abiertos = 0
         horarios_creados = 0
 
