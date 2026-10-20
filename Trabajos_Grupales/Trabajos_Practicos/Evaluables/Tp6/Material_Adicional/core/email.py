@@ -2,7 +2,9 @@ import smtplib
 from email.message import EmailMessage
 
 
-def enviar_mail_confirmacion_registro_a_actividad(destinatario: str, qr: bytes):
+def enviar_mail_confirmacion_registro_a_actividad(
+    destinatario: str, qr: bytes, resumen: str = ""
+):
     msg = EmailMessage()
     msg["Subject"] = "Confirmación de Registro"
     msg["From"] = "noreply@example.com"

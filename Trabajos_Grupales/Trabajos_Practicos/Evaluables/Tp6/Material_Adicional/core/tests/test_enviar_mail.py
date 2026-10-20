@@ -14,3 +14,18 @@ def test_enviar_mail_registro_actividad(mock_smtp: MagicMock) -> None:
     enviar_mail_confirmacion_registro_a_actividad("test@example.com", b"qr_falso")
 
     mock_server.send_message.assert_called_once()
+
+
+@patch("core.email.smtplib.SMTP")
+def test_enviar_mail_incluye_el_resumen_de_la_inscripcion(mock_smtp: MagicMock) -> None:
+    """Agrega al cuerpo del correo el resumen recibido."""
+    mock_server = MagicMock()
+    mock_smtp.return_value.__enter__.return_value = mock_server
+
+    enviar_mail_confirmacion_registro_a_actividad(
+        "test@example.com", b"qr_falso", resumen="Tirolesa · 20/10/2026 · 10:00"
+    )
+
+    mensaje_enviado = mock_server.send_message.call_args[0][0]
+    cuerpo = mensaje_enviado.get_body(preferencelist=("html",)).get_content()
+    assert "Tirolesa · 20/10/2026 · 10:00" in cuerpo
