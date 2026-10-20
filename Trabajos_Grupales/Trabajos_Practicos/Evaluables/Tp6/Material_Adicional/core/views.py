@@ -10,7 +10,7 @@ from core.inscripciones import (
     DatosParticipante,
     registrar_inscripcion,
 )
-from core.models import Actividad, Horario
+from core.models import Actividad, Horario, Inscripcion
 from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD
 
 CUPO_MAXIMO_POR_ACTIVIDAD = {
@@ -95,27 +95,34 @@ def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
     ]
 
 
+def _registrar_envio(datos: QueryDict) -> Inscripcion:
+    """Registra la inscripción con los campos enviados en el formulario."""
+    return registrar_inscripcion(
+        Horario.objects.get(pk=datos["horario"]),
+        correo=datos["correo"],
+        participantes=_leer_participantes(datos),
+        acepta_terminos="acepta_terminos" in datos,
+    )
+
+
 @require_http_methods(["GET", "POST"])
 def inscripcion(request: HttpRequest) -> HttpResponse:
     """Muestra el formulario de inscripción y registra los envíos."""
-    error = ""
     if request.method == "POST":
-        horario = Horario.objects.get(pk=request.POST["horario"])
         try:
-            inscripcion_registrada = registrar_inscripcion(
-                horario,
-                correo=request.POST["correo"],
-                participantes=_leer_participantes(request.POST),
-                acepta_terminos="acepta_terminos" in request.POST,
-            )
+            inscripcion_registrada = _registrar_envio(request.POST)
         except ValueError as rechazo:
-            error = str(rechazo)
-        else:
-            return render(
-                request,
-                "core/confirmacion.html",
-                {"inscripcion": inscripcion_registrada},
-            )
+            return _mostrar_formulario(request, error=str(rechazo))
+        return render(
+            request,
+            "core/confirmacion.html",
+            {"inscripcion": inscripcion_registrada},
+        )
+    return _mostrar_formulario(request)
+
+
+def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
+    """Renderiza el formulario visual común para todas las actividades."""
     codigo_actividad = request.GET.get("actividad", "").upper()
     actividad_seleccionada = Actividad.objects.filter(nombre=codigo_actividad).first()
     horarios = (
