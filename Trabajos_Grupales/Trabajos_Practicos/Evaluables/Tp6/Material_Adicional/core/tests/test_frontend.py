@@ -238,6 +238,20 @@ def test_formulario_rechazado_conserva_el_correo_y_la_cantidad(
 
 
 @pytest.mark.django_db
+def test_formulario_rechazado_conserva_los_datos_de_los_participantes(
+    client: Client, horario_tirolesa: Horario
+) -> None:
+    """Muestra nuevamente el nombre, DNI, edad y talle de cada participante."""
+    contenido = envio_rechazado(client, horario_tirolesa)
+
+    assert 'name="participante_1_nombre" type="text" value="Ana Pérez"' in contenido
+    assert 'name="participante_1_dni" type="text" value="30111222"' in contenido
+    assert 'name="participante_1_edad" type="number" value="35"' in contenido
+    assert 'name="participante_2_dni" type="text" value="123"' in contenido
+    assert '<option value="S" selected>S</option>' in contenido
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "edad",
     [
