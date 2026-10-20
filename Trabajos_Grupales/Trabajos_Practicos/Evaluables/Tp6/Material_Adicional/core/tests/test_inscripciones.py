@@ -7,7 +7,11 @@ from unittest.mock import patch
 import pytest
 from django.utils import timezone
 
-from core.inscripciones import DatosParticipante, registrar_inscripcion
+from core.inscripciones import (
+    DatosParticipante,
+    InscripcionSinParticipantesError,
+    registrar_inscripcion,
+)
 from core.models import Actividad, Horario
 
 
@@ -55,3 +59,12 @@ def test_registra_inscripcion_con_todos_sus_participantes(
         ("Ana Pérez", "30111222", 35, "M"),
         ("Juan Pérez", "50111222", 10, "S"),
     ]
+
+
+@pytest.mark.django_db
+def test_rechaza_inscripcion_sin_participantes(horario_tirolesa: Horario) -> None:
+    """Exige al menos un participante para inscribirse."""
+    with pytest.raises(InscripcionSinParticipantesError):
+        registrar_inscripcion(
+            horario_tirolesa, correo="ana@ejemplo.com", participantes=[]
+        )

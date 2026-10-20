@@ -5,6 +5,10 @@ from dataclasses import dataclass
 from core.models import Horario, Inscripcion
 
 
+class InscripcionSinParticipantesError(ValueError):
+    """Indica que la inscripción no incluye participantes."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""
