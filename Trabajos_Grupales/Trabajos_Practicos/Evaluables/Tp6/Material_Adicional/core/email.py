@@ -11,9 +11,10 @@ def enviar_mail_confirmacion_registro_a_actividad(
     msg["To"] = destinatario
 
     msg.set_content(
-        """\
+        f"""\
     <html>
         <body>
+            <p>{resumen}</p>
             <p>Test qr codigo:</p>
             <img src="cid:qr_code" alt="Código QR">
         </body>
