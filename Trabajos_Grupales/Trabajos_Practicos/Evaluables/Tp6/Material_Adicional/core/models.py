@@ -12,6 +12,12 @@ from core.inscripciones import (
     validar_solicitud,
 )
 
+CUPO_MAXIMO_POR_ACTIVIDAD = {
+    "TIROLESA": 10,
+    "SAFARI": 8,
+    "PALESTRA": 12,
+    "JARDINERIA": 12,
+}
 DIA_LUNES = 0
 FERIADOS_DE_CIERRE = {(1, 1), (12, 25)}
 HORAS_DE_INICIO_PERMITIDAS = {time(hora) for hora in range(9, 18)}

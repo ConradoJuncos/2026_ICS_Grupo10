@@ -14,18 +14,11 @@ from core.inscripciones import (
     DatosParticipante,
     InscripcionSinParticipantesError,
 )
-from core.models import Actividad, Horario, Inscripcion
+from core.models import CUPO_MAXIMO_POR_ACTIVIDAD, Actividad, Horario, Inscripcion
 from core.qr import GenerarQr
 from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD, EdadInvalidaError
 
 logger = logging.getLogger(__name__)
-
-CUPO_MAXIMO_POR_ACTIVIDAD = {
-    "SAFARI": 8,
-    "TIROLESA": 10,
-    "PALESTRA": 12,
-    "JARDINERIA": 12,
-}
 
 DESCRIPCIONES = {
     "SAFARI": (
