@@ -33,11 +33,10 @@ def validar_edad_para_actividad(actividad: str, edad: object) -> None:
     if edad < EDAD_MINIMA_VALIDA:
         raise EdadInvalidaError("La edad no puede ser negativa.")
 
-    # Convert to uppercase safely to match the dictionary keys
-    actividad_key = actividad.upper() if isinstance(actividad, str) else ""
-
-    edad_minima = EDADES_MINIMAS_POR_ACTIVIDAD.get(actividad_key, EDAD_MINIMA_VALIDA)
-    if edad < edad_minima:
+    codigo_actividad = actividad.upper()
+    if codigo_actividad not in EDADES_MINIMAS_POR_ACTIVIDAD:
+        raise ActividadDesconocidaError("La actividad elegida no existe.")
+    if edad < EDADES_MINIMAS_POR_ACTIVIDAD[codigo_actividad]:
         raise EdadNoPermitidaError(
             "La edad del visitante no permite realizar la actividad."
         )
