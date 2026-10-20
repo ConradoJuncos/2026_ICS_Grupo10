@@ -1,5 +1,6 @@
 """Prueba la integración HTTP del catálogo y sus enlaces de inscripción."""
 
+import base64
 import re
 from collections.abc import Iterator
 from datetime import date, datetime, time
@@ -475,3 +476,19 @@ def test_formulario_confirma_la_inscripcion_aunque_falle_el_correo(
     assert "Inscripción confirmada" in respuesta.content.decode()
     assert Inscripcion.objects.exists()
     assert "No se pudo enviar el correo de confirmación" in caplog.text
+
+
+@pytest.mark.django_db
+def test_confirmacion_muestra_el_qr_de_la_inscripcion(
+    client: Client, horario_tirolesa: Horario
+) -> None:
+    """Presenta en pantalla el mismo QR que se envía por correo."""
+    respuesta = client.post(
+        URL_FORMULARIO_TIROLESA, datos_de_inscripcion(horario_tirolesa)
+    )
+
+    qr_esperado = GenerarQr().generate(
+        f"EcoHarmony-Inscripcion-{Inscripcion.objects.get().pk}"
+    )
+    imagen = base64.b64encode(qr_esperado).decode()
+    assert f'src="data:image/png;base64,{imagen}"' in respuesta.content.decode()
