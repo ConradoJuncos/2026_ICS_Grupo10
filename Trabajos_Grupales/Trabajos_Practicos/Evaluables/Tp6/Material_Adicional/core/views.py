@@ -8,6 +8,7 @@ from core.consulta_horarios import consultar_horarios_por_actividad
 from core.inscripciones import (
     ACTIVIDADES_CON_TALLE,
     DatosParticipante,
+    InscripcionSinParticipantesError,
     registrar_inscripcion,
 )
 from core.models import Actividad, Horario, Inscripcion
@@ -91,7 +92,12 @@ def _leer_edad(texto: str) -> int:
 
 def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
     """Arma los datos de cada participante enviado en el formulario."""
-    cantidad = int(datos["cantidad_personas"])
+    try:
+        cantidad = int(datos["cantidad_personas"])
+    except ValueError:
+        raise InscripcionSinParticipantesError(
+            "Indicá la cantidad de participantes."
+        ) from None
     return [
         DatosParticipante(
             nombre=datos[f"participante_{numero}_nombre"],
