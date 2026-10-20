@@ -12,6 +12,7 @@ from core.inscripciones import (
     DatosParticipante,
     DniInvalidoError,
     InscripcionSinParticipantesError,
+    TalleInvalidoError,
     TalleObligatorioError,
     registrar_inscripcion,
 )
@@ -153,3 +154,17 @@ def test_admite_participante_sin_talle_en_actividad_que_no_lo_requiere(
     )
 
     assert inscripcion.participantes.get().talle == ""
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("talle", ["XXS", "XXXL", "m", "40"])
+def test_rechaza_participante_con_talle_inexistente(
+    horario_tirolesa: Horario, talle: str
+) -> None:
+    """Acepta solamente los talles XS, S, M, L, XL y XXL."""
+    participante = replace(PARTICIPANTE_VALIDO, talle=talle)
+
+    with pytest.raises(TalleInvalidoError):
+        registrar_inscripcion(
+            horario_tirolesa, correo="ana@ejemplo.com", participantes=[participante]
+        )

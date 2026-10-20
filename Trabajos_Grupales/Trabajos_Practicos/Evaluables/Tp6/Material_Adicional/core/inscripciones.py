@@ -22,6 +22,10 @@ class TalleObligatorioError(ValueError):
     """Indica que falta el talle de vestimenta que exige la actividad."""
 
 
+class TalleInvalidoError(ValueError):
+    """Indica que el talle informado no pertenece a los talles disponibles."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""
