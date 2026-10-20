@@ -220,6 +220,23 @@ def test_formulario_muestra_el_error_de_una_inscripcion_rechazada(
     assert not Inscripcion.objects.exists()
 
 
+def envio_rechazado(client: Client, horario: Horario) -> str:
+    """Envía una inscripción con un DNI inválido y devuelve el formulario."""
+    datos = datos_de_inscripcion(horario) | {"participante_2_dni": "123"}
+    return client.post(URL_FORMULARIO_TIROLESA, datos).content.decode()
+
+
+@pytest.mark.django_db
+def test_formulario_rechazado_conserva_el_correo_y_la_cantidad(
+    client: Client, horario_tirolesa: Horario
+) -> None:
+    """Evita que el visitante vuelva a escribir sus datos de contacto."""
+    contenido = envio_rechazado(client, horario_tirolesa)
+
+    assert 'name="correo" type="email" value="ana@ejemplo.com"' in contenido
+    assert 'name="cantidad_personas" type="number" value="2"' in contenido
+
+
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "edad",
