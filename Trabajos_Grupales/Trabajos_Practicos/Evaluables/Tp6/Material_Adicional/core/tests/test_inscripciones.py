@@ -15,6 +15,7 @@ from core.inscripciones import (
     registrar_inscripcion,
 )
 from core.models import Actividad, Horario
+from core.validacion_edad import EdadNoPermitidaError
 
 PARTICIPANTE_VALIDO = DatosParticipante(
     nombre="Ana Pérez", dni="30111222", edad=35, talle="M"
@@ -96,4 +97,19 @@ def test_rechaza_participante_con_dni_invalido(
     with pytest.raises(DniInvalidoError):
         registrar_inscripcion(
             horario_tirolesa, correo="ana@ejemplo.com", participantes=[participante]
+        )
+
+
+@pytest.mark.django_db
+def test_rechaza_inscripcion_con_un_participante_menor_a_la_edad_minima(
+    horario_tirolesa: Horario,
+) -> None:
+    """Rechaza el grupo si un integrante no alcanza la edad mínima de Tirolesa."""
+    menor = replace(PARTICIPANTE_VALIDO, nombre="Juan Pérez", dni="50111222", edad=7)
+
+    with pytest.raises(EdadNoPermitidaError):
+        registrar_inscripcion(
+            horario_tirolesa,
+            correo="ana@ejemplo.com",
+            participantes=[PARTICIPANTE_VALIDO, menor],
         )
