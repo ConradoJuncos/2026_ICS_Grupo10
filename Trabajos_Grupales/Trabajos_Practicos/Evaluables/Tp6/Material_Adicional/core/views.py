@@ -2,7 +2,7 @@
 
 import logging
 
-from django.http import HttpRequest, HttpResponse, QueryDict
+from django.http import Http404, HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_http_methods
 
@@ -117,7 +117,10 @@ def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
 
 def _registrar_envio(datos: QueryDict) -> Inscripcion:
     """Registra la inscripción con los campos enviados en el formulario."""
-    horario = get_object_or_404(Horario, pk=datos["horario"])
+    identificador_horario = datos.get("horario", "")
+    if not identificador_horario.isdigit():
+        raise Http404("El horario elegido no existe.")
+    horario = get_object_or_404(Horario, pk=identificador_horario)
     return horario.registrar_inscripcion(
         correo=datos.get("correo", ""),
         participantes=_leer_participantes(datos),
