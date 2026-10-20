@@ -168,13 +168,14 @@ def test_formulario_permite_consultar_turnos_por_get(client: Client) -> None:
 
     contenido = respuesta.content.decode()
     formulario = re.search(r'<form\b[^>]*\bid="consulta-turnos"[^>]*>', contenido)
-    selector_actividad = re.search(r'<select\b[^>]*\bid="actividad"[^>]*>', contenido)
     campo_fecha = re.search(r'<input\b[^>]*\bid="fecha-visita"[^>]*>', contenido)
     campo_correo = re.search(r'<input\b[^>]*\bname="correo"[^>]*>', contenido)
     boton_consulta = re.search(
         r'<button\b[^>]*\bform="consulta-turnos"[^>]*>', contenido
     )
-    opcion_actividad = re.search(r'<option\b[^>]*\bvalue="tirolesa"[^>]*>', contenido)
+    opcion_actividad = re.search(
+        r'<input\b[^>]*\bname="actividad" value="tirolesa"[^>]*>', contenido
+    )
     seccion_actividad = re.search(
         r'<div\b[^>]*\bid="activity-form-content"[^>]*>', contenido
     )
@@ -182,8 +183,6 @@ def test_formulario_permite_consultar_turnos_por_get(client: Client) -> None:
     assert formulario is not None
     assert 'method="get"' in formulario.group()
     assert 'action="/inscripcion/"' in formulario.group()
-    assert selector_actividad is not None
-    assert 'form="consulta-turnos"' in selector_actividad.group()
     assert campo_fecha is not None
     assert 'form="consulta-turnos"' in campo_fecha.group()
     assert campo_correo is not None
@@ -191,7 +190,9 @@ def test_formulario_permite_consultar_turnos_por_get(client: Client) -> None:
     assert boton_consulta is not None
     assert 'type="submit"' in boton_consulta.group()
     assert opcion_actividad is not None
-    assert "selected" in opcion_actividad.group()
+    assert 'type="radio"' in opcion_actividad.group()
+    assert 'form="consulta-turnos"' in opcion_actividad.group()
+    assert "checked" in opcion_actividad.group()
     assert seccion_actividad is not None
     assert "hidden" not in seccion_actividad.group()
 

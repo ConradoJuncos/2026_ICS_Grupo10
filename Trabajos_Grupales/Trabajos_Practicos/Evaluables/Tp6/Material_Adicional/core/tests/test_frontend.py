@@ -118,10 +118,12 @@ def test_una_pagina_de_inscripcion_preselecciona_actividad_por_query(
     contenido = respuesta.content.decode()
     assert respuesta.status_code == 200
     assert contenido.count("<legend>Participante ") == 12
-    assert f'value="{codigo}"' in contenido
     assert 'id="actividad"' in contenido
-    capacidades = {"safari": 8, "tirolesa": 10, "palestra": 12, "jardineria": 12}
-    assert f'data-capacity="{capacidades[codigo]}"' in contenido
+    assert contenido.count('type="radio" name="actividad"') == 4
+    assert (
+        f'name="actividad" value="{codigo}" form="consulta-turnos" required checked>'
+        in contenido
+    )
     assert 'name="horario" required' in contenido
     assert 'type="date"' in contenido
     assert 'name="cantidad_personas"' in contenido
