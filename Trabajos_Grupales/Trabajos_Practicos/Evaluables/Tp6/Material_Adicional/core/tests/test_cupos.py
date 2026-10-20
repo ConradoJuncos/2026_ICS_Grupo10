@@ -24,7 +24,7 @@ def test_horario_nuevo_tiene_disponibilidad_total(horario_tirolesa: Horario) -> 
 
 @pytest.mark.django_db
 def test_reserva_reduce_disponibilidad(horario_tirolesa: Horario) -> None:
-    """Cada inscripción ocupa un lugar del horario."""
+    """Un participante inscripto ocupa un lugar del horario."""
     Inscripcion.objects.create(horario=horario_tirolesa).participantes.create(
         nombre="Ana Pérez", dni="30111222", edad=35, talle="M"
     )
