@@ -11,6 +11,8 @@ from django.utils import timezone
 
 from core.models import Actividad, Horario, Inscripcion
 
+URL_FORMULARIO_TIROLESA = "/inscripcion/?actividad=tirolesa&fecha=2026-10-20"
+
 
 @pytest.fixture
 def reloj_controlado() -> Iterator[None]:
@@ -141,7 +143,7 @@ def test_formulario_registra_la_inscripcion_enviada(
 ) -> None:
     """Guarda la inscripción del grupo y muestra la confirmación."""
     respuesta = client.post(
-        "/inscripcion/?actividad=tirolesa&fecha=2026-10-20",
+        URL_FORMULARIO_TIROLESA,
         datos_de_inscripcion(horario_tirolesa),
     )
 
@@ -167,7 +169,7 @@ def test_formulario_muestra_el_error_de_una_inscripcion_rechazada(
     """Vuelve al formulario con el motivo del rechazo y no guarda nada."""
     datos = datos_de_inscripcion(horario_tirolesa) | {"participante_2_dni": "123"}
 
-    respuesta = client.post("/inscripcion/?actividad=tirolesa&fecha=2026-10-20", datos)
+    respuesta = client.post(URL_FORMULARIO_TIROLESA, datos)
 
     contenido = respuesta.content.decode()
     assert respuesta.status_code == 200
@@ -190,7 +192,7 @@ def test_formulario_rechaza_una_edad_no_numerica(
     """Informa que la edad debe ser un número en lugar de fallar."""
     datos = datos_de_inscripcion(horario_tirolesa) | {"participante_1_edad": edad}
 
-    respuesta = client.post("/inscripcion/?actividad=tirolesa&fecha=2026-10-20", datos)
+    respuesta = client.post(URL_FORMULARIO_TIROLESA, datos)
 
     assert "La edad debe ser un número entero." in respuesta.content.decode()
     assert not Inscripcion.objects.exists()
@@ -210,7 +212,7 @@ def test_formulario_rechaza_una_cantidad_de_participantes_no_numerica(
     """Pide indicar la cantidad de participantes en lugar de fallar."""
     datos = datos_de_inscripcion(horario_tirolesa) | {"cantidad_personas": cantidad}
 
-    respuesta = client.post("/inscripcion/?actividad=tirolesa&fecha=2026-10-20", datos)
+    respuesta = client.post(URL_FORMULARIO_TIROLESA, datos)
 
     assert "Indicá la cantidad de participantes." in respuesta.content.decode()
     assert not Inscripcion.objects.exists()
@@ -225,6 +227,6 @@ def test_formulario_responde_404_ante_un_horario_inexistente(
         "horario": str(horario_tirolesa.pk + 1)
     }
 
-    respuesta = client.post("/inscripcion/?actividad=tirolesa&fecha=2026-10-20", datos)
+    respuesta = client.post(URL_FORMULARIO_TIROLESA, datos)
 
     assert respuesta.status_code == 404
