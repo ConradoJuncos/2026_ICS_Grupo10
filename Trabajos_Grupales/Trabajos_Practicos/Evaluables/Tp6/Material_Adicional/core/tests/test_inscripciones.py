@@ -9,6 +9,7 @@ import pytest
 from django.utils import timezone
 
 from core.inscripciones import (
+    CorreoInvalidoError,
     CupoInsuficienteError,
     DatosParticipante,
     DniInvalidoError,
@@ -92,6 +93,29 @@ def test_rechaza_inscripcion_sin_participantes(horario_tirolesa: Horario) -> Non
             correo="ana@ejemplo.com",
             acepta_terminos=True,
             participantes=[],
+        )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "correo",
+    [
+        pytest.param("", id="vacio"),
+        pytest.param("ana.ejemplo.com", id="sin_arroba"),
+        pytest.param("ana@", id="sin_dominio"),
+        pytest.param("ana pérez@ejemplo.com", id="con_espacios"),
+    ],
+)
+def test_rechaza_inscripcion_con_correo_invalido(
+    horario_tirolesa: Horario, correo: str
+) -> None:
+    """Exige un correo válido para enviar el comprobante de la inscripción."""
+    with pytest.raises(CorreoInvalidoError):
+        registrar_inscripcion(
+            horario_tirolesa,
+            correo=correo,
+            acepta_terminos=True,
+            participantes=[PARTICIPANTE_VALIDO],
         )
 
 

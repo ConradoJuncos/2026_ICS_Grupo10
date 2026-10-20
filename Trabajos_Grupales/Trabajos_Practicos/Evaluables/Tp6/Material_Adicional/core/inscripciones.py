@@ -16,6 +16,10 @@ class InscripcionSinParticipantesError(ValueError):
     """Indica que la inscripción no incluye participantes."""
 
 
+class CorreoInvalidoError(ValueError):
+    """Indica que el correo de contacto no tiene un formato válido."""
+
+
 class DniInvalidoError(ValueError):
     """Indica que el DNI de un participante no tiene un formato válido."""
 
