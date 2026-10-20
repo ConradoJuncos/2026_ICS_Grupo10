@@ -1,9 +1,52 @@
 """Prueba la integración HTTP del catálogo y sus enlaces de inscripción."""
 
+from collections.abc import Iterator
+from datetime import date, datetime, time
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from django.test import Client
+from django.utils import timezone
+
+from core.models import Actividad, Horario, Inscripcion
+
+
+@pytest.fixture
+def reloj_controlado() -> Iterator[None]:
+    """Fija el reloj una hora antes del turno de las pruebas."""
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(2026, 10, 20, 9, tzinfo=timezone.get_current_timezone()),
+    ):
+        yield
+
+
+@pytest.fixture
+def horario_tirolesa(reloj_controlado: None) -> Horario:
+    """Crea un turno reservable de Tirolesa."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    return Horario.objects.create(
+        actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(10)
+    )
+
+
+def datos_de_inscripcion(horario: Horario) -> dict[str, str]:
+    """Arma los campos que envía el formulario para un grupo de dos personas."""
+    return {
+        "horario": str(horario.pk),
+        "cantidad_personas": "2",
+        "participante_1_nombre": "Ana Pérez",
+        "participante_1_dni": "30111222",
+        "participante_1_edad": "35",
+        "participante_1_talle": "M",
+        "participante_2_nombre": "Juan Pérez",
+        "participante_2_dni": "50111222",
+        "participante_2_edad": "10",
+        "participante_2_talle": "S",
+        "correo": "ana@ejemplo.com",
+        "acepta_terminos": "on",
+    }
 
 
 def test_catalogo_muestra_actividades_con_enlaces_de_inscripcion(
@@ -90,3 +133,28 @@ def test_formulario_inscripcion_rechaza_metodos_no_admitidos(client: Client) -> 
 def test_inscripcion_ya_no_tiene_ruta_por_actividad(client: Client) -> None:
     respuesta = client.get("/inscripcion/safari/")
     assert respuesta.status_code == 404
+
+
+@pytest.mark.django_db
+def test_formulario_registra_la_inscripcion_enviada(
+    client: Client, horario_tirolesa: Horario
+) -> None:
+    """Guarda la inscripción del grupo y muestra la confirmación."""
+    respuesta = client.post(
+        "/inscripcion/?actividad=tirolesa&fecha=2026-10-20",
+        datos_de_inscripcion(horario_tirolesa),
+    )
+
+    assert respuesta.status_code == 200
+    assert "Inscripción confirmada" in respuesta.content.decode()
+    inscripcion = Inscripcion.objects.get()
+    assert inscripcion.horario == horario_tirolesa
+    assert inscripcion.correo == "ana@ejemplo.com"
+    assert list(
+        inscripcion.participantes.order_by("dni").values_list(
+            "nombre", "dni", "edad", "talle"
+        )
+    ) == [
+        ("Ana Pérez", "30111222", 35, "M"),
+        ("Juan Pérez", "50111222", 10, "S"),
+    ]
