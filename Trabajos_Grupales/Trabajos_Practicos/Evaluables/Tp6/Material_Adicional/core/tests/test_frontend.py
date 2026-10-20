@@ -129,9 +129,18 @@ def test_una_pagina_de_inscripcion_preselecciona_actividad_por_query(
     assert 'name="cantidad_personas"' in contenido
     assert 'name="participante_1_talle"' in contenido
     assert "inscripcion.js" in contenido
-    assert "Condiciones preliminares" in contenido
     assert "código QR" in contenido
     assert "inscripcion.js" in contenido
+
+
+@pytest.mark.django_db
+def test_formulario_presenta_los_terminos_como_vigentes(client: Client) -> None:
+    """No anuncia los términos como provisorios ahora que la inscripción funciona."""
+    respuesta = client.get("/inscripcion/?actividad=safari")
+
+    contenido = respuesta.content.decode()
+    assert "Términos y condiciones de" in contenido
+    assert "Condiciones preliminares" not in contenido
 
 
 def test_formulario_inscripcion_rechaza_metodos_no_admitidos(client: Client) -> None:
