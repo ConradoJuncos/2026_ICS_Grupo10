@@ -125,8 +125,8 @@ def _registrar_envio(datos: QueryDict) -> Inscripcion:
     )
 
 
-def _enviar_confirmacion(inscripcion: Inscripcion) -> None:
-    """Envía al visitante el resumen y el código QR de su inscripción."""
+def _resumen_de_inscripcion(inscripcion: Inscripcion) -> str:
+    """Describe el turno y los participantes de la inscripción, uno por línea."""
     horario = inscripcion.horario
     lineas = [
         f"{horario.actividad} · {horario.fecha:%d/%m/%Y} · {horario.hora:%H:%M}",
@@ -135,11 +135,16 @@ def _enviar_confirmacion(inscripcion: Inscripcion) -> None:
             for participante in inscripcion.participantes.order_by("pk")
         ),
     ]
+    return "\n".join(lineas)
+
+
+def _enviar_confirmacion(inscripcion: Inscripcion) -> None:
+    """Envía al visitante el resumen y el código QR de su inscripción."""
     try:
         enviar_mail_confirmacion_registro_a_actividad(
             inscripcion.correo,
             GenerarQr().generate(f"EcoHarmony-Inscripcion-{inscripcion.pk}"),
-            resumen="\n".join(lineas),
+            resumen=_resumen_de_inscripcion(inscripcion),
         )
     except OSError:
         logger.exception(
