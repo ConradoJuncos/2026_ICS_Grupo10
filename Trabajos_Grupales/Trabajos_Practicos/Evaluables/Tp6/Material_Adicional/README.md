@@ -58,8 +58,9 @@ python manage.py runserver
 Abrir <http://127.0.0.1:8000/>. Al finalizar una inscripcion, la aplicacion la
 registra, muestra la confirmacion y envia el correo con el resumen y el codigo QR.
 
-El correo se envia a un servidor SMTP en `localhost:1025`. Estos requirements no
-instalan ni inician ese servidor. Sin servidor, la inscripcion se registra igual
+El correo se envia a un servidor SMTP en `localhost:1025`, configurable con
+`CORREO_SMTP_HOST` y `CORREO_SMTP_PUERTO` en `config/settings.py`. Estos
+requirements no instalan ni inician ese servidor. Sin servidor, la inscripcion se registra igual
 y el error de envio aparece en la terminal de `runserver`. Para ver los correos
 durante una demostracion se puede iniciar un servidor SMTP local de pruebas en
 ese puerto, por ejemplo Mailpit (interfaz web en <http://127.0.0.1:8025/>).
