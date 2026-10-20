@@ -278,3 +278,22 @@ def test_correo_de_confirmacion_incluye_el_qr_de_la_inscripcion(
         f"EcoHarmony-Inscripcion-{Inscripcion.objects.get().pk}"
     )
     assert imagenes == [qr_esperado]
+
+
+@pytest.mark.django_db
+def test_formulario_confirma_la_inscripcion_aunque_falle_el_correo(
+    client: Client,
+    horario_tirolesa: Horario,
+    servidor_smtp: MagicMock,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Un error del servidor de correo no cancela la inscripción y queda registrado."""
+    servidor_smtp.send_message.side_effect = ConnectionRefusedError
+
+    respuesta = client.post(
+        URL_FORMULARIO_TIROLESA, datos_de_inscripcion(horario_tirolesa)
+    )
+
+    assert "Inscripción confirmada" in respuesta.content.decode()
+    assert Inscripcion.objects.exists()
+    assert "No se pudo enviar el correo de confirmación" in caplog.text
