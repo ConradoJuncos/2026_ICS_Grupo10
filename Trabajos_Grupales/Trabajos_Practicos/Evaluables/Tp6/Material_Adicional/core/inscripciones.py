@@ -69,6 +69,8 @@ class DatosParticipante:
 
 def _validar_participante(actividad: str, participante: DatosParticipante) -> None:
     """Rechaza los datos del participante que no cumplen las reglas de la actividad."""
+    if not participante.nombre.strip():
+        raise NombreObligatorioError("Indicá el nombre de cada participante.")
     if not FORMATO_DNI.fullmatch(participante.dni):
         raise DniInvalidoError("El DNI debe tener 7 u 8 dígitos, sin puntos.")
     validar_edad_para_actividad(actividad, participante.edad)
