@@ -18,7 +18,7 @@ from core.inscripciones import (
     TerminosNoAceptadosError,
     registrar_inscripcion,
 )
-from core.models import Actividad, Horario
+from core.models import Actividad, Horario, Inscripcion, Participante
 from core.validacion_edad import EdadNoPermitidaError
 
 PARTICIPANTE_VALIDO = DatosParticipante(
@@ -227,3 +227,20 @@ def test_rechaza_inscripcion_en_horario_no_reservable(fecha: date, hora: time) -
             participantes=[PARTICIPANTE_VALIDO],
             acepta_terminos=True,
         )
+
+
+@pytest.mark.django_db
+def test_inscripcion_rechazada_no_guarda_datos(horario_tirolesa: Horario) -> None:
+    """Un participante inválido impide guardar a todo el grupo."""
+    sin_talle = replace(PARTICIPANTE_VALIDO, dni="50111222", talle="")
+
+    with pytest.raises(TalleObligatorioError):
+        registrar_inscripcion(
+            horario_tirolesa,
+            correo="ana@ejemplo.com",
+            participantes=[PARTICIPANTE_VALIDO, sin_talle],
+            acepta_terminos=True,
+        )
+
+    assert not Inscripcion.objects.exists()
+    assert not Participante.objects.exists()
