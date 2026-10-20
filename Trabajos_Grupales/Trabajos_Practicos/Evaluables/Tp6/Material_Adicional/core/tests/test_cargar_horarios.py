@@ -12,16 +12,16 @@ from core.models import Horario
 
 @pytest.mark.django_db
 def test_cargar_horarios_respeta_dias_feriados_y_turnos_de_apertura() -> None:
-    """Carga turnos en siete días abiertos sin duplicarlos al repetir."""
+    """Carga turnos desde hoy en siete días abiertos sin duplicarlos al repetir."""
     fecha_base = date(2026, 12, 23)
     dias_esperados = [
+        date(2026, 12, 23),
         date(2026, 12, 24),
         date(2026, 12, 26),
         date(2026, 12, 27),
         date(2026, 12, 29),
         date(2026, 12, 30),
         date(2026, 12, 31),
-        date(2027, 1, 2),
     ]
     with patch(
         "core.management.commands.cargar_horarios.timezone.localdate",
