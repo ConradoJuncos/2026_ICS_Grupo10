@@ -312,6 +312,25 @@ def test_formulario_responde_404_ante_un_horario_inexistente(
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    "horario",
+    [
+        pytest.param("", id="vacio"),
+        pytest.param("diez", id="en_letras"),
+    ],
+)
+def test_formulario_responde_404_ante_un_horario_no_numerico(
+    client: Client, horario_tirolesa: Horario, horario: str
+) -> None:
+    """Trata un identificador de turno mal formado como un turno inexistente."""
+    datos = datos_de_inscripcion(horario_tirolesa) | {"horario": horario}
+
+    respuesta = client.post(URL_FORMULARIO_TIROLESA, datos)
+
+    assert respuesta.status_code == 404
+
+
+@pytest.mark.django_db
 def test_formulario_se_envia_por_post(client: Client) -> None:
     """Habilita el envío del formulario con protección CSRF."""
     respuesta = client.get("/inscripcion/?actividad=safari")
