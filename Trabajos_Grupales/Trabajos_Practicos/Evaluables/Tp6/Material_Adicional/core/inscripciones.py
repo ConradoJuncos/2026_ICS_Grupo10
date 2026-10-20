@@ -1,0 +1,24 @@
+"""Registra inscripciones de visitantes a los horarios de las actividades."""
+
+from dataclasses import dataclass
+
+from core.models import Horario, Inscripcion
+
+
+@dataclass(frozen=True)
+class DatosParticipante:
+    """Datos que el visitante informa por cada participante."""
+
+    nombre: str
+    dni: str
+    edad: int
+    talle: str = ""
+
+
+def registrar_inscripcion(
+    horario: Horario,
+    correo: str,
+    participantes: list[DatosParticipante],
+) -> Inscripcion:
+    """Valida y guarda la inscripción de los participantes en el horario."""
+    raise NotImplementedError
