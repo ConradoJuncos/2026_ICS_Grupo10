@@ -8,6 +8,7 @@ from core.validacion_edad import validar_edad_para_actividad
 
 FORMATO_DNI = re.compile(r"\d{7,8}")
 ACTIVIDADES_CON_TALLE = {"TIROLESA", "PALESTRA"}
+TALLES_DISPONIBLES = {"XS", "S", "M", "L", "XL", "XXL"}
 
 
 class InscripcionSinParticipantesError(ValueError):
@@ -50,6 +51,8 @@ def registrar_inscripcion(
         validar_edad_para_actividad(horario.actividad.nombre, participante.edad)
         if horario.actividad.nombre in ACTIVIDADES_CON_TALLE and not participante.talle:
             raise TalleObligatorioError("Indicá el talle de cada participante.")
+        if participante.talle and participante.talle not in TALLES_DISPONIBLES:
+            raise TalleInvalidoError("Elegí un talle entre XS y XXL.")
     inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
     for participante in participantes:
         inscripcion.participantes.create(
