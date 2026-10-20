@@ -159,6 +159,16 @@ def test_formulario_presenta_los_terminos_como_vigentes(client: Client) -> None:
     assert "Condiciones preliminares" not in contenido
 
 
+@pytest.mark.django_db
+def test_formulario_no_pide_datos_que_la_inscripcion_no_guarda(
+    client: Client,
+) -> None:
+    """Omite el nombre de un coordinador, que no forma parte de la inscripción."""
+    respuesta = client.get("/inscripcion/?actividad=safari")
+
+    assert 'name="nombre_actividad"' not in respuesta.content.decode()
+
+
 def test_formulario_inscripcion_rechaza_metodos_no_admitidos(client: Client) -> None:
     respuesta = client.put("/inscripcion/")
     assert respuesta.status_code == 405
