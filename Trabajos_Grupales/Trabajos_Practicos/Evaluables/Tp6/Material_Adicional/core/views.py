@@ -2,11 +2,15 @@
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_http_methods
 
 from core.consulta_horarios import consultar_horarios_por_actividad
-from core.inscripciones import ACTIVIDADES_CON_TALLE
-from core.models import Actividad
+from core.inscripciones import (
+    ACTIVIDADES_CON_TALLE,
+    DatosParticipante,
+    registrar_inscripcion,
+)
+from core.models import Actividad, Horario
 from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD
 
 CUPO_MAXIMO_POR_ACTIVIDAD = {
@@ -77,9 +81,32 @@ def catalogo(request: HttpRequest) -> HttpResponse:
     )
 
 
-@require_GET
+@require_http_methods(["GET", "POST"])
 def inscripcion(request: HttpRequest) -> HttpResponse:
-    """Renderiza el formulario visual común para todas las actividades."""
+    """Muestra el formulario de inscripción y registra los envíos."""
+    if request.method == "POST":
+        horario = Horario.objects.get(pk=request.POST["horario"])
+        cantidad = int(request.POST["cantidad_personas"])
+        participantes = [
+            DatosParticipante(
+                nombre=request.POST[f"participante_{numero}_nombre"],
+                dni=request.POST[f"participante_{numero}_dni"],
+                edad=int(request.POST[f"participante_{numero}_edad"]),
+                talle=request.POST.get(f"participante_{numero}_talle", ""),
+            )
+            for numero in range(1, cantidad + 1)
+        ]
+        inscripcion_registrada = registrar_inscripcion(
+            horario,
+            correo=request.POST["correo"],
+            participantes=participantes,
+            acepta_terminos="acepta_terminos" in request.POST,
+        )
+        return render(
+            request,
+            "core/confirmacion.html",
+            {"inscripcion": inscripcion_registrada},
+        )
     codigo_actividad = request.GET.get("actividad", "").upper()
     actividad_seleccionada = Actividad.objects.filter(nombre=codigo_actividad).first()
     horarios = (
