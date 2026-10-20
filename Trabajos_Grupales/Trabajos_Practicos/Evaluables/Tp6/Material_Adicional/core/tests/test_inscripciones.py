@@ -17,6 +17,7 @@ from core.inscripciones import (
     HorarioNoReservableError,
     InscripcionSimultaneaError,
     InscripcionSinParticipantesError,
+    NombreObligatorioError,
     TalleInvalidoError,
     TalleObligatorioError,
     TerminosNoAceptadosError,
@@ -112,6 +113,28 @@ def test_rechaza_inscripcion_con_correo_invalido(
             correo=correo,
             acepta_terminos=True,
             participantes=[PARTICIPANTE_VALIDO],
+        )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "nombre",
+    [
+        pytest.param("", id="vacio"),
+        pytest.param("   ", id="solo_espacios"),
+    ],
+)
+def test_rechaza_participante_sin_nombre(
+    horario_tirolesa: Horario, nombre: str
+) -> None:
+    """Exige el nombre de cada participante."""
+    participante = replace(PARTICIPANTE_VALIDO, nombre=nombre)
+
+    with pytest.raises(NombreObligatorioError):
+        horario_tirolesa.registrar_inscripcion(
+            correo="ana@ejemplo.com",
+            acepta_terminos=True,
+            participantes=[participante],
         )
 
 
