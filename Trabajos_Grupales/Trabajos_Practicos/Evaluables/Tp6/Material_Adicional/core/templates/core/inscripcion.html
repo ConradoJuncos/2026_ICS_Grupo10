@@ -3,16 +3,16 @@
 <html lang="es-AR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#386641">
   <meta name="description" content="Elegí una actividad y prepará tu inscripción a EcoHarmony Park.">
-  <title>Inscripción | EcoHarmony Park</title>
+  <title>{% if actividad_elegida %}Inscripción a {{ actividad_elegida.nombre }}{% else %}Inscripción{% endif %} | EcoHarmony Park</title>
   <link rel="icon" href="{% static 'core/huella.svg' %}" type="image/svg+xml">
   <link rel="stylesheet" href="{% static 'core/parque.css' %}">
   <link rel="stylesheet" href="{% static 'core/inscripcion.css' %}">
   <script src="{% static 'core/inscripcion.js' %}" defer></script>
 </head>
-<body>
+<body class="registration-body">
 <a class="skip-link" href="#formulario-inscripcion">Ir al formulario</a>
 <header class="site-header">
   <a class="brand" href="{% url 'catalogo' %}" aria-label="EcoHarmony Park, inicio">
@@ -20,7 +20,7 @@
     <span>EcoHarmony<span class="brand-park">Park</span></span>
   </a>
   <nav aria-label="Navegación principal">
-    <a href="{% url 'catalogo' %}">Volver a actividades <span aria-hidden="true">↗</span></a>
+    <a href="{% url 'catalogo' %}">Actividades <span aria-hidden="true">↗</span></a>
   </nav>
 </header>
 <main class="registration-page" id="formulario-inscripcion">
@@ -33,19 +33,23 @@
     <h1 id="registration-title">Inscripción a una actividad.</h1>
     <p id="registration-description">Elegí una actividad para ver sus horarios, lugares y condiciones.</p>
     {% endif %}
-    {% if error %}
-    <p class="field-feedback" role="alert">{{ error }}</p>
-    {% endif %}
-    <div class="registration-capacity" id="registration-capacity" hidden><span>Lugares disponibles en el turno</span><strong id="capacity-value"></strong></div>
   </div>
 
+  {% if error %}
+  <div class="form-alert" id="form-alert" role="alert" tabindex="-1">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 7v6m0 3.5v.5"/></svg>
+    <div><strong>Revisá los datos de la inscripción</strong><p>{{ error }}</p></div>
+  </div>
+  {% endif %}
+
   <form id="consulta-turnos" method="get" action="{% url 'inscripcion' %}"></form>
-  <form class="registration-form" id="registration-form" method="post">
+  <form class="registration-form{% if actividad_elegida %} has-activity{% endif %}" id="registration-form" method="post" action="{{ request.get_full_path }}#formulario-inscripcion">
     {% csrf_token %}
-    <section class="registration-section" aria-labelledby="actividad-title">
+    <div class="registration-steps">
+    <section class="registration-section" id="paso-actividad" data-step aria-labelledby="actividad-title">
       <div class="registration-section-heading">
-        <span class="step-number" aria-hidden="true">01</span>
-        <div><h2 id="actividad-title">Elegí una actividad</h2><p>Podés cambiarla cuando quieras desde esta lista.</p></div>
+        <span class="step-number" aria-hidden="true">1</span>
+        <div><h2 id="actividad-title">Elegí una actividad</h2><p>Podés cambiarla cuando quieras.</p></div>
       </div>
       <fieldset class="activity-picker" id="actividad">
         <legend class="visually-hidden">Actividad</legend>
@@ -53,92 +57,98 @@
         <label class="activity-option">
           <input type="radio" name="actividad" value="{{ opcion.codigo }}" form="consulta-turnos" required{% if opcion.codigo == actividad_seleccionada %} checked{% endif %}>
           <span class="activity-option-art">{% include 'core/ilustracion.html' with actividad=opcion.arte %}</span>
-          <span class="activity-option-name">{{ opcion.nombre }}</span>
-          <span class="activity-option-meta">{% if opcion.edad_minima %}Desde {{ opcion.edad_minima }} años{% else %}Todas las edades{% endif %}{% if opcion.requiere_talle %} · Con talle{% endif %}</span>
+          <span class="activity-option-text">
+            <span class="activity-option-name">{{ opcion.nombre }}</span>
+            <span class="activity-option-meta">{% if opcion.edad_minima %}Desde {{ opcion.edad_minima }} años{% else %}Todas las edades{% endif %}{% if opcion.requiere_talle %} · Con talle{% endif %}</span>
+          </span>
+          <span class="option-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 12.5 4 4 8-9"/></svg></span>
         </label>
         {% endfor %}
       </fieldset>
       <button class="button button-dark consult-button" type="submit" form="consulta-turnos" formnovalidate>Ver fechas y turnos <span aria-hidden="true">↗</span></button>
     </section>
 
-    <div id="activity-form-content" class="registration-form"{% if not actividad_seleccionada %} hidden{% endif %}>
-    <section class="registration-section" aria-labelledby="turno-title">
+    {% if actividad_elegida %}
+    <div id="activity-form-content" class="registration-detail">
+    <section class="registration-section" id="paso-turno" data-step aria-labelledby="turno-title">
       <div class="registration-section-heading">
-        <span class="step-number" aria-hidden="true">02</span>
-        <div><h2 id="turno-title">Elegí la fecha y el turno</h2><p>El parque abre de martes a domingo. Los turnos duran una hora, de 09:00 a 18:00.</p></div>
+        <span class="step-number" aria-hidden="true">2</span>
+        <div><h2 id="turno-title">Elegí la fecha y el turno</h2><p>Los turnos duran una hora y se reservan dentro de las 24 horas previas.</p></div>
       </div>
-      <div class="registration-field-grid">
-        <fieldset class="registration-field choice-field" id="fecha-visita">
-          <legend>Fecha <span aria-hidden="true">*</span></legend>
-          {% if fechas_disponibles %}
-          <div class="choice-group">
-            {% for fecha in fechas_disponibles %}
-            <label class="choice-chip">
-              <input type="radio" name="fecha" value="{{ fecha|date:'Y-m-d' }}" form="consulta-turnos" required{% if fecha|date:'Y-m-d' == fecha_seleccionada %} checked{% endif %}>
-              <span class="choice-title">{% if fecha == hoy %}Hoy{% elif fecha == manana %}Mañana{% else %}{{ fecha|date:'l'|capfirst }}{% endif %}</span>
-              <span class="choice-detail">{{ fecha|date:'l j \d\e F' }}</span>
-            </label>
-            {% endfor %}
-          </div>
-          {% else %}
-          <p class="choice-empty">Por ahora no hay turnos reservables para esta actividad.</p>
-          {% endif %}
-          <small id="date-guidance">No se admiten reservas con más de 24 horas de anticipación.</small>
-        </fieldset>
-        <fieldset class="registration-field choice-field" id="horario">
-          <legend>Turno <span aria-hidden="true">*</span></legend>
-          {% if horarios_disponibles %}
-          <div class="choice-group time-group">
-            {% for horario in horarios_disponibles %}
-            <label class="choice-chip time-chip">
-              <input type="radio" name="horario" value="{{ horario.pk }}" data-cupos="{{ horario.cupos_disponibles }}" required{% if envio.horario == horario.pk|stringformat:"d" %} checked{% endif %}>
-              <span class="choice-title">{{ horario.hora|time:'H:i' }}</span>
-              <span class="choice-detail">{{ horario.cupos_disponibles }} lugar{{ horario.cupos_disponibles|pluralize:"es" }}</span>
-            </label>
-            {% endfor %}
-          </div>
-          {% elif sin_turnos %}
-          <p class="choice-empty">No hay turnos reservables para esta actividad y fecha.</p>
-          {% else %}
-          <p class="choice-empty">Elegí una fecha para ver los turnos.</p>
-          {% endif %}
-          <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
-        </fieldset>
-        <div class="registration-field">
-          <label for="cantidad-personas">Cantidad de participantes <span aria-hidden="true">*</span></label>
-          <input id="cantidad-personas" name="cantidad_personas" type="number" value="{{ envio.cantidad_personas }}" min="1" step="1" inputmode="numeric" placeholder="Seleccioná la actividad primero" required>
-          <small id="participant-capacity-note">Elegí un horario para ver los lugares disponibles.</small>
+      <fieldset class="choice-field" id="fecha-visita">
+        <legend>Fecha</legend>
+        {% if fechas_disponibles %}
+        <div class="choice-group date-group">
+          {% for fecha in fechas_disponibles %}
+          <label class="choice-chip date-chip">
+            <input type="radio" name="fecha" value="{{ fecha|date:'Y-m-d' }}" form="consulta-turnos" required{% if fecha|date:'Y-m-d' == fecha_seleccionada %} checked{% endif %}>
+            <span class="choice-title">{% if fecha == hoy %}Hoy{% elif fecha == manana %}Mañana{% else %}{{ fecha|date:'l'|capfirst }}{% endif %}</span>
+            <span class="choice-detail">{{ fecha|date:'l j \d\e F' }}</span>
+          </label>
+          {% endfor %}
         </div>
-      </div>
+        {% else %}
+        <p class="choice-empty">Por ahora no hay turnos reservables para esta actividad. Probá más tarde o elegí otra.</p>
+        {% endif %}
+        <small id="date-guidance">No se admiten reservas con más de 24 horas de anticipación.</small>
+      </fieldset>
+      <fieldset class="choice-field" id="horario">
+        <legend>Turno</legend>
+        {% if horarios_disponibles %}
+        <div class="choice-group time-group">
+          {% for horario in horarios_disponibles %}
+          <label class="choice-chip time-chip">
+            <input type="radio" name="horario" value="{{ horario.pk }}" data-cupos="{{ horario.cupos_disponibles }}" required{% if envio.horario == horario.pk|stringformat:"d" %} checked{% endif %}>
+            <span class="choice-title">{{ horario.hora|time:'H:i' }}</span>
+            <span class="choice-detail{% if horario.cupos_disponibles <= 3 %} is-low{% endif %}">{{ horario.cupos_disponibles }} lugar{{ horario.cupos_disponibles|pluralize:"es" }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        {% elif sin_turnos %}
+        <p class="choice-empty">No hay turnos reservables para esta actividad y fecha.</p>
+        {% else %}
+        <p class="choice-empty">Elegí una fecha para ver los turnos.</p>
+        {% endif %}
+        <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
+      </fieldset>
     </section>
 
-    <section class="registration-section" aria-labelledby="participantes-title">
+    <section class="registration-section" id="paso-participantes" data-step aria-labelledby="participantes-title">
       <div class="registration-section-heading">
-        <span class="step-number" aria-hidden="true">03</span>
-        <div><h2 id="participantes-title">Datos de participantes</h2><p>Completá un bloque por cada persona indicada arriba.</p></div>
+        <span class="step-number" aria-hidden="true">3</span>
+        <div><h2 id="participantes-title">¿Quiénes participan?</h2><p>Completá los datos de cada persona.{% if actividad_elegida.requiere_talle %} Esta actividad necesita el talle de vestimenta.{% endif %}</p></div>
+      </div>
+      <div class="participant-count">
+        <label for="cantidad-personas">Cantidad de participantes</label>
+        <div class="stepper">
+          <button class="stepper-button" type="button" data-step-by="-1" aria-label="Quitar un participante" aria-controls="cantidad-personas">−</button>
+          <input id="cantidad-personas" name="cantidad_personas" type="number" value="{{ cantidad_inicial }}" min="1" max="{{ participantes|length }}" step="1" inputmode="numeric" required aria-describedby="participant-capacity-note">
+          <button class="stepper-button" type="button" data-step-by="1" aria-label="Agregar un participante" aria-controls="cantidad-personas">+</button>
+        </div>
+        <small id="participant-capacity-note" aria-live="polite">Elegí un turno para ver los lugares disponibles.</small>
       </div>
       <div class="participant-list">
         {% for participante in participantes %}
-        <fieldset class="participant-card" data-participant="{{ participante.numero }}" hidden>
+        <fieldset class="participant-card" data-participant="{{ participante.numero }}"{% if not participante.visible %} hidden{% endif %}>
           <legend>Participante {{ participante.numero }}</legend>
-          <div class="registration-field-grid">
-            <div class="registration-field">
-              <label for="nombre-{{ participante.numero }}">Nombre y apellido <span aria-hidden="true">*</span></label>
-              <input id="nombre-{{ participante.numero }}" name="participante_{{ participante.numero }}_nombre" type="text" value="{{ participante.nombre }}" autocomplete="name" placeholder="Nombre completo" required>
+          <div class="participant-fields">
+            <div class="registration-field field-name">
+              <label for="nombre-{{ participante.numero }}">Nombre y apellido</label>
+              <input id="nombre-{{ participante.numero }}" name="participante_{{ participante.numero }}_nombre" type="text" value="{{ participante.nombre }}" autocomplete="off" placeholder="Como figura en el DNI" required{% if not participante.visible %} disabled{% endif %}>
             </div>
             <div class="registration-field">
-              <label for="dni-{{ participante.numero }}">DNI <span aria-hidden="true">*</span></label>
-              <input id="dni-{{ participante.numero }}" name="participante_{{ participante.numero }}_dni" type="text" value="{{ participante.dni }}" inputmode="numeric" autocomplete="off" placeholder="Número de documento" required>
+              <label for="dni-{{ participante.numero }}">DNI</label>
+              <input id="dni-{{ participante.numero }}" name="participante_{{ participante.numero }}_dni" type="text" value="{{ participante.dni }}" inputmode="numeric" pattern="[0-9]{7,8}" maxlength="8" autocomplete="off" placeholder="Sin puntos" title="7 u 8 dígitos, sin puntos" required{% if not participante.visible %} disabled{% endif %}>
             </div>
             <div class="registration-field">
-              <label for="edad-{{ participante.numero }}">Edad <span aria-hidden="true">*</span></label>
-              <input id="edad-{{ participante.numero }}" name="participante_{{ participante.numero }}_edad" type="number" value="{{ participante.edad }}" min="0" step="1" inputmode="numeric" placeholder="Edad en años" required>
+              <label for="edad-{{ participante.numero }}">Edad</label>
+              <input id="edad-{{ participante.numero }}" name="participante_{{ participante.numero }}_edad" type="number" value="{{ participante.edad }}" min="{{ actividad_elegida.edad_minima }}" max="120" step="1" inputmode="numeric" placeholder="Años" required{% if not participante.visible %} disabled{% endif %}>
             </div>
             {% if actividad_elegida.requiere_talle %}
-            <div class="registration-field sizing-field">
-              <label for="talle-{{ participante.numero }}">Talle de vestimenta <span aria-hidden="true">*</span></label>
-              <select id="talle-{{ participante.numero }}" name="participante_{{ participante.numero }}_talle" required>
-                <option value=""{% if not participante.talle %} selected{% endif %} disabled>Seleccioná un talle</option>
+            <div class="registration-field field-size">
+              <label for="talle-{{ participante.numero }}">Talle de vestimenta</label>
+              <select id="talle-{{ participante.numero }}" name="participante_{{ participante.numero }}_talle" required{% if not participante.visible %} disabled{% endif %}>
+                <option value=""{% if not participante.talle %} selected{% endif %} disabled>Elegí un talle</option>
                 {% for talle in talles %}<option value="{{ talle }}"{% if talle == participante.talle %} selected{% endif %}>{{ talle }}</option>{% endfor %}
               </select>
             </div>
@@ -149,29 +159,43 @@
       </div>
     </section>
 
-    <section class="registration-section" aria-labelledby="contacto-title">
+    <section class="registration-section" id="paso-contacto" data-step aria-labelledby="contacto-title">
       <div class="registration-section-heading">
-        <span class="step-number" aria-hidden="true">04</span>
-        <div><h2 id="contacto-title">¿A dónde enviamos la información?</h2><p>El correo de confirmación incluirá el resumen de la inscripción y su código QR.</p></div>
+        <span class="step-number" aria-hidden="true">4</span>
+        <div><h2 id="contacto-title">¿A dónde te enviamos el pase?</h2><p>Recibirás el resumen de la inscripción con su código QR.</p></div>
       </div>
       <div class="registration-field registration-email">
-        <label for="correo">Correo electrónico <span aria-hidden="true">*</span></label>
-        <input id="correo" name="correo" type="email" value="{{ envio.correo }}" autocomplete="email" placeholder="nombre@correo.com" required>
+        <label for="correo">Correo electrónico</label>
+        <input id="correo" name="correo" type="email" value="{{ envio.correo }}" autocomplete="email" inputmode="email" placeholder="nombre@correo.com" required>
       </div>
     </section>
 
-    <section class="terms-box" aria-labelledby="terminos-title">
-      <p class="registration-eyebrow">Antes de finalizar</p>
-      <h2 id="terminos-title">Términos y condiciones de {{ actividad_elegida.nombre }}</h2>
+    <section class="registration-section terms-box" id="paso-terminos" data-step aria-labelledby="terminos-title">
+      <div class="registration-section-heading">
+        <span class="step-number" aria-hidden="true">5</span>
+        <div><h2 id="terminos-title">Términos y condiciones de {{ actividad_elegida.nombre }}</h2><p>Leelos antes de confirmar.</p></div>
+      </div>
       <p id="activity-terms">{{ actividad_elegida.terminos }}</p>
-      <label class="terms-acceptance"><input type="checkbox" name="acepta_terminos" required{% if envio.acepta_terminos %} checked{% endif %}> <span>Leí y acepto los términos y condiciones de {{ actividad_elegida.nombre }}. <span aria-hidden="true">*</span></span></label>
+      <label class="terms-acceptance"><input type="checkbox" name="acepta_terminos" required{% if envio.acepta_terminos %} checked{% endif %}> <span>Leí y acepto los términos y condiciones de {{ actividad_elegida.nombre }}.</span></label>
     </section>
+    </div>
+    {% endif %}
+    </div>
 
-    <div class="registration-submit">
-      <button class="button button-dark" type="submit">Finalizar inscripción <span aria-hidden="true">↗</span></button>
-      <p>Al finalizar verás el resumen de tu inscripción.</p>
-    </div>
-    </div>
+    {% if actividad_elegida %}
+    <aside class="booking-summary" aria-labelledby="resumen-title">
+      <div class="summary-art" aria-hidden="true">{% include 'core/ilustracion.html' with actividad=actividad_elegida.arte %}</div>
+      <h2 id="resumen-title" class="summary-title">Tu inscripción</h2>
+      <dl class="summary-list">
+        <div><dt>Actividad</dt><dd>{{ actividad_elegida.nombre }}</dd></div>
+        <div><dt>Fecha</dt><dd>{% if fecha_elegida %}{% if fecha_elegida == hoy %}Hoy{% elif fecha_elegida == manana %}Mañana{% else %}{{ fecha_elegida|date:'l'|capfirst }}{% endif %}, {{ fecha_elegida|date:'j \d\e F' }}{% else %}Sin elegir{% endif %}</dd></div>
+        <div><dt>Turno</dt><dd data-summary="turno">Sin elegir</dd></div>
+        <div><dt>Participantes</dt><dd data-summary="personas">{{ cantidad_inicial }} persona{{ cantidad_inicial|pluralize }}</dd></div>
+      </dl>
+      <p class="summary-compact" aria-hidden="true"><strong>{{ actividad_elegida.nombre }}</strong> <span data-summary="compacto">Elegí fecha y turno</span></p>
+      <button class="button button-dark submit-button" type="submit">Finalizar inscripción <span aria-hidden="true">↗</span></button>
+    </aside>
+    {% endif %}
   </form>
 </main>
 <footer><a class="footer-brand" href="{% url 'catalogo' %}">EcoHarmony Park <span aria-hidden="true">✳</span></a><span>Un lugar para conectar con la naturaleza.</span><a href="#formulario-inscripcion" class="back-top">Volver arriba ↑</a></footer>

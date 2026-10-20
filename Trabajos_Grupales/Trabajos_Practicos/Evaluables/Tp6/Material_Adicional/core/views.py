@@ -111,8 +111,18 @@ def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
     ]
 
 
+def _cantidad_inicial(envio: QueryDict) -> int:
+    """Indica cuántos bloques de participantes mostrar al abrir el formulario."""
+    try:
+        cantidad = int(envio.get("cantidad_personas", ""))
+    except ValueError:
+        return 1
+    return min(max(cantidad, 1), max(CUPO_MAXIMO_POR_ACTIVIDAD.values()))
+
+
 def _valores_de_participantes(envio: QueryDict) -> list[dict[str, object]]:
     """Prepara un bloque por cada lugar posible con los datos ya enviados."""
+    cantidad = _cantidad_inicial(envio)
     return [
         {
             "numero": numero,
@@ -120,6 +130,7 @@ def _valores_de_participantes(envio: QueryDict) -> list[dict[str, object]]:
             "dni": envio.get(f"participante_{numero}_dni", ""),
             "edad": envio.get(f"participante_{numero}_edad", ""),
             "talle": envio.get(f"participante_{numero}_talle", ""),
+            "visible": numero <= cantidad,
         }
         for numero in range(1, max(CUPO_MAXIMO_POR_ACTIVIDAD.values()) + 1)
     ]
@@ -185,6 +196,7 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
                 "inscripcion": inscripcion_registrada,
                 "qr": base64.b64encode(qr).decode(),
                 "correo_enviado": correo_enviado,
+                "arte": {"codigo": inscripcion_registrada.horario.actividad.nombre},
             },
         )
     return _mostrar_formulario(request)
@@ -243,6 +255,14 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
                 codigo_actividad.lower() if codigo_actividad in DESCRIPCIONES else ""
             ),
             "fecha_seleccionada": fecha_seleccionada or "",
+            "fecha_elegida": next(
+                (
+                    fecha
+                    for fecha in fechas_disponibles
+                    if fecha.isoformat() == fecha_seleccionada
+                ),
+                None,
+            ),
             "hoy": timezone.localdate(),
             "manana": timezone.localdate() + timedelta(days=1),
             "horarios_disponibles": horarios_disponibles,
@@ -250,6 +270,7 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
             "error": error,
             "envio": request.POST,
             "participantes": _valores_de_participantes(request.POST),
+            "cantidad_inicial": _cantidad_inicial(request.POST),
             "talles": TALLES_DISPONIBLES,
         },
     )

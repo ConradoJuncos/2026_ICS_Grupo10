@@ -3,7 +3,7 @@
 <html lang="es-AR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#386641">
   <title>Inscripción confirmada | EcoHarmony Park</title>
   <link rel="icon" href="{% static 'core/huella.svg' %}" type="image/svg+xml">
@@ -17,26 +17,59 @@
     <span>EcoHarmony<span class="brand-park">Park</span></span>
   </a>
   <nav aria-label="Navegación principal">
-    <a href="{% url 'catalogo' %}">Volver a actividades <span aria-hidden="true">↗</span></a>
+    <a href="{% url 'catalogo' %}">Actividades <span aria-hidden="true">↗</span></a>
   </nav>
 </header>
-<main class="registration-page">
-  <div class="registration-heading">
-    <p class="registration-eyebrow"><span aria-hidden="true">✳</span> Todo listo</p>
-    <h1>Inscripción confirmada.</h1>
-    <p>{{ inscripcion.horario.actividad }} · {{ inscripcion.horario.fecha|date:'d/m/Y' }} · {{ inscripcion.horario.hora|time:'H:i' }}</p>
+<main class="pass-page">
+  {% with horario=inscripcion.horario %}
+  <div class="pass-heading">
+    <p class="registration-eyebrow"><span aria-hidden="true">✳</span> Inscripción confirmada</p>
+    <h1>¡Nos vemos en {{ horario.actividad }}!</h1>
+    {% if correo_enviado %}
+    <p class="pass-status">Enviamos el resumen y el código QR a <strong>{{ inscripcion.correo }}</strong>.</p>
+    {% else %}
+    <p class="pass-status is-warning" role="status">No pudimos enviar el correo a {{ inscripcion.correo }}. Guardá este pase o sacale una captura.</p>
+    {% endif %}
   </div>
-  <section class="registration-section" aria-labelledby="resumen-title">
-    <div class="registration-section-heading">
-      <div><h2 id="resumen-title">Participantes</h2><p>{% if correo_enviado %}Enviamos el resumen y el código QR a {{ inscripcion.correo }}.{% else %}No pudimos enviar el correo a {{ inscripcion.correo }}. Guardá este pase o sacale una captura.{% endif %}</p></div>
+
+  <article class="activity-pass" aria-labelledby="pass-title">
+    <div class="pass-top">
+      {% include 'core/ilustracion.html' with actividad=arte %}
+      <span class="pass-stamp" aria-hidden="true">Confirmada</span>
     </div>
-    <ul>
-      {% for participante in inscripcion.participantes.all %}
-      <li>{{ participante.nombre }} · DNI {{ participante.dni }}</li>
-      {% endfor %}
-    </ul>
-    <img src="data:image/png;base64,{{ qr }}" alt="Código QR de la inscripción" width="200" height="200">
-  </section>
+    <div class="pass-body">
+      <p class="pass-label">Pase de actividad</p>
+      <h2 id="pass-title">{{ horario.actividad }}</h2>
+      <dl class="pass-facts">
+        <div><dt>Fecha</dt><dd>{{ horario.fecha|date:'D j \d\e F'|capfirst }}</dd></div>
+        <div><dt>Turno</dt><dd>{{ horario.hora|time:'H:i' }} h</dd></div>
+        <div><dt>Participantes</dt><dd>{{ inscripcion.participantes.count }}</dd></div>
+        <div><dt>Código</dt><dd>N.º {{ inscripcion.pk|stringformat:'06d' }}</dd></div>
+      </dl>
+    </div>
+    <div class="pass-tear" aria-hidden="true"></div>
+    <div class="pass-qr">
+      <img src="data:image/png;base64,{{ qr }}" alt="Código QR de la inscripción N.º {{ inscripcion.pk|stringformat:'06d' }}" width="220" height="220">
+      <p>Mostralo al llegar a la actividad.</p>
+    </div>
+    <div class="pass-people">
+      <h3>Participantes</h3>
+      <ul>
+        {% for participante in inscripcion.participantes.all %}
+        <li>
+          <span class="pass-avatar" aria-hidden="true">{{ participante.nombre|first|upper }}</span>
+          <span>{{ participante.nombre }}<small>DNI {{ participante.dni }} · {{ participante.edad }} año{{ participante.edad|pluralize }}{% if participante.talle %} · Talle {{ participante.talle }}{% endif %}</small></span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </article>
+
+  <div class="pass-actions">
+    <a class="button button-dark" href="{% url 'catalogo' %}#actividades">Ver otras actividades <span aria-hidden="true">↗</span></a>
+    <button class="button button-light" type="button" onclick="window.print()">Guardar o imprimir</button>
+  </div>
+  {% endwith %}
 </main>
 <footer><a class="footer-brand" href="{% url 'catalogo' %}">EcoHarmony Park <span aria-hidden="true">✳</span></a><span>Un lugar para conectar con la naturaleza.</span></footer>
 </body>

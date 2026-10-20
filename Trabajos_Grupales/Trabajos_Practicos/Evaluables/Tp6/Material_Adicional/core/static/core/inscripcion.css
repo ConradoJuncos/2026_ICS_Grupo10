@@ -1,1 +1,737 @@
-.registration-page{max-width:1100px;margin:0 auto;padding:75px 7% 100px}.registration-heading{max-width:700px;margin:0 auto 44px;text-align:center}.registration-eyebrow{color:var(--forest);font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 14px}.registration-eyebrow span{color:var(--leaf);font-size:19px;margin-right:5px}.registration-heading h1{font-size:clamp(48px,6vw,76px);letter-spacing:-3px;margin:0 0 15px}.registration-heading>p:not(.registration-eyebrow){color:#58634f;margin:0}.registration-capacity{display:inline-flex;gap:12px;align-items:center;margin-top:22px;padding:10px 18px;border:1px solid var(--forest);border-radius:30px;background:var(--cream);font-size:14px;font-weight:600;color:var(--forest)}.registration-capacity strong{color:var(--forest);font-size:16px}.registration-form{display:grid;gap:22px}.registration-section,.terms-box{background:#fffdf7;border:1px solid var(--line);border-radius:16px;padding:30px 34px}.registration-section-heading{display:flex;gap:16px;align-items:flex-start;margin-bottom:24px}.step-number{display:grid;place-items:center;flex:0 0 40px;height:40px;border-radius:50%;background:var(--cream);color:var(--forest);font-size:12px;font-weight:900}.registration-section-heading h2,.terms-box h2{font-size:25px;letter-spacing:-.6px;margin:0 0 5px}.registration-section-heading p{margin:0;color:#647058;font-size:13px}.registration-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.registration-field{min-width:0}.registration-field label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.registration-field label>span,.terms-acceptance>span:last-child{color:var(--red)}.registration-field input,.registration-field select{height:52px;background:var(--paper);border:1px solid #a4ad90;border-radius:7px;color:var(--ink);padding:10px 13px;font-size:15px}.registration-field input::placeholder{color:#89917e}.registration-field small{display:block;margin:6px 0 0;color:#647058;font-size:11px}.field-feedback{margin:7px 0 0;color:var(--red);font-size:12px}.participant-list{display:grid;gap:14px}.participant-card{min-width:0;margin:0;padding:20px;border:1px solid #e0e3d6;border-radius:11px}.participant-card legend{padding:0 8px;color:var(--forest);font-weight:900;font-size:14px}.participant-card .registration-field-grid{row-gap:15px}.registration-email{max-width:520px}.terms-box{background:var(--cream);border-color:#e2d7b7}.terms-box .registration-eyebrow{margin-bottom:7px}.terms-box h2{margin-bottom:14px}.terms-box>p:not(.registration-eyebrow){font-size:14px;line-height:1.7}.terms-acceptance{display:flex;align-items:flex-start;gap:10px;border-top:1px solid #d7cba9;margin-top:20px;padding-top:17px;font-size:13px;font-weight:700}.terms-acceptance input{width:20px;height:20px;flex:0 0 20px;margin:0;accent-color:var(--forest)}.registration-submit{text-align:center;padding-top:4px}.registration-submit .button{min-width:260px}.registration-submit .button:disabled{opacity:.6;cursor:not-allowed;transform:none}.registration-submit p{font-size:12px;color:#647058;margin:12px 0 0}.registration-activity{max-width:520px}[hidden]{display:none!important}@media(max-width:760px){.registration-page{padding:48px 6% 65px}.registration-heading{margin-bottom:30px}.registration-heading h1{font-size:clamp(43px,10vw,62px);letter-spacing:-2px}.registration-section,.terms-box{padding:23px 20px;border-radius:13px}.registration-section-heading{gap:12px;margin-bottom:20px}.registration-section-heading h2,.terms-box h2{font-size:21px}.step-number{flex-basis:34px;height:34px;font-size:11px}.registration-field-grid{grid-template-columns:1fr;gap:14px}.participant-card{padding:17px 14px}.registration-form{gap:15px}.registration-submit .button{width:100%;max-width:400px}}@media(prefers-reduced-motion:reduce){.registration-page *{scroll-behavior:auto}}
+/* Inscripción y pase de actividad. Diseño mobile-first: la base es un celular
+   de 360 px y las consultas min-width amplían la composición. */
+
+:root {
+  --card: #fffdf7;
+  --field: #fbf9f1;
+  --field-line: #b9c0a6;
+  --muted: #5f6b56;
+  --soft-line: #e3e5d6;
+  --focus-ring: 0 0 0 4px rgb(167 201 87 / 45%);
+  --shadow-card: 0 1px 2px rgb(33 62 43 / 6%), 0 8px 24px -12px rgb(33 62 43 / 18%);
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+}
+
+@view-transition { navigation: auto; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+[hidden] { display: none !important; }
+
+/* Página */
+
+.registration-page {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 28px 16px 0;
+}
+
+.registration-heading { margin: 0 0 22px; }
+
+.registration-eyebrow {
+  margin: 0 0 10px;
+  color: var(--forest);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.registration-eyebrow span { margin-right: 4px; color: var(--leaf); font-size: 17px; }
+
+.registration-heading h1 {
+  margin: 0 0 10px;
+  font-size: clamp(36px, 10.5vw, 72px);
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.registration-heading p:last-child { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* Aviso de rechazo */
+
+.form-alert {
+  display: flex;
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid #e2b9b5;
+  border-left: 5px solid var(--red);
+  border-radius: 12px;
+  background: #f9e9e4;
+  color: #5a2223;
+  animation: rise .35s var(--ease-out) both;
+}
+
+.form-alert:focus { outline: none; box-shadow: var(--focus-ring); }
+
+.form-alert svg {
+  flex: 0 0 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.form-alert strong { display: block; font-size: 14px; }
+.form-alert p { margin: 2px 0 0; font-size: 14px; }
+
+/* Pasos */
+
+.registration-form { display: grid; gap: 14px; }
+.registration-steps, .registration-detail { display: grid; gap: 14px; min-width: 0; }
+
+.registration-section {
+  min-width: 0;
+  padding: 20px 16px;
+  border: 1px solid var(--soft-line);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+
+.registration-section-heading {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.registration-section-heading h2 {
+  margin: 0 0 3px;
+  font-size: 21px;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+
+.registration-section-heading p { margin: 0; color: var(--muted); font-size: 13px; }
+
+.step-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--forest);
+  font-size: 14px;
+  font-weight: 900;
+  transition: background .25s, color .25s, transform .25s var(--ease-out);
+}
+
+.is-complete .step-number { background: var(--forest); color: transparent; position: relative; }
+
+.is-complete .step-number::after {
+  content: "";
+  position: absolute;
+  width: 11px;
+  height: 6px;
+  border: solid var(--paper);
+  border-width: 0 0 2.5px 2.5px;
+  transform: translateY(-2px) rotate(-45deg);
+}
+
+/* Actividades */
+
+.activity-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.activity-option {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  border: 1.5px solid var(--soft-line);
+  border-radius: 16px;
+  background: var(--field);
+  cursor: pointer;
+  transition: border-color .2s, box-shadow .2s, transform .2s var(--ease-out);
+}
+
+.activity-option input,
+.choice-chip input { position: absolute; opacity: 0; pointer-events: none; }
+
+.activity-option-art,
+.pass-top,
+.summary-art { position: relative; }
+
+/* Las ilustraciones conservan su proporción y se apoyan en el suelo del recuadro. */
+.activity-option-art svg,
+.pass-top svg,
+.summary-art svg {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+}
+
+.activity-option-art {
+  display: block;
+  aspect-ratio: 500 / 300;
+  overflow: hidden;
+  background: #e9e5c7;
+}
+
+.activity-option-art svg { transform-origin: 50% 100%; transition: transform .4s var(--ease-out); }
+
+.activity-option-text { display: grid; gap: 1px; padding: 9px 11px 11px; }
+.activity-option-name { font-size: 16px; font-weight: 900; letter-spacing: -.02em; }
+.activity-option-meta { color: var(--muted); font-size: 11px; line-height: 1.35; }
+
+.option-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--forest);
+  opacity: 0;
+  transform: scale(.4);
+  transition: opacity .2s, transform .3s var(--ease-out);
+}
+
+.option-check svg { width: 16px; fill: none; stroke: var(--paper); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+.activity-option:has(input:checked) {
+  border-color: var(--forest);
+  background: #f3f6ea;
+  box-shadow: 0 0 0 1.5px var(--forest);
+}
+
+.activity-option:has(input:checked) .option-check { opacity: 1; transform: scale(1); }
+.activity-option:has(input:focus-visible),
+.choice-chip:has(input:focus-visible) { box-shadow: var(--focus-ring); }
+
+.consult-button { width: 100%; margin-top: 14px; }
+.js .consult-button { display: none; }
+
+/* Fecha y turno */
+
+.choice-field { min-width: 0; margin: 0 0 18px; padding: 0; border: 0; }
+.choice-field:last-child { margin-bottom: 0; }
+
+.choice-field legend,
+.registration-field label,
+.participant-count label {
+  display: block;
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.choice-group { display: grid; gap: 8px; }
+.date-group { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+.time-group { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.choice-chip {
+  position: relative;
+  display: grid;
+  gap: 1px;
+  min-height: 58px;
+  align-content: center;
+  padding: 9px 12px;
+  border: 1.5px solid var(--field-line);
+  border-radius: 12px;
+  background: var(--field);
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s, transform .15s var(--ease-out);
+}
+
+.choice-chip:active { transform: scale(.97); }
+.choice-title { font-size: 16px; font-weight: 900; letter-spacing: -.01em; }
+.choice-detail { color: var(--muted); font-size: 12px; line-height: 1.3; }
+.choice-detail.is-low { color: var(--red); font-weight: 700; }
+.time-chip { text-align: center; }
+
+.choice-chip:has(input:checked) {
+  border-color: var(--forest);
+  background: var(--forest);
+  color: var(--paper);
+}
+
+.choice-chip:has(input:checked) .choice-detail { color: #dfe8cf; }
+
+.choice-empty {
+  margin: 0;
+  padding: 14px;
+  border: 1.5px dashed var(--field-line);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.choice-field small,
+.registration-field small,
+.participant-count small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Campos */
+
+.registration-field { min-width: 0; }
+
+.registration-field input,
+.registration-field select {
+  width: 100%;
+  height: 50px;
+  padding: 0 13px;
+  border: 1.5px solid var(--field-line);
+  border-radius: 11px;
+  background: var(--field);
+  color: var(--ink);
+  font-size: 16px;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.registration-field select {
+  appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23386641' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+}
+
+.registration-field input::placeholder { color: #8a927f; }
+
+.registration-field input:focus,
+.registration-field select:focus,
+.stepper input:focus {
+  border-color: var(--forest);
+  background-color: #fff;
+  box-shadow: var(--focus-ring);
+  outline: none;
+}
+
+.registration-field input:user-invalid,
+.registration-field select:user-invalid { border-color: var(--red); background-color: #fdf3f1; }
+
+/* Participantes */
+
+.participant-count { margin-bottom: 16px; }
+
+.stepper {
+  display: inline-grid;
+  grid-template-columns: 48px 72px 48px;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepper-button {
+  width: 48px;
+  height: 48px;
+  border: 1.5px solid var(--forest);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--forest);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background .2s, color .2s, transform .15s;
+}
+
+.stepper-button:hover { background: var(--forest); color: var(--paper); }
+.stepper-button:active { transform: scale(.92); }
+
+.stepper input {
+  width: 72px;
+  height: 48px;
+  border: 1.5px solid var(--field-line);
+  border-radius: 11px;
+  background: var(--field);
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+  appearance: textfield;
+}
+
+.stepper input::-webkit-inner-spin-button,
+.stepper input::-webkit-outer-spin-button { margin: 0; appearance: none; }
+
+.participant-count small.is-warning { color: var(--red); font-weight: 700; }
+
+.participant-list { display: grid; gap: 12px; counter-reset: participante; }
+
+.participant-card {
+  min-width: 0;
+  margin: 0;
+  padding: 14px 14px 16px;
+  border: 1px solid var(--soft-line);
+  border-radius: 14px;
+  background: var(--field);
+  counter-increment: participante;
+}
+
+.participant-card.is-entering { animation: rise .35s var(--ease-out) both; }
+
+.participant-card legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px 0 0;
+  color: var(--forest);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.participant-card legend::before {
+  content: counter(participante);
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: var(--deep);
+  font-size: 12px;
+}
+
+.participant-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 10px;
+  margin-top: 6px;
+}
+
+.field-name, .field-size { grid-column: 1 / -1; }
+
+/* Contacto y términos */
+
+.terms-box { background: var(--cream); border-color: #e2d7b7; }
+.terms-box .step-number { background: var(--paper); }
+.terms-box .is-complete .step-number, .terms-box.is-complete .step-number { background: var(--forest); }
+
+#activity-terms {
+  margin: 0;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgb(255 253 247 / 70%);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.terms-acceptance {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.terms-acceptance input {
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--forest);
+}
+
+/* Resumen: barra fija abajo en el celular, panel lateral en escritorio. */
+
+.booking-summary {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px -16px 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-radius: 20px 20px 0 0;
+  background: var(--deep);
+  color: var(--paper);
+  box-shadow: 0 -10px 30px -12px rgb(33 62 43 / 45%);
+}
+
+.summary-art, .summary-title, .summary-list { display: none; }
+
+.summary-compact {
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  color: #d9e4c6;
+}
+
+.summary-compact strong { overflow: hidden; color: var(--paper); font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+
+.submit-button {
+  flex: 0 0 auto;
+  min-height: 50px;
+  gap: 14px;
+  padding: 12px 18px;
+  background: var(--lime);
+  color: var(--deep);
+}
+
+.submit-button:hover { background: #b9d86a; }
+.submit-button:disabled { opacity: .75; cursor: progress; transform: none; }
+
+.registration-body footer { margin-top: 0; }
+.registration-body:not(:has(.booking-summary)) .registration-page { padding-bottom: 40px; }
+
+.is-loading .registration-detail { opacity: .45; pointer-events: none; transition: opacity .2s; }
+
+/* Pase de actividad (confirmación) */
+
+.pass-page { max-width: 560px; margin: 0 auto; padding: 28px 16px 44px; }
+.pass-heading { margin-bottom: 20px; }
+
+.pass-heading h1 {
+  margin: 0 0 8px;
+  font-size: clamp(36px, 10.5vw, 58px);
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.pass-status { margin: 0; color: var(--muted); font-size: 15px; }
+
+.pass-status.is-warning {
+  padding: 12px 14px;
+  border-left: 4px solid var(--red);
+  border-radius: 10px;
+  background: #f9e9e4;
+  color: #5a2223;
+}
+
+.activity-pass {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--card);
+  box-shadow: 0 2px 4px rgb(33 62 43 / 8%), 0 24px 48px -20px rgb(33 62 43 / 35%);
+  animation: rise .6s var(--ease-out) both;
+}
+
+.pass-top { position: relative; aspect-ratio: 500 / 230; overflow: hidden; background: #e9e5c7; }
+
+.pass-stamp {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  padding: 7px 12px;
+  border: 3px solid var(--red);
+  border-radius: 8px;
+  background: rgb(255 253 247 / 88%);
+  color: var(--red);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  transform: rotate(-9deg);
+  animation: stamp .45s .55s cubic-bezier(.3, 1.4, .5, 1) both;
+}
+
+.pass-body { padding: 20px 20px 18px; }
+
+.pass-label {
+  margin: 0 0 4px;
+  color: var(--leaf);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.pass-body h2 { margin: 0 0 14px; font-size: 32px; line-height: 1; letter-spacing: -.04em; }
+
+.pass-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.pass-facts div { min-width: 0; }
+.pass-facts dt { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.pass-facts dd { margin: 1px 0 0; font-size: 16px; font-weight: 900; }
+
+.pass-tear {
+  position: relative;
+  height: 24px;
+  margin: 0 12px;
+  background: radial-gradient(circle, var(--field-line) 1.5px, transparent 2px) center / 12px 4px repeat-x;
+}
+
+.pass-tear::before,
+.pass-tear::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 3px 6px -3px rgb(33 62 43 / 25%);
+}
+
+.pass-tear::before { left: -24px; }
+.pass-tear::after { right: -24px; }
+
+.pass-qr { display: grid; justify-items: center; gap: 8px; padding: 8px 20px 18px; text-align: center; }
+
+.pass-qr img {
+  width: min(220px, 62vw);
+  height: auto;
+  padding: 10px;
+  border: 1px solid var(--soft-line);
+  border-radius: 14px;
+  background: #fff;
+  image-rendering: pixelated;
+}
+
+.pass-qr p { margin: 0; color: var(--muted); font-size: 13px; }
+.pass-code { color: var(--ink); font-size: 14px; font-weight: 900; letter-spacing: .08em; }
+
+.pass-people { padding: 16px 20px 20px; border-top: 1px solid var(--soft-line); }
+.pass-people h3 { margin: 0 0 10px; font-size: 15px; }
+.pass-people ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.pass-people li { display: flex; align-items: center; gap: 12px; }
+
+.pass-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--lime);
+  color: var(--deep);
+  font-weight: 900;
+}
+
+.pass-people li span:last-child { display: grid; font-weight: 700; }
+.pass-people small { color: var(--muted); font-size: 12px; font-weight: 400; }
+
+.pass-actions { display: grid; gap: 10px; margin-top: 20px; }
+.pass-actions .button { justify-content: center; gap: 14px; }
+
+.button-light {
+  border: 1.5px solid var(--forest);
+  background: transparent;
+  color: var(--forest);
+}
+
+.button-light:hover { background: var(--cream); transform: translateY(-2px); }
+
+/* Movimiento */
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes stamp {
+  from { opacity: 0; transform: rotate(-9deg) scale(1.9); }
+  to { opacity: 1; transform: rotate(-9deg) scale(1); }
+}
+
+@media (hover: hover) {
+  .activity-option:hover { border-color: var(--leaf); transform: translateY(-2px); }
+  .activity-option:hover .activity-option-art svg { transform: scale(1.05); }
+  .choice-chip:hover { border-color: var(--forest); }
+}
+
+/* Celulares más anchos y tablets */
+
+@media (min-width: 560px) {
+  .registration-page { padding: 40px 24px 0; }
+  .registration-section { padding: 24px; }
+  .activity-picker { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .time-group { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+  .participant-fields { grid-template-columns: 2fr 1fr 1fr; }
+  .field-name { grid-column: auto; }
+  .field-size { grid-column: auto; }
+  .participant-fields:has(.field-size) { grid-template-columns: repeat(2, minmax(0, 1fr)) 1fr 1fr; }
+  .participant-fields:has(.field-size) .field-name { grid-column: 1 / 3; }
+  .booking-summary { margin: 4px -24px 0; padding-left: 24px; padding-right: 24px; }
+  .pass-actions { grid-template-columns: 1fr 1fr; }
+}
+
+/* Escritorio: el resumen pasa a una columna fija junto a los pasos. */
+
+@media (min-width: 1000px) {
+  .registration-page { padding: 56px 32px 72px; }
+  .registration-heading { margin-bottom: 32px; }
+  .registration-heading h1 { max-width: 14ch; }
+
+  .registration-form.has-activity {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    align-items: start;
+    gap: 28px;
+  }
+
+  .registration-section { padding: 28px 30px; }
+  .registration-section-heading h2 { font-size: 24px; }
+  .registration-steps, .registration-detail { gap: 18px; }
+
+  .booking-summary {
+    top: 24px;
+    bottom: auto;
+    display: grid;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 0;
+    margin: 0;
+    padding: 0 0 22px;
+    overflow: hidden;
+    border: 1px solid var(--soft-line);
+    border-radius: 20px;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: var(--shadow-card);
+  }
+
+  .summary-art { display: block; aspect-ratio: 500 / 220; overflow: hidden; background: #e9e5c7; }
+  .summary-title { display: block; margin: 20px 22px 6px; font-size: 20px; letter-spacing: -.02em; }
+  .summary-list { display: grid; margin: 0 22px 18px; }
+
+  .summary-list div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--soft-line);
+    font-size: 14px;
+  }
+
+  .summary-list dt { color: var(--muted); }
+  .summary-list dd { margin: 0; font-weight: 700; text-align: right; }
+  .summary-compact { display: none; }
+  .submit-button { width: calc(100% - 44px); margin: 0 22px; justify-content: space-between; background: var(--forest); color: var(--paper); }
+  .submit-button:hover { background: var(--deep); }
+  .pass-page { padding-top: 56px; padding-bottom: 72px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  @view-transition { navigation: none; }
+}
+
+@media print {
+  .site-header, footer, .pass-actions, .skip-link { display: none !important; }
+  body { background: #fff; }
+  .activity-pass { box-shadow: none; border: 1px solid #ccc; }
+}
