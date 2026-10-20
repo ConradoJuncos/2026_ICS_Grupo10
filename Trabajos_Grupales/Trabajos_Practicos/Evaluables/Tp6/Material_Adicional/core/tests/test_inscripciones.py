@@ -14,6 +14,7 @@ from core.inscripciones import (
     DniInvalidoError,
     DniRepetidoError,
     HorarioNoReservableError,
+    InscripcionSimultaneaError,
     InscripcionSinParticipantesError,
     TalleInvalidoError,
     TalleObligatorioError,
@@ -293,5 +294,28 @@ def test_rechaza_inscripcion_con_dni_repetido(horario_tirolesa: Horario) -> None
             horario_tirolesa,
             correo="ana@ejemplo.com",
             participantes=[PARTICIPANTE_VALIDO, misma_persona],
+            acepta_terminos=True,
+        )
+
+
+@pytest.mark.django_db
+def test_rechaza_participante_inscripto_en_otra_actividad_a_la_misma_hora(
+    horario_tirolesa: Horario,
+) -> None:
+    """Impide que una persona esté en dos actividades simultáneas."""
+    horario_safari = Horario.objects.create(
+        actividad=Actividad.objects.create(nombre="SAFARI", cupo_maximo=8),
+        fecha=horario_tirolesa.fecha,
+        hora=horario_tirolesa.hora,
+    )
+    Inscripcion.objects.create(horario=horario_safari).participantes.create(
+        nombre="Ana Pérez", dni=PARTICIPANTE_VALIDO.dni, edad=35
+    )
+
+    with pytest.raises(InscripcionSimultaneaError):
+        registrar_inscripcion(
+            horario_tirolesa,
+            correo="ana@ejemplo.com",
+            participantes=[PARTICIPANTE_VALIDO],
             acepta_terminos=True,
         )

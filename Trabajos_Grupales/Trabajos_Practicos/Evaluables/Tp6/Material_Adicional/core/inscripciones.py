@@ -44,6 +44,10 @@ class DniRepetidoError(ValueError):
     """Indica que una misma persona figura dos veces en la inscripción."""
 
 
+class InscripcionSimultaneaError(ValueError):
+    """Indica que un participante ya está inscripto en otro turno a la misma hora."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""
