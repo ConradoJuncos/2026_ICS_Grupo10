@@ -45,16 +45,18 @@
         <span class="step-number" aria-hidden="true">01</span>
         <div><h2 id="actividad-title">Elegí una actividad</h2><p>Podés cambiarla cuando quieras desde esta lista.</p></div>
       </div>
-      <div class="registration-field registration-activity">
-        <label for="actividad">Actividad <span aria-hidden="true">*</span></label>
-        <select id="actividad" name="actividad" required form="consulta-turnos">
-          <option value=""{% if not actividad_seleccionada %} selected{% endif %} disabled>Seleccioná una actividad</option>
-          {% for opcion in actividades %}
-          <option value="{{ opcion.codigo }}" data-capacity="{{ opcion.cupo }}" data-min-age="{{ opcion.edad_minima }}" data-requires-size="{{ opcion.requiere_talle|yesno:'true,false' }}" data-description="{{ opcion.descripcion }}" data-terms="{{ opcion.terminos }}"{% if opcion.codigo == actividad_seleccionada %} selected{% endif %}>{{ opcion.nombre }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <button class="button button-dark" type="submit" form="consulta-turnos" formnovalidate>Consultar fechas y horarios <span aria-hidden="true">↗</span></button>
+      <fieldset class="activity-picker" id="actividad">
+        <legend class="visually-hidden">Actividad</legend>
+        {% for opcion in actividades %}
+        <label class="activity-option">
+          <input type="radio" name="actividad" value="{{ opcion.codigo }}" form="consulta-turnos" required{% if opcion.codigo == actividad_seleccionada %} checked{% endif %}>
+          <span class="activity-option-art">{% include 'core/ilustracion.html' with actividad=opcion.arte %}</span>
+          <span class="activity-option-name">{{ opcion.nombre }}</span>
+          <span class="activity-option-meta">{% if opcion.edad_minima %}Desde {{ opcion.edad_minima }} años{% else %}Todas las edades{% endif %}{% if opcion.requiere_talle %} · Con talle{% endif %}</span>
+        </label>
+        {% endfor %}
+      </fieldset>
+      <button class="button button-dark consult-button" type="submit" form="consulta-turnos" formnovalidate>Ver fechas y turnos <span aria-hidden="true">↗</span></button>
     </section>
 
     <div id="activity-form-content" class="registration-form"{% if not actividad_seleccionada %} hidden{% endif %}>

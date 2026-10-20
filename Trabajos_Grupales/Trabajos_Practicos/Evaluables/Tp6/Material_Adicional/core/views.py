@@ -202,16 +202,15 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
         and not horarios_disponibles
     )
     nombres = dict(Actividad.OPCIONES_ACTIVIDAD)
-    cupos = dict(Actividad.objects.values_list("nombre", "cupo_maximo"))
     actividades = [
         {
             "codigo": codigo.lower(),
             "nombre": nombres[codigo],
             "descripcion": contenido[0],
-            "cupo": cupos.get(codigo, CUPO_MAXIMO_POR_ACTIVIDAD[codigo]),
             "edad_minima": EDADES_MINIMAS_POR_ACTIVIDAD[codigo],
             "requiere_talle": codigo in ACTIVIDADES_CON_TALLE,
             "terminos": TERMINOS_POR_ACTIVIDAD[codigo],
+            "arte": {"codigo": codigo},
         }
         for codigo, contenido in DESCRIPCIONES.items()
     ]
@@ -222,7 +221,7 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
             "actividades": actividades,
             "fechas_disponibles": fechas_disponibles,
             "actividad_seleccionada": (
-                codigo_actividad.lower() if actividad_seleccionada is not None else ""
+                codigo_actividad.lower() if codigo_actividad in DESCRIPCIONES else ""
             ),
             "fecha_seleccionada": fecha_seleccionada or "",
             "horarios_disponibles": horarios_disponibles,
