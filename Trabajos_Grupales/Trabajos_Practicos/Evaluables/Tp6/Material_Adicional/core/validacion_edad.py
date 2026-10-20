@@ -1,4 +1,4 @@
-# core/validacion_edad.py
+"""Valida la edad de los visitantes según la actividad elegida."""
 
 EDAD_MINIMA_PALESTRA = 12
 EDAD_MINIMA_TIROLESA = 8

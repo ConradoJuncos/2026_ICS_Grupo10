@@ -1,14 +1,19 @@
+"""Genera códigos QR en formato PNG."""
+
 import io
 
 import segno
 
 
 class GenerarQr:
-    def __init__(self, scale: int = 10, error: str = "m"):
+    """Convierte un texto en la imagen PNG de su código QR."""
+
+    def __init__(self, scale: int = 10, error: str = "m") -> None:
         self.scale = scale
         self.error = error
 
     def generate(self, data: str) -> bytes:
+        """Devuelve los bytes PNG del código QR que codifica el texto."""
         qr = segno.make(data, error=self.error)
         buffer = io.BytesIO()
         qr.save(buffer, kind="png", scale=self.scale)

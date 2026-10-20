@@ -1,3 +1,5 @@
+"""Modelos del catálogo de actividades, sus horarios e inscripciones."""
+
 from datetime import datetime, time, timedelta
 from typing import ClassVar
 
