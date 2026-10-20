@@ -82,27 +82,28 @@ def catalogo(request: HttpRequest) -> HttpResponse:
     )
 
 
-def _leer_edad(texto: str) -> int:
-    """Convierte la edad ingresada en el formulario a un número entero."""
+def _leer_entero(texto: str, rechazo: ValueError) -> int:
+    """Convierte un campo numérico del formulario o informa el rechazo dado."""
     try:
         return int(texto)
     except ValueError:
-        raise EdadInvalidaError("La edad debe ser un número entero.") from None
+        raise rechazo from None
 
 
 def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
     """Arma los datos de cada participante enviado en el formulario."""
-    try:
-        cantidad = int(datos["cantidad_personas"])
-    except ValueError:
-        raise InscripcionSinParticipantesError(
-            "Indicá la cantidad de participantes."
-        ) from None
+    cantidad = _leer_entero(
+        datos["cantidad_personas"],
+        InscripcionSinParticipantesError("Indicá la cantidad de participantes."),
+    )
     return [
         DatosParticipante(
             nombre=datos[f"participante_{numero}_nombre"],
             dni=datos[f"participante_{numero}_dni"],
-            edad=_leer_edad(datos[f"participante_{numero}_edad"]),
+            edad=_leer_entero(
+                datos[f"participante_{numero}_edad"],
+                EdadInvalidaError("La edad debe ser un número entero."),
+            ),
             talle=datos.get(f"participante_{numero}_talle", ""),
         )
         for numero in range(1, cantidad + 1)
