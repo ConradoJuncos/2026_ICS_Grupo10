@@ -3,7 +3,7 @@
 from collections.abc import Iterator
 from datetime import date, datetime, time
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.test import Client
@@ -242,3 +242,19 @@ def test_formulario_se_envia_por_post(client: Client) -> None:
     assert 'name="csrfmiddlewaretoken"' in contenido
     assert 'type="submit">Finalizar inscripción' in contenido
     assert "todavía no están habilitados" not in contenido
+
+
+@pytest.mark.django_db
+def test_formulario_envia_el_correo_de_confirmacion(
+    client: Client, horario_tirolesa: Horario, servidor_smtp: MagicMock
+) -> None:
+    """Envía al visitante el resumen de la inscripción registrada."""
+    client.post(URL_FORMULARIO_TIROLESA, datos_de_inscripcion(horario_tirolesa))
+
+    servidor_smtp.send_message.assert_called_once()
+    mensaje_enviado = servidor_smtp.send_message.call_args[0][0]
+    cuerpo = mensaje_enviado.get_body(preferencelist=("html",)).get_content()
+    assert mensaje_enviado["To"] == "ana@ejemplo.com"
+    assert "Tirolesa · 20/10/2026 · 10:00" in cuerpo
+    assert "Ana Pérez · DNI 30111222" in cuerpo
+    assert "Juan Pérez · DNI 50111222" in cuerpo
