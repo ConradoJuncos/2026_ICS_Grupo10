@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass
 
 from core.consulta_horarios import consultar_horarios_por_actividad
-from core.models import Horario, Inscripcion
+from core.models import Horario, Inscripcion, Participante
 from core.validacion_edad import validar_edad_para_actividad
 
 FORMATO_DNI = re.compile(r"\d{7,8}")
@@ -91,6 +91,14 @@ def registrar_inscripcion(
     dnis = [participante.dni for participante in participantes]
     if len(set(dnis)) != len(dnis):
         raise DniRepetidoError("Cada participante debe tener un DNI distinto.")
+    if Participante.objects.filter(
+        dni__in=dnis,
+        inscripcion__horario__fecha=horario.fecha,
+        inscripcion__horario__hora=horario.hora,
+    ).exists():
+        raise InscripcionSimultaneaError(
+            "Un participante ya está inscripto en otra actividad a esa hora."
+        )
     inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
     for participante in participantes:
         inscripcion.participantes.create(
