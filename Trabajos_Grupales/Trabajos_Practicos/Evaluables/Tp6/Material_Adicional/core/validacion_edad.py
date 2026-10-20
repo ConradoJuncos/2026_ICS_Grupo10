@@ -12,6 +12,10 @@ EDADES_MINIMAS_POR_ACTIVIDAD = {
 }
 
 
+class ActividadDesconocidaError(ValueError):
+    """Indica que la actividad no pertenece al catálogo del parque."""
+
+
 class EdadNoPermitidaError(ValueError):
     """Indica que la edad del visitante no permite realizar la actividad."""
 

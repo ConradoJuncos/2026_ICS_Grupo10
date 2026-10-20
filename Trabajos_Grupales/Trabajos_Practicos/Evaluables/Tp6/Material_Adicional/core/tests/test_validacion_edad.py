@@ -3,6 +3,7 @@
 import pytest
 
 from core.validacion_edad import (
+    ActividadDesconocidaError,
     EdadInvalidaError,
     EdadNoPermitidaError,
     validar_edad_para_actividad,
@@ -98,3 +99,9 @@ def test_aplica_la_edad_minima_sin_distinguir_mayusculas(actividad: str) -> None
     """Reconoce la actividad aunque su código no llegue en mayúsculas."""
     with pytest.raises(EdadNoPermitidaError):
         validar_edad_para_actividad(actividad, 7)
+
+
+def test_rechaza_una_actividad_desconocida() -> None:
+    """No valida edades para actividades que el parque no ofrece."""
+    with pytest.raises(ActividadDesconocidaError):
+        validar_edad_para_actividad("PARAPENTE", 30)
