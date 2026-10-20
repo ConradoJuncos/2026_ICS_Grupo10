@@ -21,4 +21,12 @@ def registrar_inscripcion(
     participantes: list[DatosParticipante],
 ) -> Inscripcion:
     """Valida y guarda la inscripción de los participantes en el horario."""
-    raise NotImplementedError
+    inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
+    for participante in participantes:
+        inscripcion.participantes.create(
+            nombre=participante.nombre,
+            dni=participante.dni,
+            edad=participante.edad,
+            talle=participante.talle,
+        )
+    return inscripcion
