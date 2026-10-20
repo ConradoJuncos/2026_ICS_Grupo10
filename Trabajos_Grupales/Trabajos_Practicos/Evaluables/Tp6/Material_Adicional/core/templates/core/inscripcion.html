@@ -73,9 +73,9 @@
         <div class="registration-field">
           <label for="horario">Horario <span aria-hidden="true">*</span></label>
           <select id="horario" name="horario" required{% if sin_turnos %} disabled{% endif %}>
-            <option value="" selected disabled>{% if horarios_disponibles %}Seleccioná un horario{% else %}Seleccioná una fecha primero{% endif %}</option>
+            <option value=""{% if not envio.horario %} selected{% endif %} disabled>{% if horarios_disponibles %}Seleccioná un horario{% else %}Seleccioná una fecha primero{% endif %}</option>
             {% for horario in horarios_disponibles %}
-            <option value="{{ horario.pk }}" data-cupos="{{ horario.cupos_disponibles }}">{{ horario.hora|time:'H:i' }} · {{ horario.cupos_disponibles }} lugares disponibles</option>
+            <option value="{{ horario.pk }}" data-cupos="{{ horario.cupos_disponibles }}"{% if envio.horario == horario.pk|stringformat:"d" %} selected{% endif %}>{{ horario.hora|time:'H:i' }} · {{ horario.cupos_disponibles }} lugares disponibles</option>
             {% endfor %}
           </select>
           <small id="time-guidance">Los turnos se habilitan hasta 15 minutos antes de su inicio. Una persona no puede reservar actividades simultáneas.</small>
