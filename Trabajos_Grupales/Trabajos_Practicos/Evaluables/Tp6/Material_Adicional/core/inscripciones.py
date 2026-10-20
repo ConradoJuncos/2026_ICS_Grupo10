@@ -48,6 +48,8 @@ def registrar_inscripcion(
     acepta_terminos: bool,
 ) -> Inscripcion:
     """Valida y guarda la inscripción de los participantes en el horario."""
+    if not acepta_terminos:
+        raise TerminosNoAceptadosError("Aceptá los términos de la actividad.")
     if not participantes:
         raise InscripcionSinParticipantesError("Agregá al menos un participante.")
     for participante in participantes:
