@@ -47,3 +47,11 @@ def test_enviar_mail_conserva_los_saltos_de_linea_del_resumen() -> None:
     cuerpo = cuerpo_del_correo_enviado("Ana Pérez\nJuan Pérez")
 
     assert "Ana Pérez<br>Juan Pérez" in cuerpo
+
+
+def test_enviar_mail_confirma_la_inscripcion_y_presenta_el_qr() -> None:
+    """Explica al visitante que la inscripción está confirmada y para qué es el QR."""
+    cuerpo = cuerpo_del_correo_enviado("")
+
+    assert "Tu inscripción a EcoHarmony Park está confirmada." in cuerpo
+    assert "Presentá este código QR al llegar a la actividad." in cuerpo
