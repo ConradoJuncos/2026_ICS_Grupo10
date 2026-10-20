@@ -125,7 +125,6 @@ def test_una_pagina_de_inscripcion_preselecciona_actividad_por_query(
     assert "Elegí una fecha para ver los turnos." in contenido
     assert 'id="fecha-visita"' in contenido
     assert 'name="cantidad_personas"' in contenido
-    assert 'name="participante_1_talle"' in contenido
     assert "inscripcion.js" in contenido
     assert "código QR" in contenido
     assert "inscripcion.js" in contenido
@@ -153,6 +152,28 @@ def test_selector_ofrece_el_ultimo_turno_del_dia(client: Client) -> None:
     assert turno is not None
     assert "17:00" in turno.group()
     assert "10 lugares" in turno.group()
+
+
+@pytest.mark.django_db
+def test_formulario_presenta_los_datos_de_la_actividad_elegida(client: Client) -> None:
+    """Muestra el título, los términos y el talle propios de la actividad."""
+    respuesta = client.get("/inscripcion/?actividad=tirolesa")
+
+    contenido = respuesta.content.decode()
+    assert "Inscripción a Tirolesa." in contenido
+    assert "Términos y condiciones de Tirolesa" in contenido
+    assert "utilizá la talla de vestimenta declarada" in contenido
+    assert 'name="participante_1_talle"' in contenido
+
+
+@pytest.mark.django_db
+def test_formulario_no_pide_talle_en_actividades_que_no_lo_requieren(
+    client: Client,
+) -> None:
+    """Omite el talle de vestimenta cuando la actividad no lo usa."""
+    respuesta = client.get("/inscripcion/?actividad=safari")
+
+    assert 'name="participante_1_talle"' not in respuesta.content.decode()
 
 
 @pytest.mark.django_db
