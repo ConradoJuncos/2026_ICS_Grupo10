@@ -261,6 +261,43 @@ def test_formulario_rechaza_una_cantidad_de_participantes_no_numerica(
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("campo", "mensaje"),
+    [
+        pytest.param(
+            "cantidad_personas", "Indicá la cantidad de participantes.", id="cantidad"
+        ),
+        pytest.param("correo", "Ingresá un correo electrónico válido.", id="correo"),
+        pytest.param(
+            "participante_2_nombre",
+            "Indicá el nombre de cada participante.",
+            id="nombre",
+        ),
+        pytest.param(
+            "participante_2_dni",
+            "El DNI debe tener 7 u 8 dígitos, sin puntos.",
+            id="dni",
+        ),
+        pytest.param(
+            "participante_2_edad", "La edad debe ser un número entero.", id="edad"
+        ),
+    ],
+)
+def test_formulario_informa_los_campos_faltantes(
+    client: Client, horario_tirolesa: Horario, campo: str, mensaje: str
+) -> None:
+    """Vuelve al formulario con el motivo cuando el envío omite un campo."""
+    datos = datos_de_inscripcion(horario_tirolesa)
+    del datos[campo]
+
+    respuesta = client.post(URL_FORMULARIO_TIROLESA, datos)
+
+    assert respuesta.status_code == 200
+    assert mensaje in respuesta.content.decode()
+    assert not Inscripcion.objects.exists()
+
+
+@pytest.mark.django_db
 def test_formulario_responde_404_ante_un_horario_inexistente(
     client: Client, horario_tirolesa: Horario
 ) -> None:
