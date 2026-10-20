@@ -1,6 +1,6 @@
 """Catálogo público de actividades del parque."""
 
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_http_methods
 
@@ -81,25 +81,29 @@ def catalogo(request: HttpRequest) -> HttpResponse:
     )
 
 
+def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
+    """Arma los datos de cada participante enviado en el formulario."""
+    cantidad = int(datos["cantidad_personas"])
+    return [
+        DatosParticipante(
+            nombre=datos[f"participante_{numero}_nombre"],
+            dni=datos[f"participante_{numero}_dni"],
+            edad=int(datos[f"participante_{numero}_edad"]),
+            talle=datos.get(f"participante_{numero}_talle", ""),
+        )
+        for numero in range(1, cantidad + 1)
+    ]
+
+
 @require_http_methods(["GET", "POST"])
 def inscripcion(request: HttpRequest) -> HttpResponse:
     """Muestra el formulario de inscripción y registra los envíos."""
     if request.method == "POST":
         horario = Horario.objects.get(pk=request.POST["horario"])
-        cantidad = int(request.POST["cantidad_personas"])
-        participantes = [
-            DatosParticipante(
-                nombre=request.POST[f"participante_{numero}_nombre"],
-                dni=request.POST[f"participante_{numero}_dni"],
-                edad=int(request.POST[f"participante_{numero}_edad"]),
-                talle=request.POST.get(f"participante_{numero}_talle", ""),
-            )
-            for numero in range(1, cantidad + 1)
-        ]
         inscripcion_registrada = registrar_inscripcion(
             horario,
             correo=request.POST["correo"],
-            participantes=participantes,
+            participantes=_leer_participantes(request.POST),
             acepta_terminos="acepta_terminos" in request.POST,
         )
         return render(
