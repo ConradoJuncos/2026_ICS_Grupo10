@@ -158,3 +158,19 @@ def test_formulario_registra_la_inscripcion_enviada(
         ("Ana Pérez", "30111222", 35, "M"),
         ("Juan Pérez", "50111222", 10, "S"),
     ]
+
+
+@pytest.mark.django_db
+def test_formulario_muestra_el_error_de_una_inscripcion_rechazada(
+    client: Client, horario_tirolesa: Horario
+) -> None:
+    """Vuelve al formulario con el motivo del rechazo y no guarda nada."""
+    datos = datos_de_inscripcion(horario_tirolesa) | {"participante_2_dni": "123"}
+
+    respuesta = client.post("/inscripcion/?actividad=tirolesa&fecha=2026-10-20", datos)
+
+    contenido = respuesta.content.decode()
+    assert respuesta.status_code == 200
+    assert 'id="registration-form"' in contenido
+    assert "El DNI debe tener 7 u 8 dígitos, sin puntos." in contenido
+    assert not Inscripcion.objects.exists()
