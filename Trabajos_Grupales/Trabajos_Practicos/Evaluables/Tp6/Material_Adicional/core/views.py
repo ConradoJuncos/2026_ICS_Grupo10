@@ -1,7 +1,7 @@
 """Catálogo público de actividades del parque."""
 
 from django.http import HttpRequest, HttpResponse, QueryDict
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_http_methods
 
 from core.consulta_horarios import consultar_horarios_por_actividad
@@ -113,7 +113,7 @@ def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
 def _registrar_envio(datos: QueryDict) -> Inscripcion:
     """Registra la inscripción con los campos enviados en el formulario."""
     return registrar_inscripcion(
-        Horario.objects.get(pk=datos["horario"]),
+        get_object_or_404(Horario, pk=datos["horario"]),
         correo=datos["correo"],
         participantes=_leer_participantes(datos),
         acepta_terminos="acepta_terminos" in datos,
