@@ -174,3 +174,23 @@ def test_formulario_muestra_el_error_de_una_inscripcion_rechazada(
     assert 'id="registration-form"' in contenido
     assert "El DNI debe tener 7 u 8 dígitos, sin puntos." in contenido
     assert not Inscripcion.objects.exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "edad",
+    [
+        pytest.param("", id="vacia"),
+        pytest.param("diez", id="en_letras"),
+    ],
+)
+def test_formulario_rechaza_una_edad_no_numerica(
+    client: Client, horario_tirolesa: Horario, edad: str
+) -> None:
+    """Informa que la edad debe ser un número en lugar de fallar."""
+    datos = datos_de_inscripcion(horario_tirolesa) | {"participante_1_edad": edad}
+
+    respuesta = client.post("/inscripcion/?actividad=tirolesa&fecha=2026-10-20", datos)
+
+    assert "La edad debe ser un número entero." in respuesta.content.decode()
+    assert not Inscripcion.objects.exists()
