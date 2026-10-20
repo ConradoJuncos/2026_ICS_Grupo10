@@ -1,22 +1,19 @@
-from unittest.mock import MagicMock, patch
+"""Comprueba el formato del correo de confirmación."""
 
-from django.test import TestCase
+from unittest.mock import MagicMock, patch
 
 from core.email import enviar_mail_confirmacion_registro_a_actividad
 
 
-class ServicioEmailTest(TestCase):
-    @patch("core.email.smtplib.SMTP")
-    def test_enviar_mail_envia_imagen_inline(self, mock_smtp):
-        # SMTP se usa como context manager: el servidor es lo que devuelve __enter__.
-        mock_server = MagicMock()
-        mock_smtp.return_value.__enter__.return_value = mock_server
+@patch("core.email.smtplib.SMTP")
+def test_enviar_mail_envia_imagen_inline(mock_smtp: MagicMock) -> None:
+    """Envía un mensaje multiparte con el QR incluido en el cuerpo."""
+    # SMTP se usa como context manager: el servidor es lo que devuelve __enter__.
+    mock_server = MagicMock()
+    mock_smtp.return_value.__enter__.return_value = mock_server
 
-        enviar_mail_confirmacion_registro_a_actividad("test@ejemplo.com", b"qr_falso")
+    enviar_mail_confirmacion_registro_a_actividad("test@ejemplo.com", b"qr_falso")
 
-        # Verificar que el mensaje fue enviado y que tiene html
-        mock_server.send_message.assert_called_once()
-        sent_message = mock_server.send_message.call_args[0][0]
-
-        # Verificar que el mensaje enviado es multiparte
-        self.assertTrue(sent_message.is_multipart())
+    mock_server.send_message.assert_called_once()
+    mensaje_enviado = mock_server.send_message.call_args[0][0]
+    assert mensaje_enviado.is_multipart()
