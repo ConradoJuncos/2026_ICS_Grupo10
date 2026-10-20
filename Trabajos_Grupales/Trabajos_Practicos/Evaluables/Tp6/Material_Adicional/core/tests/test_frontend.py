@@ -124,13 +124,29 @@ def test_una_pagina_de_inscripcion_preselecciona_actividad_por_query(
     capacidades = {"safari": 8, "tirolesa": 10, "palestra": 12, "jardineria": 12}
     assert f'data-capacity="{capacidades[codigo]}"' in contenido
     assert 'name="horario" required' in contenido
-    assert 'value="17:00">' not in contenido
     assert 'type="date"' in contenido
     assert 'name="cantidad_personas"' in contenido
     assert 'name="participante_1_talle"' in contenido
     assert "inscripcion.js" in contenido
     assert "código QR" in contenido
     assert "inscripcion.js" in contenido
+
+
+@pytest.mark.django_db
+def test_selector_ofrece_el_ultimo_turno_del_dia(client: Client) -> None:
+    """Ofrece el turno de las 17:00, el último que comienza dentro del horario."""
+    tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+    Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(17))
+
+    with patch(
+        "django.utils.timezone.now",
+        return_value=datetime(
+            2026, 10, 20, 16, 30, tzinfo=timezone.get_current_timezone()
+        ),
+    ):
+        respuesta = client.get(URL_FORMULARIO_TIROLESA)
+
+    assert "17:00 · 10 lugares disponibles" in respuesta.content.decode()
 
 
 @pytest.mark.django_db
