@@ -1,10 +1,14 @@
-from django.test import TestCase
+"""Comprueba la persistencia de las actividades."""
 
-from core.models import Actividad  # This model doesn't exist yet
+import pytest
+
+from core.models import Actividad
 
 
-class TestActividades(TestCase):
-    def test_crear_actividad_tirolesa(self):
-        actividad = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
-        self.assertEqual(actividad.nombre, "TIROLESA")
-        self.assertEqual(actividad.cupo_maximo, 10)
+@pytest.mark.django_db
+def test_crear_actividad_tirolesa() -> None:
+    """Guarda la Tirolesa con su nombre y su cupo máximo."""
+    actividad = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
+
+    assert actividad.nombre == "TIROLESA"
+    assert actividad.cupo_maximo == 10
