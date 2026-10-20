@@ -98,15 +98,15 @@ def _leer_entero(texto: str, rechazo: ValueError) -> int:
 def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
     """Arma los datos de cada participante enviado en el formulario."""
     cantidad = _leer_entero(
-        datos["cantidad_personas"],
+        datos.get("cantidad_personas", ""),
         InscripcionSinParticipantesError("Indicá la cantidad de participantes."),
     )
     return [
         DatosParticipante(
-            nombre=datos[f"participante_{numero}_nombre"],
-            dni=datos[f"participante_{numero}_dni"],
+            nombre=datos.get(f"participante_{numero}_nombre", ""),
+            dni=datos.get(f"participante_{numero}_dni", ""),
             edad=_leer_entero(
-                datos[f"participante_{numero}_edad"],
+                datos.get(f"participante_{numero}_edad", ""),
                 EdadInvalidaError("La edad debe ser un número entero."),
             ),
             talle=datos.get(f"participante_{numero}_talle", ""),
@@ -119,7 +119,7 @@ def _registrar_envio(datos: QueryDict) -> Inscripcion:
     """Registra la inscripción con los campos enviados en el formulario."""
     horario = get_object_or_404(Horario, pk=datos["horario"])
     return horario.registrar_inscripcion(
-        correo=datos["correo"],
+        correo=datos.get("correo", ""),
         participantes=_leer_participantes(datos),
         acepta_terminos="acepta_terminos" in datos,
     )
