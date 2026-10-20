@@ -262,6 +262,16 @@ def test_formulario_rechazado_conserva_el_horario_elegido(
 
 
 @pytest.mark.django_db
+def test_formulario_rechazado_conserva_la_aceptacion_de_los_terminos(
+    client: Client, horario_tirolesa: Horario
+) -> None:
+    """No obliga a volver a aceptar términos que ya fueron aceptados."""
+    contenido = envio_rechazado(client, horario_tirolesa)
+
+    assert 'name="acepta_terminos" required checked>' in contenido
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "edad",
     [
