@@ -36,6 +36,10 @@ class HorarioNoReservableError(ValueError):
     """Indica que el horario elegido no admite inscripciones."""
 
 
+class CupoInsuficienteError(ValueError):
+    """Indica que el horario no tiene lugares para todos los participantes."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""

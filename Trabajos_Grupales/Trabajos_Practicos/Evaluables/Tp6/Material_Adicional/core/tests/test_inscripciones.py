@@ -9,6 +9,7 @@ import pytest
 from django.utils import timezone
 
 from core.inscripciones import (
+    CupoInsuficienteError,
     DatosParticipante,
     DniInvalidoError,
     HorarioNoReservableError,
@@ -24,6 +25,11 @@ from core.validacion_edad import EdadNoPermitidaError
 PARTICIPANTE_VALIDO = DatosParticipante(
     nombre="Ana Pérez", dni="30111222", edad=35, talle="M"
 )
+GRUPO_DE_TRES = [
+    PARTICIPANTE_VALIDO,
+    replace(PARTICIPANTE_VALIDO, nombre="Beto Gómez", dni="31222333"),
+    replace(PARTICIPANTE_VALIDO, nombre="Carla Díaz", dni="32333444"),
+]
 
 
 @pytest.fixture(autouse=True)
@@ -244,3 +250,33 @@ def test_inscripcion_rechazada_no_guarda_datos(horario_tirolesa: Horario) -> Non
 
     assert not Inscripcion.objects.exists()
     assert not Participante.objects.exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("cupo_maximo", "participantes"),
+    [
+        pytest.param(1, [PARTICIPANTE_VALIDO], id="turno_lleno"),
+        pytest.param(3, GRUPO_DE_TRES, id="grupo_mayor_al_cupo_restante"),
+    ],
+)
+def test_rechaza_inscripcion_sin_cupo_suficiente(
+    cupo_maximo: int, participantes: list[DatosParticipante]
+) -> None:
+    """Rechaza el grupo si no quedan lugares para todos sus integrantes."""
+    horario = Horario.objects.create(
+        actividad=Actividad.objects.create(nombre="TIROLESA", cupo_maximo=cupo_maximo),
+        fecha=date(2026, 10, 20),
+        hora=time(10),
+    )
+    Inscripcion.objects.create(horario=horario).participantes.create(
+        nombre="Dora Ruiz", dni="40111222", edad=30, talle="M"
+    )
+
+    with pytest.raises(CupoInsuficienteError):
+        registrar_inscripcion(
+            horario,
+            correo="ana@ejemplo.com",
+            participantes=participantes,
+            acepta_terminos=True,
+        )
