@@ -319,3 +319,27 @@ def test_rechaza_participante_inscripto_en_otra_actividad_a_la_misma_hora(
             participantes=[PARTICIPANTE_VALIDO],
             acepta_terminos=True,
         )
+
+
+@pytest.mark.django_db
+def test_admite_participante_inscripto_en_otro_horario(
+    horario_tirolesa: Horario,
+) -> None:
+    """Permite a una persona inscribirse en turnos que no se superponen."""
+    otro_horario = Horario.objects.create(
+        actividad=horario_tirolesa.actividad,
+        fecha=horario_tirolesa.fecha,
+        hora=time(11),
+    )
+    Inscripcion.objects.create(horario=otro_horario).participantes.create(
+        nombre="Ana Pérez", dni=PARTICIPANTE_VALIDO.dni, edad=35, talle="M"
+    )
+
+    inscripcion = registrar_inscripcion(
+        horario_tirolesa,
+        correo="ana@ejemplo.com",
+        participantes=[PARTICIPANTE_VALIDO],
+        acepta_terminos=True,
+    )
+
+    assert inscripcion.participantes.get().dni == PARTICIPANTE_VALIDO.dni
