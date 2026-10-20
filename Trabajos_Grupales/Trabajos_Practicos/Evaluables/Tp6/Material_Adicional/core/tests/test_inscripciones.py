@@ -1,6 +1,7 @@
 """Comprueba el registro de inscripciones a las actividades."""
 
 from collections.abc import Iterator
+from dataclasses import replace
 from datetime import date, datetime, time
 from unittest.mock import patch
 
@@ -9,10 +10,15 @@ from django.utils import timezone
 
 from core.inscripciones import (
     DatosParticipante,
+    DniInvalidoError,
     InscripcionSinParticipantesError,
     registrar_inscripcion,
 )
 from core.models import Actividad, Horario
+
+PARTICIPANTE_VALIDO = DatosParticipante(
+    nombre="Ana Pérez", dni="30111222", edad=35, talle="M"
+)
 
 
 @pytest.fixture(autouse=True)
@@ -67,4 +73,27 @@ def test_rechaza_inscripcion_sin_participantes(horario_tirolesa: Horario) -> Non
     with pytest.raises(InscripcionSinParticipantesError):
         registrar_inscripcion(
             horario_tirolesa, correo="ana@ejemplo.com", participantes=[]
+        )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "dni",
+    [
+        pytest.param("", id="vacio"),
+        pytest.param("123456", id="seis_digitos"),
+        pytest.param("123456789", id="nueve_digitos"),
+        pytest.param("30.111.222", id="con_puntos"),
+        pytest.param("3011122A", id="con_letras"),
+    ],
+)
+def test_rechaza_participante_con_dni_invalido(
+    horario_tirolesa: Horario, dni: str
+) -> None:
+    """Exige un DNI de 7 u 8 dígitos sin separadores."""
+    participante = replace(PARTICIPANTE_VALIDO, dni=dni)
+
+    with pytest.raises(DniInvalidoError):
+        registrar_inscripcion(
+            horario_tirolesa, correo="ana@ejemplo.com", participantes=[participante]
         )

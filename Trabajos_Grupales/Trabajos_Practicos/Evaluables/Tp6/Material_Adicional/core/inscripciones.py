@@ -9,6 +9,10 @@ class InscripcionSinParticipantesError(ValueError):
     """Indica que la inscripción no incluye participantes."""
 
 
+class DniInvalidoError(ValueError):
+    """Indica que el DNI de un participante no tiene un formato válido."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""
