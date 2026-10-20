@@ -230,3 +230,15 @@ def test_formulario_responde_404_ante_un_horario_inexistente(
     respuesta = client.post(URL_FORMULARIO_TIROLESA, datos)
 
     assert respuesta.status_code == 404
+
+
+@pytest.mark.django_db
+def test_formulario_se_envia_por_post(client: Client) -> None:
+    """Habilita el envío del formulario con protección CSRF."""
+    respuesta = client.get("/inscripcion/?actividad=safari")
+
+    contenido = respuesta.content.decode()
+    assert 'id="registration-form" method="post"' in contenido
+    assert 'name="csrfmiddlewaretoken"' in contenido
+    assert 'type="submit">Finalizar inscripción' in contenido
+    assert "todavía no están habilitados" not in contenido
