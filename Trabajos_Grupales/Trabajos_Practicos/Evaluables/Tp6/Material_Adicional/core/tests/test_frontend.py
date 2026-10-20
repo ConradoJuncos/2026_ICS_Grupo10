@@ -492,3 +492,19 @@ def test_confirmacion_muestra_el_qr_de_la_inscripcion(
     )
     imagen = base64.b64encode(qr_esperado).decode()
     assert f'src="data:image/png;base64,{imagen}"' in respuesta.content.decode()
+
+
+@pytest.mark.django_db
+def test_confirmacion_avisa_cuando_no_se_pudo_enviar_el_correo(
+    client: Client, horario_tirolesa: Horario, servidor_smtp: MagicMock
+) -> None:
+    """Pide guardar el pase en pantalla si el correo no salió."""
+    servidor_smtp.send_message.side_effect = ConnectionRefusedError
+
+    respuesta = client.post(
+        URL_FORMULARIO_TIROLESA, datos_de_inscripcion(horario_tirolesa)
+    )
+
+    contenido = respuesta.content.decode()
+    assert "No pudimos enviar el correo a ana@ejemplo.com" in contenido
+    assert "Enviamos el resumen" not in contenido
