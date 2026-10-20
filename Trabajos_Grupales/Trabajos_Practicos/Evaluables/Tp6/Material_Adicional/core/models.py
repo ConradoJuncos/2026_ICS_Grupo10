@@ -29,18 +29,11 @@ class Horario(models.Model):
         )  # Cuenta cuántas inscripciones tiene este horario
         return self.actividad.cupo_maximo - inscritos
 
-    def registrar_inscripcion(self, nombre_participante):
-        if self.cupos_disponibles() <= 0:
-            raise ValueError("No hay cupos disponibles para este horario.")
-
-        return self.inscripciones.create(nombre_participante=nombre_participante)
-
 
 class Inscripcion(models.Model):
     horario = models.ForeignKey(
         Horario, on_delete=models.CASCADE, related_name="inscripciones"
     )
-    nombre_participante = models.CharField(max_length=100, blank=True, default="")
     correo = models.EmailField(blank=True, default="")
 
 
