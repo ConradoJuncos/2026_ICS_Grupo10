@@ -38,7 +38,8 @@
   </div>
 
   <form id="consulta-turnos" method="get" action="{% url 'inscripcion' %}"></form>
-  <form class="registration-form" id="registration-form">
+  <form class="registration-form" id="registration-form" method="post">
+    {% csrf_token %}
     <section class="registration-section" aria-labelledby="actividad-title">
       <div class="registration-section-heading">
         <span class="step-number" aria-hidden="true">01</span>
@@ -158,8 +159,8 @@
     </section>
 
     <div class="registration-submit">
-      <button class="button button-dark" type="button" disabled>Finalizar inscripción <span aria-hidden="true">↗</span></button>
-      <p>El envío de inscripciones, el correo y el código QR todavía no están habilitados.</p>
+      <button class="button button-dark" type="submit">Finalizar inscripción <span aria-hidden="true">↗</span></button>
+      <p>Al finalizar verás el resumen de tu inscripción.</p>
     </div>
     </div>
   </form>
