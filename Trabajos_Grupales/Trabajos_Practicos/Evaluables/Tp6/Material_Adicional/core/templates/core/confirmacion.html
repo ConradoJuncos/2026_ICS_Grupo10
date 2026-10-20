@@ -28,7 +28,7 @@
   </div>
   <section class="registration-section" aria-labelledby="resumen-title">
     <div class="registration-section-heading">
-      <div><h2 id="resumen-title">Participantes</h2><p>Enviaremos el resumen a {{ inscripcion.correo }}.</p></div>
+      <div><h2 id="resumen-title">Participantes</h2><p>{% if correo_enviado %}Enviamos el resumen y el código QR a {{ inscripcion.correo }}.{% else %}No pudimos enviar el correo a {{ inscripcion.correo }}. Guardá este pase o sacale una captura.{% endif %}</p></div>
     </div>
     <ul>
       {% for participante in inscripcion.participantes.all %}

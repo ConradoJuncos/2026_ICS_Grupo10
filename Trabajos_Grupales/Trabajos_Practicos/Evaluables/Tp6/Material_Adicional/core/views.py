@@ -151,8 +151,8 @@ def _resumen_de_inscripcion(inscripcion: Inscripcion) -> str:
     return "\n".join(lineas)
 
 
-def _enviar_confirmacion(inscripcion: Inscripcion, qr: bytes) -> None:
-    """Envía al visitante el resumen y el código QR de su inscripción."""
+def _enviar_confirmacion(inscripcion: Inscripcion, qr: bytes) -> bool:
+    """Envía al visitante el resumen y el QR, e indica si el correo salió."""
     try:
         enviar_mail_confirmacion_registro_a_actividad(
             inscripcion.correo,
@@ -164,6 +164,8 @@ def _enviar_confirmacion(inscripcion: Inscripcion, qr: bytes) -> None:
             "No se pudo enviar el correo de confirmación de la inscripción %s.",
             inscripcion.pk,
         )
+        return False
+    return True
 
 
 @require_http_methods(["GET", "POST"])
@@ -175,13 +177,14 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
         except ValueError as rechazo:
             return _mostrar_formulario(request, error=str(rechazo))
         qr = GenerarQr().generate(f"EcoHarmony-Inscripcion-{inscripcion_registrada.pk}")
-        _enviar_confirmacion(inscripcion_registrada, qr)
+        correo_enviado = _enviar_confirmacion(inscripcion_registrada, qr)
         return render(
             request,
             "core/confirmacion.html",
             {
                 "inscripcion": inscripcion_registrada,
                 "qr": base64.b64encode(qr).decode(),
+                "correo_enviado": correo_enviado,
             },
         )
     return _mostrar_formulario(request)
