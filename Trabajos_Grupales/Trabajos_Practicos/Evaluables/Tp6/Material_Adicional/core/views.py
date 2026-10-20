@@ -213,6 +213,8 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
     )
     fechas_disponibles = sorted({horario.fecha for horario in horarios})
     fecha_seleccionada = request.GET.get("fecha")
+    if not fecha_seleccionada and len(fechas_disponibles) == 1:
+        fecha_seleccionada = fechas_disponibles[0].isoformat()
     horarios_disponibles = [
         horario
         for horario in horarios
