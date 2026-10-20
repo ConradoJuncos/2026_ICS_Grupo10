@@ -6,6 +6,7 @@ from html import escape
 def enviar_mail_confirmacion_registro_a_actividad(
     destinatario: str, qr: bytes, resumen: str = ""
 ):
+    resumen_html = escape(resumen).replace("\n", "<br>")
     msg = EmailMessage()
     msg["Subject"] = "Confirmación de Registro"
     msg["From"] = "noreply@example.com"
@@ -15,7 +16,7 @@ def enviar_mail_confirmacion_registro_a_actividad(
         f"""\
     <html>
         <body>
-            <p>{escape(resumen)}</p>
+            <p>{resumen_html}</p>
             <p>Test qr codigo:</p>
             <img src="cid:qr_code" alt="Código QR">
         </body>
