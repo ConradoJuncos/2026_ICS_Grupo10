@@ -1,9 +1,11 @@
 """Catálogo público de actividades del parque."""
 
 import logging
+from datetime import timedelta
 
 from django.http import Http404, HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods
 
 from core.consulta_horarios import consultar_horarios_por_actividad
@@ -224,6 +226,8 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
                 codigo_actividad.lower() if codigo_actividad in DESCRIPCIONES else ""
             ),
             "fecha_seleccionada": fecha_seleccionada or "",
+            "hoy": timezone.localdate(),
+            "manana": timezone.localdate() + timedelta(days=1),
             "horarios_disponibles": horarios_disponibles,
             "sin_turnos": sin_turnos,
             "error": error,

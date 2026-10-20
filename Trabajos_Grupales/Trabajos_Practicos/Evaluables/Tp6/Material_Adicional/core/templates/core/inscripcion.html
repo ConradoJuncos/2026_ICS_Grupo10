@@ -66,12 +66,23 @@
         <div><h2 id="turno-title">Elegí la fecha y el turno</h2><p>El parque abre de martes a domingo. Los turnos duran una hora, de 09:00 a 18:00.</p></div>
       </div>
       <div class="registration-field-grid">
-        <div class="registration-field">
-          <label for="fecha-visita">Fecha de la actividad <span aria-hidden="true">*</span></label>
-          <input id="fecha-visita" name="fecha" type="date" required form="consulta-turnos" value="{{ fecha_seleccionada }}"{% if fechas_disponibles %} min="{{ fechas_disponibles.0|date:'Y-m-d' }}" max="{{ fechas_disponibles|last|date:'Y-m-d' }}"{% else %} disabled{% endif %}>
-          <small id="date-guidance">Elegí una fecha con turnos disponibles. No se admiten reservas con más de 24 horas de anticipación.</small>
-          <p class="field-feedback" id="date-feedback" aria-live="polite"></p>
-        </div>
+        <fieldset class="registration-field choice-field" id="fecha-visita">
+          <legend>Fecha <span aria-hidden="true">*</span></legend>
+          {% if fechas_disponibles %}
+          <div class="choice-group">
+            {% for fecha in fechas_disponibles %}
+            <label class="choice-chip">
+              <input type="radio" name="fecha" value="{{ fecha|date:'Y-m-d' }}" form="consulta-turnos" required{% if fecha|date:'Y-m-d' == fecha_seleccionada %} checked{% endif %}>
+              <span class="choice-title">{% if fecha == hoy %}Hoy{% elif fecha == manana %}Mañana{% else %}{{ fecha|date:'l'|capfirst }}{% endif %}</span>
+              <span class="choice-detail">{{ fecha|date:'l j \d\e F' }}</span>
+            </label>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p class="choice-empty">Por ahora no hay turnos reservables para esta actividad.</p>
+          {% endif %}
+          <small id="date-guidance">No se admiten reservas con más de 24 horas de anticipación.</small>
+        </fieldset>
         <div class="registration-field">
           <label for="horario">Horario <span aria-hidden="true">*</span></label>
           <select id="horario" name="horario" required{% if sin_turnos %} disabled{% endif %}>
