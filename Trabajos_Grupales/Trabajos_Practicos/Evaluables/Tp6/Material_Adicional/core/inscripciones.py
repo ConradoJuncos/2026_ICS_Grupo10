@@ -68,6 +68,8 @@ def registrar_inscripcion(
     acepta_terminos: bool,
 ) -> Inscripcion:
     """Valida y guarda la inscripción de los participantes en el horario."""
+    if len(participantes) > horario.cupos_disponibles():
+        raise CupoInsuficienteError("No quedan lugares para todos los participantes.")
     if horario not in consultar_horarios_por_actividad(
         horario.actividad, horario.fecha
     ):
