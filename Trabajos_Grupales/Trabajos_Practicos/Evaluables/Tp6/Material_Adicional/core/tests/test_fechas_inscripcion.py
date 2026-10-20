@@ -88,8 +88,8 @@ def test_inscripcion_informa_cuando_no_hay_turnos_reservables(client: Client) ->
 
 
 @pytest.mark.django_db
-def test_calendario_limita_la_seleccion_a_fechas_reservables(client: Client) -> None:
-    """El campo de fecha usa los límites de los turnos reservables de la BD."""
+def test_formulario_ofrece_solo_fechas_reservables(client: Client) -> None:
+    """Presenta como opciones las fechas que tienen turnos reservables."""
     tirolesa = Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10)
     Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 20), hora=time(17))
     Horario.objects.create(actividad=tirolesa, fecha=date(2026, 10, 21), hora=time(9))
@@ -103,13 +103,12 @@ def test_calendario_limita_la_seleccion_a_fechas_reservables(client: Client) -> 
     ):
         respuesta = client.get("/inscripcion/?actividad=tirolesa")
 
-    campo_fecha = re.search(
-        r'<input\b[^>]*\bid="fecha-visita"[^>]*>', respuesta.content.decode()
-    )
+    contenido = respuesta.content.decode()
+    fechas = re.findall(r'<input\b[^>]*\bname="fecha" value="([^"]+)"', contenido)
     assert respuesta.status_code == 200
-    assert campo_fecha is not None
-    assert 'min="2026-10-20"' in campo_fecha.group()
-    assert 'max="2026-10-21"' in campo_fecha.group()
+    assert fechas == ["2026-10-20", "2026-10-21"]
+    assert '<span class="choice-title">Hoy</span>' in contenido
+    assert '<span class="choice-title">Mañana</span>' in contenido
 
 
 @pytest.mark.django_db
@@ -140,7 +139,9 @@ def test_formulario_muestra_turnos_reales_y_conserva_fecha(client: Client) -> No
         contenido,
         flags=re.DOTALL,
     )
-    campo_fecha = re.search(r'<input\b[^>]*\bid="fecha-visita"[^>]*>', contenido)
+    campo_fecha = re.search(
+        r'<input\b[^>]*\bname="fecha" value="2026-10-21"[^>]*>', contenido
+    )
     assert respuesta.status_code == 200
     assert selector is not None
     assert re.findall(r'<option\b[^>]*\bvalue="([^"]+)"', selector["opciones"]) == [
@@ -149,7 +150,7 @@ def test_formulario_muestra_turnos_reales_y_conserva_fecha(client: Client) -> No
     assert "09:00" in selector["opciones"]
     assert "disabled" not in selector["atributos"]
     assert campo_fecha is not None
-    assert 'value="2026-10-21"' in campo_fecha.group()
+    assert "checked" in campo_fecha.group()
 
 
 @pytest.mark.django_db
@@ -168,7 +169,7 @@ def test_formulario_permite_consultar_turnos_por_get(client: Client) -> None:
 
     contenido = respuesta.content.decode()
     formulario = re.search(r'<form\b[^>]*\bid="consulta-turnos"[^>]*>', contenido)
-    campo_fecha = re.search(r'<input\b[^>]*\bid="fecha-visita"[^>]*>', contenido)
+    campo_fecha = re.search(r'<input\b[^>]*\bname="fecha"[^>]*>', contenido)
     campo_correo = re.search(r'<input\b[^>]*\bname="correo"[^>]*>', contenido)
     boton_consulta = re.search(
         r'<button\b[^>]*\bform="consulta-turnos"[^>]*>', contenido

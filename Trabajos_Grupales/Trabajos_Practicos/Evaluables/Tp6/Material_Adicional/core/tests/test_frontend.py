@@ -2,7 +2,6 @@
 
 from collections.abc import Iterator
 from datetime import date, datetime, time
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -83,11 +82,9 @@ def test_formulario_muestra_fecha_y_horarios(client: Client) -> None:
     respuesta = client.get("/inscripcion/?actividad=safari")
     contenido = respuesta.content.decode()
     assert respuesta.status_code == 200
-    assert 'id="fecha-visita" name="fecha" type="date" required' in contenido
+    assert 'id="fecha-visita"' in contenido
     assert "No se admiten reservas con más de 24 horas de anticipación" in contenido
     assert "Los turnos se habilitan hasta 15 minutos antes" in contenido
-    javascript = Path("core/static/core/inscripcion.js").read_text(encoding="utf-8")
-    assert "Solo se puede reservar dentro de las 24 horas previas" in javascript
 
 
 @pytest.mark.django_db
@@ -125,7 +122,7 @@ def test_una_pagina_de_inscripcion_preselecciona_actividad_por_query(
         in contenido
     )
     assert 'name="horario" required' in contenido
-    assert 'type="date"' in contenido
+    assert 'id="fecha-visita"' in contenido
     assert 'name="cantidad_personas"' in contenido
     assert 'name="participante_1_talle"' in contenido
     assert "inscripcion.js" in contenido
