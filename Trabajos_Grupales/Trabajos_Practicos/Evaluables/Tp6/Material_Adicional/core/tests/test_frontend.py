@@ -10,6 +10,7 @@ from django.test import Client
 from django.utils import timezone
 
 from core.models import Actividad, Horario, Inscripcion
+from core.qr import GenerarQr
 
 URL_FORMULARIO_TIROLESA = "/inscripcion/?actividad=tirolesa&fecha=2026-10-20"
 
@@ -258,3 +259,22 @@ def test_formulario_envia_el_correo_de_confirmacion(
     assert "Tirolesa · 20/10/2026 · 10:00" in cuerpo
     assert "Ana Pérez · DNI 30111222" in cuerpo
     assert "Juan Pérez · DNI 50111222" in cuerpo
+
+
+@pytest.mark.django_db
+def test_correo_de_confirmacion_incluye_el_qr_de_la_inscripcion(
+    client: Client, horario_tirolesa: Horario, servidor_smtp: MagicMock
+) -> None:
+    """Adjunta un QR que solo codifica el identificador de la inscripción."""
+    client.post(URL_FORMULARIO_TIROLESA, datos_de_inscripcion(horario_tirolesa))
+
+    mensaje_enviado = servidor_smtp.send_message.call_args[0][0]
+    imagenes = [
+        parte.get_content()
+        for parte in mensaje_enviado.walk()
+        if parte.get_content_type() == "image/png"
+    ]
+    qr_esperado = GenerarQr().generate(
+        f"EcoHarmony-Inscripcion-{Inscripcion.objects.get().pk}"
+    )
+    assert imagenes == [qr_esperado]
