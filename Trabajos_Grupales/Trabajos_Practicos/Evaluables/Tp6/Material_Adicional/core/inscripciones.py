@@ -25,6 +25,8 @@ def registrar_inscripcion(
     participantes: list[DatosParticipante],
 ) -> Inscripcion:
     """Valida y guarda la inscripción de los participantes en el horario."""
+    if not participantes:
+        raise InscripcionSinParticipantesError("Agregá al menos un participante.")
     inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
     for participante in participantes:
         inscripcion.participantes.create(
