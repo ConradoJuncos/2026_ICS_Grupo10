@@ -11,7 +11,7 @@ from core.inscripciones import (
     registrar_inscripcion,
 )
 from core.models import Actividad, Horario, Inscripcion
-from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD
+from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD, EdadInvalidaError
 
 CUPO_MAXIMO_POR_ACTIVIDAD = {
     "SAFARI": 8,
@@ -81,6 +81,14 @@ def catalogo(request: HttpRequest) -> HttpResponse:
     )
 
 
+def _leer_edad(texto: str) -> int:
+    """Convierte la edad ingresada en el formulario a un número entero."""
+    try:
+        return int(texto)
+    except ValueError:
+        raise EdadInvalidaError("La edad debe ser un número entero.") from None
+
+
 def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
     """Arma los datos de cada participante enviado en el formulario."""
     cantidad = int(datos["cantidad_personas"])
@@ -88,7 +96,7 @@ def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
         DatosParticipante(
             nombre=datos[f"participante_{numero}_nombre"],
             dni=datos[f"participante_{numero}_dni"],
-            edad=int(datos[f"participante_{numero}_edad"]),
+            edad=_leer_edad(datos[f"participante_{numero}_edad"]),
             talle=datos.get(f"participante_{numero}_talle", ""),
         )
         for numero in range(1, cantidad + 1)
