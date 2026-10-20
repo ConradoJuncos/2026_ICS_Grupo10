@@ -4,6 +4,7 @@ import re
 from dataclasses import dataclass
 
 from core.models import Horario, Inscripcion
+from core.validacion_edad import validar_edad_para_actividad
 
 FORMATO_DNI = re.compile(r"\d{7,8}")
 
@@ -37,6 +38,7 @@ def registrar_inscripcion(
     for participante in participantes:
         if not FORMATO_DNI.fullmatch(participante.dni):
             raise DniInvalidoError("El DNI debe tener 7 u 8 dígitos, sin puntos.")
+        validar_edad_para_actividad(horario.actividad.nombre, participante.edad)
     inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
     for participante in participantes:
         inscripcion.participantes.create(
