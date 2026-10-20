@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
 from core.consulta_horarios import consultar_horarios_por_actividad
+from core.inscripciones import ACTIVIDADES_CON_TALLE
 from core.models import Actividad
 from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD
 
@@ -63,7 +64,7 @@ def catalogo(request: HttpRequest) -> HttpResponse:
             "ilustracion": contenido[2],
             "edad_minima": EDADES_MINIMAS_POR_ACTIVIDAD[codigo],
             "cupo": CUPO_MAXIMO_POR_ACTIVIDAD[codigo],
-            "requiere_talle": codigo in {"TIROLESA", "PALESTRA"},
+            "requiere_talle": codigo in ACTIVIDADES_CON_TALLE,
         }
         for codigo, contenido in DESCRIPCIONES.items()
     ]
@@ -107,7 +108,7 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
             "descripcion": contenido[0],
             "cupo": cupos.get(codigo, CUPO_MAXIMO_POR_ACTIVIDAD[codigo]),
             "edad_minima": EDADES_MINIMAS_POR_ACTIVIDAD[codigo],
-            "requiere_talle": codigo in {"TIROLESA", "PALESTRA"},
+            "requiere_talle": codigo in ACTIVIDADES_CON_TALLE,
             "terminos": TERMINOS_POR_ACTIVIDAD[codigo],
         }
         for codigo, contenido in DESCRIPCIONES.items()
