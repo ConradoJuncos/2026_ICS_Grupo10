@@ -31,6 +31,9 @@
     {% if sin_turnos %}
     <p class="field-feedback" role="status">No hay turnos reservables para esta actividad y fecha.</p>
     {% endif %}
+    {% if error %}
+    <p class="field-feedback" role="alert">{{ error }}</p>
+    {% endif %}
     <div class="registration-capacity" id="registration-capacity" hidden><span>Lugares disponibles en el turno</span><strong id="capacity-value"></strong></div>
   </div>
 

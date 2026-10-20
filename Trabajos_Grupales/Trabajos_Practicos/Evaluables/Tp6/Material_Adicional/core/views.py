@@ -98,19 +98,24 @@ def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
 @require_http_methods(["GET", "POST"])
 def inscripcion(request: HttpRequest) -> HttpResponse:
     """Muestra el formulario de inscripción y registra los envíos."""
+    error = ""
     if request.method == "POST":
         horario = Horario.objects.get(pk=request.POST["horario"])
-        inscripcion_registrada = registrar_inscripcion(
-            horario,
-            correo=request.POST["correo"],
-            participantes=_leer_participantes(request.POST),
-            acepta_terminos="acepta_terminos" in request.POST,
-        )
-        return render(
-            request,
-            "core/confirmacion.html",
-            {"inscripcion": inscripcion_registrada},
-        )
+        try:
+            inscripcion_registrada = registrar_inscripcion(
+                horario,
+                correo=request.POST["correo"],
+                participantes=_leer_participantes(request.POST),
+                acepta_terminos="acepta_terminos" in request.POST,
+            )
+        except ValueError as rechazo:
+            error = str(rechazo)
+        else:
+            return render(
+                request,
+                "core/confirmacion.html",
+                {"inscripcion": inscripcion_registrada},
+            )
     codigo_actividad = request.GET.get("actividad", "").upper()
     actividad_seleccionada = Actividad.objects.filter(nombre=codigo_actividad).first()
     horarios = (
@@ -156,6 +161,7 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
             "fecha_seleccionada": fecha_seleccionada or "",
             "horarios_disponibles": horarios_disponibles,
             "sin_turnos": sin_turnos,
+            "error": error,
             "participantes": range(1, max(CUPO_MAXIMO_POR_ACTIVIDAD.values()) + 1),
         },
     )
