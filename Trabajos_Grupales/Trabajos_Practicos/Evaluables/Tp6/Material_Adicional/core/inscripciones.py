@@ -46,6 +46,17 @@ class DatosParticipante:
     talle: str = ""
 
 
+def _validar_participante(actividad: str, participante: DatosParticipante) -> None:
+    """Rechaza los datos del participante que no cumplen las reglas de la actividad."""
+    if not FORMATO_DNI.fullmatch(participante.dni):
+        raise DniInvalidoError("El DNI debe tener 7 u 8 dígitos, sin puntos.")
+    validar_edad_para_actividad(actividad, participante.edad)
+    if actividad in ACTIVIDADES_CON_TALLE and not participante.talle:
+        raise TalleObligatorioError("Indicá el talle de cada participante.")
+    if participante.talle and participante.talle not in TALLES_DISPONIBLES:
+        raise TalleInvalidoError("Elegí un talle entre XS y XXL.")
+
+
 def registrar_inscripcion(
     horario: Horario,
     correo: str,
@@ -62,13 +73,7 @@ def registrar_inscripcion(
     if not participantes:
         raise InscripcionSinParticipantesError("Agregá al menos un participante.")
     for participante in participantes:
-        if not FORMATO_DNI.fullmatch(participante.dni):
-            raise DniInvalidoError("El DNI debe tener 7 u 8 dígitos, sin puntos.")
-        validar_edad_para_actividad(horario.actividad.nombre, participante.edad)
-        if horario.actividad.nombre in ACTIVIDADES_CON_TALLE and not participante.talle:
-            raise TalleObligatorioError("Indicá el talle de cada participante.")
-        if participante.talle and participante.talle not in TALLES_DISPONIBLES:
-            raise TalleInvalidoError("Elegí un talle entre XS y XXL.")
+        _validar_participante(horario.actividad.nombre, participante)
     inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
     for participante in participantes:
         inscripcion.participantes.create(
