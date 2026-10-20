@@ -55,9 +55,11 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-Abrir <http://127.0.0.1:8000/>. El catalogo y la pantalla de inscripcion son
-visuales; todavia no registran reservas reales.
+Abrir <http://127.0.0.1:8000/>. Al finalizar una inscripcion, la aplicacion la
+registra, muestra la confirmacion y envia el correo con el resumen y el codigo QR.
 
-El adaptador de correo usa un servidor SMTP externo en `localhost:1025`.
-Estos requirements no instalan ni inician ese servidor. Su configuracion de
-demostracion y la entrega real quedan fuera de la preparacion de dependencias.
+El correo se envia a un servidor SMTP en `localhost:1025`. Estos requirements no
+instalan ni inician ese servidor. Sin servidor, la inscripcion se registra igual
+y el error de envio aparece en la terminal de `runserver`. Para ver los correos
+durante una demostracion se puede iniciar un servidor SMTP local de pruebas en
+ese puerto, por ejemplo Mailpit (interfaz web en <http://127.0.0.1:8025/>).
