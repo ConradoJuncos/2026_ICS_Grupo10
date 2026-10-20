@@ -1,5 +1,7 @@
 """Catálogo público de actividades del parque."""
 
+import logging
+
 from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_http_methods
@@ -14,6 +16,8 @@ from core.inscripciones import (
 from core.models import Actividad, Horario, Inscripcion
 from core.qr import GenerarQr
 from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD, EdadInvalidaError
+
+logger = logging.getLogger(__name__)
 
 CUPO_MAXIMO_POR_ACTIVIDAD = {
     "SAFARI": 8,
@@ -131,11 +135,17 @@ def _enviar_confirmacion(inscripcion: Inscripcion) -> None:
             for participante in inscripcion.participantes.order_by("pk")
         ),
     ]
-    enviar_mail_confirmacion_registro_a_actividad(
-        inscripcion.correo,
-        GenerarQr().generate(f"EcoHarmony-Inscripcion-{inscripcion.pk}"),
-        resumen="\n".join(lineas),
-    )
+    try:
+        enviar_mail_confirmacion_registro_a_actividad(
+            inscripcion.correo,
+            GenerarQr().generate(f"EcoHarmony-Inscripcion-{inscripcion.pk}"),
+            resumen="\n".join(lineas),
+        )
+    except OSError:
+        logger.exception(
+            "No se pudo enviar el correo de confirmación de la inscripción %s.",
+            inscripcion.pk,
+        )
 
 
 @require_http_methods(["GET", "POST"])
