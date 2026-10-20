@@ -1,7 +1,7 @@
 from datetime import datetime, time, timedelta
 from typing import ClassVar
 
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 
 from core.inscripciones import (
@@ -92,14 +92,15 @@ class Horario(models.Model):
             raise InscripcionSimultaneaError(
                 "Un participante ya está inscripto en otra actividad a esa hora."
             )
-        inscripcion = self.inscripciones.create(correo=correo)
-        for participante in participantes:
-            inscripcion.participantes.create(
-                nombre=participante.nombre,
-                dni=participante.dni,
-                edad=participante.edad,
-                talle=participante.talle,
-            )
+        with transaction.atomic():
+            inscripcion = self.inscripciones.create(correo=correo)
+            for participante in participantes:
+                inscripcion.participantes.create(
+                    nombre=participante.nombre,
+                    dni=participante.dni,
+                    edad=participante.edad,
+                    talle=participante.talle,
+                )
         return inscripcion
 
 
