@@ -12,6 +12,7 @@ from core.inscripciones import (
     DatosParticipante,
     DniInvalidoError,
     InscripcionSinParticipantesError,
+    TalleObligatorioError,
     registrar_inscripcion,
 )
 from core.models import Actividad, Horario
@@ -112,4 +113,23 @@ def test_rechaza_inscripcion_con_un_participante_menor_a_la_edad_minima(
             horario_tirolesa,
             correo="ana@ejemplo.com",
             participantes=[PARTICIPANTE_VALIDO, menor],
+        )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("actividad", ["TIROLESA", "PALESTRA"])
+def test_rechaza_participante_sin_talle_en_actividad_que_lo_requiere(
+    actividad: str,
+) -> None:
+    """Exige el talle de vestimenta en Tirolesa y Palestra."""
+    horario = Horario.objects.create(
+        actividad=Actividad.objects.create(nombre=actividad, cupo_maximo=10),
+        fecha=date(2026, 10, 20),
+        hora=time(10),
+    )
+    participante = replace(PARTICIPANTE_VALIDO, talle="")
+
+    with pytest.raises(TalleObligatorioError):
+        registrar_inscripcion(
+            horario, correo="ana@ejemplo.com", participantes=[participante]
         )

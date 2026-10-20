@@ -17,6 +17,10 @@ class DniInvalidoError(ValueError):
     """Indica que el DNI de un participante no tiene un formato válido."""
 
 
+class TalleObligatorioError(ValueError):
+    """Indica que falta el talle de vestimenta que exige la actividad."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""
