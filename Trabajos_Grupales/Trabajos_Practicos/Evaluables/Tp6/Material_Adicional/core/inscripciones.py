@@ -3,6 +3,7 @@
 import re
 from dataclasses import dataclass
 
+from core.consulta_horarios import consultar_horarios_por_actividad
 from core.models import Horario, Inscripcion
 from core.validacion_edad import validar_edad_para_actividad
 
@@ -52,6 +53,10 @@ def registrar_inscripcion(
     acepta_terminos: bool,
 ) -> Inscripcion:
     """Valida y guarda la inscripción de los participantes en el horario."""
+    if horario not in consultar_horarios_por_actividad(
+        horario.actividad, horario.fecha
+    ):
+        raise HorarioNoReservableError("El horario elegido ya no admite inscripciones.")
     if not acepta_terminos:
         raise TerminosNoAceptadosError("Aceptá los términos de la actividad.")
     if not participantes:
