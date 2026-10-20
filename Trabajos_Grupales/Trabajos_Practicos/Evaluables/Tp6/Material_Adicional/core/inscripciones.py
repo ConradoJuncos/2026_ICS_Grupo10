@@ -7,6 +7,7 @@ from core.models import Horario, Inscripcion
 from core.validacion_edad import validar_edad_para_actividad
 
 FORMATO_DNI = re.compile(r"\d{7,8}")
+ACTIVIDADES_CON_TALLE = {"TIROLESA", "PALESTRA"}
 
 
 class InscripcionSinParticipantesError(ValueError):
@@ -43,6 +44,8 @@ def registrar_inscripcion(
         if not FORMATO_DNI.fullmatch(participante.dni):
             raise DniInvalidoError("El DNI debe tener 7 u 8 dígitos, sin puntos.")
         validar_edad_para_actividad(horario.actividad.nombre, participante.edad)
+        if horario.actividad.nombre in ACTIVIDADES_CON_TALLE and not participante.talle:
+            raise TalleObligatorioError("Indicá el talle de cada participante.")
     inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
     for participante in participantes:
         inscripcion.participantes.create(
