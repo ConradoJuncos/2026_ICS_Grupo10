@@ -194,3 +194,23 @@ def test_formulario_rechaza_una_edad_no_numerica(
 
     assert "La edad debe ser un número entero." in respuesta.content.decode()
     assert not Inscripcion.objects.exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "cantidad",
+    [
+        pytest.param("", id="vacia"),
+        pytest.param("dos", id="en_letras"),
+    ],
+)
+def test_formulario_rechaza_una_cantidad_de_participantes_no_numerica(
+    client: Client, horario_tirolesa: Horario, cantidad: str
+) -> None:
+    """Pide indicar la cantidad de participantes en lugar de fallar."""
+    datos = datos_de_inscripcion(horario_tirolesa) | {"cantidad_personas": cantidad}
+
+    respuesta = client.post("/inscripcion/?actividad=tirolesa&fecha=2026-10-20", datos)
+
+    assert "Indicá la cantidad de participantes." in respuesta.content.decode()
+    assert not Inscripcion.objects.exists()
