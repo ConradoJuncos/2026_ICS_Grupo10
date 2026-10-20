@@ -138,7 +138,7 @@
       <p class="registration-eyebrow">Antes de finalizar</p>
       <h2 id="terminos-title">Términos y condiciones de <span id="terms-activity-name"></span></h2>
       <p id="activity-terms"></p>
-      <label class="terms-acceptance"><input type="checkbox" name="acepta_terminos" required> <span>Leí y acepto los términos y condiciones de <span id="terms-acceptance-name"></span>. <span aria-hidden="true">*</span></span></label>
+      <label class="terms-acceptance"><input type="checkbox" name="acepta_terminos" required{% if envio.acepta_terminos %} checked{% endif %}> <span>Leí y acepto los términos y condiciones de <span id="terms-acceptance-name"></span>. <span aria-hidden="true">*</span></span></label>
     </section>
 
     <div class="registration-submit">
