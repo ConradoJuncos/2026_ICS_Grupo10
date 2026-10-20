@@ -84,6 +84,9 @@ def registrar_inscripcion(
         raise InscripcionSinParticipantesError("Agregá al menos un participante.")
     for participante in participantes:
         _validar_participante(horario.actividad.nombre, participante)
+    dnis = [participante.dni for participante in participantes]
+    if len(set(dnis)) != len(dnis):
+        raise DniRepetidoError("Cada participante debe tener un DNI distinto.")
     inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
     for participante in participantes:
         inscripcion.participantes.create(
