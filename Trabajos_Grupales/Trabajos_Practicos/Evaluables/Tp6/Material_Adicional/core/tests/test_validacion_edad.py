@@ -91,3 +91,10 @@ def test_rechaza_edad_booleana(actividad: str, edad: bool) -> None:
     """Rechaza booleanos aunque Python los considere subtipos de entero."""
     with pytest.raises(EdadInvalidaError):
         validar_edad_para_actividad(actividad, edad)
+
+
+@pytest.mark.parametrize("actividad", ["tirolesa", "Tirolesa"])
+def test_aplica_la_edad_minima_sin_distinguir_mayusculas(actividad: str) -> None:
+    """Reconoce la actividad aunque su código no llegue en mayúsculas."""
+    with pytest.raises(EdadNoPermitidaError):
+        validar_edad_para_actividad(actividad, 7)
