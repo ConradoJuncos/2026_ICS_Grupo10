@@ -133,3 +133,23 @@ def test_rechaza_participante_sin_talle_en_actividad_que_lo_requiere(
         registrar_inscripcion(
             horario, correo="ana@ejemplo.com", participantes=[participante]
         )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("actividad", ["SAFARI", "JARDINERIA"])
+def test_admite_participante_sin_talle_en_actividad_que_no_lo_requiere(
+    actividad: str,
+) -> None:
+    """Permite omitir el talle en Safari y Jardinería."""
+    horario = Horario.objects.create(
+        actividad=Actividad.objects.create(nombre=actividad, cupo_maximo=10),
+        fecha=date(2026, 10, 20),
+        hora=time(10),
+    )
+    participante = replace(PARTICIPANTE_VALIDO, talle="")
+
+    inscripcion = registrar_inscripcion(
+        horario, correo="ana@ejemplo.com", participantes=[participante]
+    )
+
+    assert inscripcion.participantes.get().talle == ""
