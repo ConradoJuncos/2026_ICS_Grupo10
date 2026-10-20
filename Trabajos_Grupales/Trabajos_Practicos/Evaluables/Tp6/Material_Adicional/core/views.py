@@ -216,11 +216,20 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
         }
         for codigo, contenido in DESCRIPCIONES.items()
     ]
+    actividad_elegida = next(
+        (
+            opcion
+            for opcion in actividades
+            if opcion["codigo"] == codigo_actividad.lower()
+        ),
+        None,
+    )
     return render(
         request,
         "core/inscripcion.html",
         {
             "actividades": actividades,
+            "actividad_elegida": actividad_elegida,
             "fechas_disponibles": fechas_disponibles,
             "actividad_seleccionada": (
                 codigo_actividad.lower() if codigo_actividad in DESCRIPCIONES else ""

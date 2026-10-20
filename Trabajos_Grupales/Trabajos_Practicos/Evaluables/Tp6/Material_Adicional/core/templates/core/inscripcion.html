@@ -26,8 +26,13 @@
 <main class="registration-page" id="formulario-inscripcion">
   <div class="registration-heading">
     <p class="registration-eyebrow"><span aria-hidden="true">✳</span> Tu próxima aventura</p>
+    {% if actividad_elegida %}
+    <h1 id="registration-title">Inscripción a {{ actividad_elegida.nombre }}.</h1>
+    <p id="registration-description">{{ actividad_elegida.descripcion }} {% if actividad_elegida.edad_minima %}Edad mínima: {{ actividad_elegida.edad_minima }} años.{% else %}Apta para todas las edades.{% endif %}</p>
+    {% else %}
     <h1 id="registration-title">Inscripción a una actividad.</h1>
-    <p id="registration-description">Elegí una actividad para ver sus horarios, cupos y condiciones.</p>
+    <p id="registration-description">Elegí una actividad para ver sus horarios, lugares y condiciones.</p>
+    {% endif %}
     {% if error %}
     <p class="field-feedback" role="alert">{{ error }}</p>
     {% endif %}
@@ -129,13 +134,15 @@
               <label for="edad-{{ participante.numero }}">Edad <span aria-hidden="true">*</span></label>
               <input id="edad-{{ participante.numero }}" name="participante_{{ participante.numero }}_edad" type="number" value="{{ participante.edad }}" min="0" step="1" inputmode="numeric" placeholder="Edad en años" required>
             </div>
-            <div class="registration-field sizing-field" data-sizing-field hidden>
+            {% if actividad_elegida.requiere_talle %}
+            <div class="registration-field sizing-field">
               <label for="talle-{{ participante.numero }}">Talle de vestimenta <span aria-hidden="true">*</span></label>
-              <select id="talle-{{ participante.numero }}" name="participante_{{ participante.numero }}_talle" required disabled>
+              <select id="talle-{{ participante.numero }}" name="participante_{{ participante.numero }}_talle" required>
                 <option value=""{% if not participante.talle %} selected{% endif %} disabled>Seleccioná un talle</option>
                 {% for talle in talles %}<option value="{{ talle }}"{% if talle == participante.talle %} selected{% endif %}>{{ talle }}</option>{% endfor %}
               </select>
             </div>
+            {% endif %}
           </div>
         </fieldset>
         {% endfor %}
@@ -155,9 +162,9 @@
 
     <section class="terms-box" aria-labelledby="terminos-title">
       <p class="registration-eyebrow">Antes de finalizar</p>
-      <h2 id="terminos-title">Términos y condiciones de <span id="terms-activity-name"></span></h2>
-      <p id="activity-terms"></p>
-      <label class="terms-acceptance"><input type="checkbox" name="acepta_terminos" required{% if envio.acepta_terminos %} checked{% endif %}> <span>Leí y acepto los términos y condiciones de <span id="terms-acceptance-name"></span>. <span aria-hidden="true">*</span></span></label>
+      <h2 id="terminos-title">Términos y condiciones de {{ actividad_elegida.nombre }}</h2>
+      <p id="activity-terms">{{ actividad_elegida.terminos }}</p>
+      <label class="terms-acceptance"><input type="checkbox" name="acepta_terminos" required{% if envio.acepta_terminos %} checked{% endif %}> <span>Leí y acepto los términos y condiciones de {{ actividad_elegida.nombre }}. <span aria-hidden="true">*</span></span></label>
     </section>
 
     <div class="registration-submit">
