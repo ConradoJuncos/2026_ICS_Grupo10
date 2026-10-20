@@ -67,7 +67,6 @@ def catalogo(request: HttpRequest) -> HttpResponse:
             "descripcion": contenido[1],
             "ilustracion": contenido[2],
             "edad_minima": EDADES_MINIMAS_POR_ACTIVIDAD[codigo],
-            "cupo": CUPO_MAXIMO_POR_ACTIVIDAD[codigo],
             "requiere_talle": codigo in ACTIVIDADES_CON_TALLE,
         }
         for codigo, contenido in DESCRIPCIONES.items()
