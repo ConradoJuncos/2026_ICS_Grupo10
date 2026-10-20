@@ -69,6 +69,20 @@ def _validar_participante(actividad: str, participante: DatosParticipante) -> No
         raise TalleInvalidoError("Elegí un talle entre XS y XXL.")
 
 
+def _validar_dnis_disponibles(horario: Horario, dnis: list[str]) -> None:
+    """Rechaza personas repetidas o ya inscriptas en un turno simultáneo."""
+    if len(set(dnis)) != len(dnis):
+        raise DniRepetidoError("Cada participante debe tener un DNI distinto.")
+    if Participante.objects.filter(
+        dni__in=dnis,
+        inscripcion__horario__fecha=horario.fecha,
+        inscripcion__horario__hora=horario.hora,
+    ).exists():
+        raise InscripcionSimultaneaError(
+            "Un participante ya está inscripto en otra actividad a esa hora."
+        )
+
+
 def registrar_inscripcion(
     horario: Horario,
     correo: str,
@@ -88,17 +102,9 @@ def registrar_inscripcion(
         raise InscripcionSinParticipantesError("Agregá al menos un participante.")
     for participante in participantes:
         _validar_participante(horario.actividad.nombre, participante)
-    dnis = [participante.dni for participante in participantes]
-    if len(set(dnis)) != len(dnis):
-        raise DniRepetidoError("Cada participante debe tener un DNI distinto.")
-    if Participante.objects.filter(
-        dni__in=dnis,
-        inscripcion__horario__fecha=horario.fecha,
-        inscripcion__horario__hora=horario.hora,
-    ).exists():
-        raise InscripcionSimultaneaError(
-            "Un participante ya está inscripto en otra actividad a esa hora."
-        )
+    _validar_dnis_disponibles(
+        horario, [participante.dni for participante in participantes]
+    )
     inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
     for participante in participantes:
         inscripcion.participantes.create(
