@@ -20,7 +20,6 @@ from core.inscripciones import (
     TalleInvalidoError,
     TalleObligatorioError,
     TerminosNoAceptadosError,
-    registrar_inscripcion,
 )
 from core.models import Actividad, Horario, Inscripcion, Participante
 from core.validacion_edad import EdadNoPermitidaError
@@ -64,8 +63,7 @@ def test_registra_inscripcion_con_todos_sus_participantes(
         DatosParticipante(nombre="Juan Pérez", dni="50111222", edad=10, talle="S"),
     ]
 
-    inscripcion = registrar_inscripcion(
-        horario_tirolesa,
+    inscripcion = horario_tirolesa.registrar_inscripcion(
         correo="ana@ejemplo.com",
         acepta_terminos=True,
         participantes=participantes,
@@ -88,8 +86,7 @@ def test_registra_inscripcion_con_todos_sus_participantes(
 def test_rechaza_inscripcion_sin_participantes(horario_tirolesa: Horario) -> None:
     """Exige al menos un participante para inscribirse."""
     with pytest.raises(InscripcionSinParticipantesError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo="ana@ejemplo.com",
             acepta_terminos=True,
             participantes=[],
@@ -111,8 +108,7 @@ def test_rechaza_inscripcion_con_correo_invalido(
 ) -> None:
     """Exige un correo válido para enviar el comprobante de la inscripción."""
     with pytest.raises(CorreoInvalidoError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo=correo,
             acepta_terminos=True,
             participantes=[PARTICIPANTE_VALIDO],
@@ -137,8 +133,7 @@ def test_rechaza_participante_con_dni_invalido(
     participante = replace(PARTICIPANTE_VALIDO, dni=dni)
 
     with pytest.raises(DniInvalidoError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo="ana@ejemplo.com",
             acepta_terminos=True,
             participantes=[participante],
@@ -153,8 +148,7 @@ def test_rechaza_inscripcion_con_un_participante_menor_a_la_edad_minima(
     menor = replace(PARTICIPANTE_VALIDO, nombre="Juan Pérez", dni="50111222", edad=7)
 
     with pytest.raises(EdadNoPermitidaError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo="ana@ejemplo.com",
             acepta_terminos=True,
             participantes=[PARTICIPANTE_VALIDO, menor],
@@ -175,8 +169,7 @@ def test_rechaza_participante_sin_talle_en_actividad_que_lo_requiere(
     participante = replace(PARTICIPANTE_VALIDO, talle="")
 
     with pytest.raises(TalleObligatorioError):
-        registrar_inscripcion(
-            horario,
+        horario.registrar_inscripcion(
             correo="ana@ejemplo.com",
             acepta_terminos=True,
             participantes=[participante],
@@ -196,8 +189,7 @@ def test_admite_participante_sin_talle_en_actividad_que_no_lo_requiere(
     )
     participante = replace(PARTICIPANTE_VALIDO, talle="")
 
-    inscripcion = registrar_inscripcion(
-        horario,
+    inscripcion = horario.registrar_inscripcion(
         correo="ana@ejemplo.com",
         acepta_terminos=True,
         participantes=[participante],
@@ -215,8 +207,7 @@ def test_rechaza_participante_con_talle_inexistente(
     participante = replace(PARTICIPANTE_VALIDO, talle=talle)
 
     with pytest.raises(TalleInvalidoError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo="ana@ejemplo.com",
             acepta_terminos=True,
             participantes=[participante],
@@ -227,8 +218,7 @@ def test_rechaza_participante_con_talle_inexistente(
 def test_rechaza_inscripcion_sin_aceptar_terminos(horario_tirolesa: Horario) -> None:
     """Exige aceptar los términos y condiciones de la actividad."""
     with pytest.raises(TerminosNoAceptadosError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo="ana@ejemplo.com",
             participantes=[PARTICIPANTE_VALIDO],
             acepta_terminos=False,
@@ -253,8 +243,7 @@ def test_rechaza_inscripcion_en_horario_no_reservable(fecha: date, hora: time) -
     )
 
     with pytest.raises(HorarioNoReservableError):
-        registrar_inscripcion(
-            horario,
+        horario.registrar_inscripcion(
             correo="ana@ejemplo.com",
             participantes=[PARTICIPANTE_VALIDO],
             acepta_terminos=True,
@@ -267,8 +256,7 @@ def test_inscripcion_rechazada_no_guarda_datos(horario_tirolesa: Horario) -> Non
     sin_talle = replace(PARTICIPANTE_VALIDO, dni="50111222", talle="")
 
     with pytest.raises(TalleObligatorioError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo="ana@ejemplo.com",
             participantes=[PARTICIPANTE_VALIDO, sin_talle],
             acepta_terminos=True,
@@ -300,8 +288,7 @@ def test_rechaza_inscripcion_sin_cupo_suficiente(
     )
 
     with pytest.raises(CupoInsuficienteError):
-        registrar_inscripcion(
-            horario,
+        horario.registrar_inscripcion(
             correo="ana@ejemplo.com",
             participantes=participantes,
             acepta_terminos=True,
@@ -314,8 +301,7 @@ def test_rechaza_inscripcion_con_dni_repetido(horario_tirolesa: Horario) -> None
     misma_persona = replace(PARTICIPANTE_VALIDO, nombre="Ana M. Pérez")
 
     with pytest.raises(DniRepetidoError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo="ana@ejemplo.com",
             participantes=[PARTICIPANTE_VALIDO, misma_persona],
             acepta_terminos=True,
@@ -337,8 +323,7 @@ def test_rechaza_participante_inscripto_en_otra_actividad_a_la_misma_hora(
     )
 
     with pytest.raises(InscripcionSimultaneaError):
-        registrar_inscripcion(
-            horario_tirolesa,
+        horario_tirolesa.registrar_inscripcion(
             correo="ana@ejemplo.com",
             participantes=[PARTICIPANTE_VALIDO],
             acepta_terminos=True,
@@ -359,8 +344,7 @@ def test_admite_participante_inscripto_en_otro_horario(
         nombre="Ana Pérez", dni=PARTICIPANTE_VALIDO.dni, edad=35, talle="M"
     )
 
-    inscripcion = registrar_inscripcion(
-        horario_tirolesa,
+    inscripcion = horario_tirolesa.registrar_inscripcion(
         correo="ana@ejemplo.com",
         participantes=[PARTICIPANTE_VALIDO],
         acepta_terminos=True,

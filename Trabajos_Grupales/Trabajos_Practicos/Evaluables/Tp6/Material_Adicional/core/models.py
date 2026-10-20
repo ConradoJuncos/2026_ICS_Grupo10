@@ -4,6 +4,14 @@ from typing import ClassVar
 from django.db import models
 from django.utils import timezone
 
+from core.inscripciones import (
+    CupoInsuficienteError,
+    DatosParticipante,
+    HorarioNoReservableError,
+    InscripcionSimultaneaError,
+    validar_solicitud,
+)
+
 DIA_LUNES = 0
 FERIADOS_DE_CIERRE = {(1, 1), (12, 25)}
 HORAS_DE_INICIO_PERMITIDAS = {time(hora) for hora in range(9, 18)}
@@ -53,6 +61,40 @@ class Horario(models.Model):
             <= ahora + ANTICIPACION_MAXIMA
             and self.cupos_disponibles() > 0
         )
+
+    def registrar_inscripcion(
+        self,
+        correo: str,
+        participantes: list[DatosParticipante],
+        acepta_terminos: bool,
+    ) -> "Inscripcion":
+        """Valida y guarda la inscripción de los participantes en el horario."""
+        if len(participantes) > self.cupos_disponibles():
+            raise CupoInsuficienteError(
+                "No quedan lugares para todos los participantes."
+            )
+        if not self.admite_inscripciones():
+            raise HorarioNoReservableError(
+                "El horario elegido ya no admite inscripciones."
+            )
+        validar_solicitud(self.actividad.nombre, correo, participantes, acepta_terminos)
+        if Participante.objects.filter(
+            dni__in=[participante.dni for participante in participantes],
+            inscripcion__horario__fecha=self.fecha,
+            inscripcion__horario__hora=self.hora,
+        ).exists():
+            raise InscripcionSimultaneaError(
+                "Un participante ya está inscripto en otra actividad a esa hora."
+            )
+        inscripcion = self.inscripciones.create(correo=correo)
+        for participante in participantes:
+            inscripcion.participantes.create(
+                nombre=participante.nombre,
+                dni=participante.dni,
+                edad=participante.edad,
+                talle=participante.talle,
+            )
+        return inscripcion
 
 
 class Inscripcion(models.Model):

@@ -9,7 +9,6 @@ from core.inscripciones import (
     ACTIVIDADES_CON_TALLE,
     DatosParticipante,
     InscripcionSinParticipantesError,
-    registrar_inscripcion,
 )
 from core.models import Actividad, Horario, Inscripcion
 from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD, EdadInvalidaError
@@ -112,8 +111,8 @@ def _leer_participantes(datos: QueryDict) -> list[DatosParticipante]:
 
 def _registrar_envio(datos: QueryDict) -> Inscripcion:
     """Registra la inscripción con los campos enviados en el formulario."""
-    return registrar_inscripcion(
-        get_object_or_404(Horario, pk=datos["horario"]),
+    horario = get_object_or_404(Horario, pk=datos["horario"])
+    return horario.registrar_inscripcion(
         correo=datos["correo"],
         participantes=_leer_participantes(datos),
         acepta_terminos="acepta_terminos" in datos,

@@ -1,4 +1,4 @@
-"""Registra inscripciones de visitantes a los horarios de las actividades."""
+"""Define las reglas de los datos de una inscripción a una actividad."""
 
 import re
 from dataclasses import dataclass
@@ -6,8 +6,6 @@ from dataclasses import dataclass
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
-from core.consulta_horarios import consultar_horarios_por_actividad
-from core.models import Horario, Inscripcion, Participante
 from core.validacion_edad import validar_edad_para_actividad
 
 FORMATO_DNI = re.compile(r"\d{7,8}")
@@ -76,33 +74,13 @@ def _validar_participante(actividad: str, participante: DatosParticipante) -> No
         raise TalleInvalidoError("Elegí un talle entre XS y XXL.")
 
 
-def _validar_dnis_disponibles(horario: Horario, dnis: list[str]) -> None:
-    """Rechaza personas repetidas o ya inscriptas en un turno simultáneo."""
-    if len(set(dnis)) != len(dnis):
-        raise DniRepetidoError("Cada participante debe tener un DNI distinto.")
-    if Participante.objects.filter(
-        dni__in=dnis,
-        inscripcion__horario__fecha=horario.fecha,
-        inscripcion__horario__hora=horario.hora,
-    ).exists():
-        raise InscripcionSimultaneaError(
-            "Un participante ya está inscripto en otra actividad a esa hora."
-        )
-
-
-def registrar_inscripcion(
-    horario: Horario,
+def validar_solicitud(
+    actividad: str,
     correo: str,
     participantes: list[DatosParticipante],
     acepta_terminos: bool,
-) -> Inscripcion:
-    """Valida y guarda la inscripción de los participantes en el horario."""
-    if len(participantes) > horario.cupos_disponibles():
-        raise CupoInsuficienteError("No quedan lugares para todos los participantes.")
-    if horario not in consultar_horarios_por_actividad(
-        horario.actividad, horario.fecha
-    ):
-        raise HorarioNoReservableError("El horario elegido ya no admite inscripciones.")
+) -> None:
+    """Rechaza los datos de la solicitud que no cumplen las reglas de inscripción."""
     if not acepta_terminos:
         raise TerminosNoAceptadosError("Aceptá los términos de la actividad.")
     try:
@@ -112,16 +90,7 @@ def registrar_inscripcion(
     if not participantes:
         raise InscripcionSinParticipantesError("Agregá al menos un participante.")
     for participante in participantes:
-        _validar_participante(horario.actividad.nombre, participante)
-    _validar_dnis_disponibles(
-        horario, [participante.dni for participante in participantes]
-    )
-    inscripcion = Inscripcion.objects.create(horario=horario, correo=correo)
-    for participante in participantes:
-        inscripcion.participantes.create(
-            nombre=participante.nombre,
-            dni=participante.dni,
-            edad=participante.edad,
-            talle=participante.talle,
-        )
-    return inscripcion
+        _validar_participante(actividad, participante)
+    dnis = [participante.dni for participante in participantes]
+    if len(set(dnis)) != len(dnis):
+        raise DniRepetidoError("Cada participante debe tener un DNI distinto.")
