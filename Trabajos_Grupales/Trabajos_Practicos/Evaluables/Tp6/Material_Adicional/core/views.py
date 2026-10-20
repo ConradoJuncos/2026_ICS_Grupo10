@@ -5,12 +5,14 @@ from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_GET, require_http_methods
 
 from core.consulta_horarios import consultar_horarios_por_actividad
+from core.email import enviar_mail_confirmacion_registro_a_actividad
 from core.inscripciones import (
     ACTIVIDADES_CON_TALLE,
     DatosParticipante,
     InscripcionSinParticipantesError,
 )
 from core.models import Actividad, Horario, Inscripcion
+from core.qr import GenerarQr
 from core.validacion_edad import EDADES_MINIMAS_POR_ACTIVIDAD, EdadInvalidaError
 
 CUPO_MAXIMO_POR_ACTIVIDAD = {
@@ -119,6 +121,23 @@ def _registrar_envio(datos: QueryDict) -> Inscripcion:
     )
 
 
+def _enviar_confirmacion(inscripcion: Inscripcion) -> None:
+    """Envía al visitante el resumen y el código QR de su inscripción."""
+    horario = inscripcion.horario
+    lineas = [
+        f"{horario.actividad} · {horario.fecha:%d/%m/%Y} · {horario.hora:%H:%M}",
+        *(
+            f"{participante.nombre} · DNI {participante.dni}"
+            for participante in inscripcion.participantes.order_by("pk")
+        ),
+    ]
+    enviar_mail_confirmacion_registro_a_actividad(
+        inscripcion.correo,
+        GenerarQr().generate(f"EcoHarmony-Inscripcion-{inscripcion.pk}"),
+        resumen="\n".join(lineas),
+    )
+
+
 @require_http_methods(["GET", "POST"])
 def inscripcion(request: HttpRequest) -> HttpResponse:
     """Muestra el formulario de inscripción y registra los envíos."""
@@ -127,6 +146,7 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
             inscripcion_registrada = _registrar_envio(request.POST)
         except ValueError as rechazo:
             return _mostrar_formulario(request, error=str(rechazo))
+        _enviar_confirmacion(inscripcion_registrada)
         return render(
             request,
             "core/confirmacion.html",
