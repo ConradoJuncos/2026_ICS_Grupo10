@@ -214,3 +214,17 @@ def test_formulario_rechaza_una_cantidad_de_participantes_no_numerica(
 
     assert "Indicá la cantidad de participantes." in respuesta.content.decode()
     assert not Inscripcion.objects.exists()
+
+
+@pytest.mark.django_db
+def test_formulario_responde_404_ante_un_horario_inexistente(
+    client: Client, horario_tirolesa: Horario
+) -> None:
+    """No registra envíos para turnos que no existen."""
+    datos = datos_de_inscripcion(horario_tirolesa) | {
+        "horario": str(horario_tirolesa.pk + 1)
+    }
+
+    respuesta = client.post("/inscripcion/?actividad=tirolesa&fecha=2026-10-20", datos)
+
+    assert respuesta.status_code == 404
