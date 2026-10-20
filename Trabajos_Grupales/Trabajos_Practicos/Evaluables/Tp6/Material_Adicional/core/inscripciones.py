@@ -31,6 +31,10 @@ class TerminosNoAceptadosError(ValueError):
     """Indica que el visitante no aceptó los términos de la actividad."""
 
 
+class HorarioNoReservableError(ValueError):
+    """Indica que el horario elegido no admite inscripciones."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""

@@ -11,6 +11,7 @@ from django.utils import timezone
 from core.inscripciones import (
     DatosParticipante,
     DniInvalidoError,
+    HorarioNoReservableError,
     InscripcionSinParticipantesError,
     TalleInvalidoError,
     TalleObligatorioError,
@@ -199,4 +200,30 @@ def test_rechaza_inscripcion_sin_aceptar_terminos(horario_tirolesa: Horario) -> 
             correo="ana@ejemplo.com",
             participantes=[PARTICIPANTE_VALIDO],
             acepta_terminos=False,
+        )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("fecha", "hora"),
+    [
+        pytest.param(date(2026, 10, 20), time(9), id="turno_cerrado"),
+        pytest.param(date(2026, 10, 21), time(11), id="mas_de_24_horas"),
+        pytest.param(date(2026, 10, 20), time(18), id="fuera_del_horario_del_parque"),
+    ],
+)
+def test_rechaza_inscripcion_en_horario_no_reservable(fecha: date, hora: time) -> None:
+    """Rechaza turnos cerrados, lejanos o fuera del horario del parque."""
+    horario = Horario.objects.create(
+        actividad=Actividad.objects.create(nombre="TIROLESA", cupo_maximo=10),
+        fecha=fecha,
+        hora=hora,
+    )
+
+    with pytest.raises(HorarioNoReservableError):
+        registrar_inscripcion(
+            horario,
+            correo="ana@ejemplo.com",
+            participantes=[PARTICIPANTE_VALIDO],
+            acepta_terminos=True,
         )
