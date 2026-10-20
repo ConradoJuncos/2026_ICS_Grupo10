@@ -80,20 +80,26 @@ def test_catalogo_muestra_capacidad_por_actividad(client: Client) -> None:
 
 
 @pytest.mark.django_db
-def test_formulario_muestra_fecha_horarios_y_precios(client: Client) -> None:
+def test_formulario_muestra_fecha_y_horarios(client: Client) -> None:
     respuesta = client.get("/inscripcion/?actividad=safari")
     contenido = respuesta.content.decode()
     assert respuesta.status_code == 200
     assert 'id="fecha-visita" name="fecha" type="date" required' in contenido
     assert "No se admiten reservas con más de 24 horas de anticipación" in contenido
     assert "Los turnos se habilitan hasta 15 minutos antes" in contenido
-    assert "Entrada común" in contenido
-    assert "$10.000" in contenido
-    assert "Entrada VIP" in contenido
-    assert "$20.000" in contenido
-    assert "50% de descuento" in contenido
     javascript = Path("core/static/core/inscripcion.js").read_text(encoding="utf-8")
     assert "Solo se puede reservar dentro de las 24 horas previas" in javascript
+
+
+@pytest.mark.django_db
+def test_formulario_no_muestra_precios_de_entradas(client: Client) -> None:
+    """Deja los precios y descuentos de entradas a la compra de entradas."""
+    respuesta = client.get("/inscripcion/?actividad=safari")
+
+    contenido = respuesta.content.decode()
+    assert "Precios de entradas" not in contenido
+    assert "$10.000" not in contenido
+    assert "50% de descuento" not in contenido
 
 
 @pytest.mark.django_db
