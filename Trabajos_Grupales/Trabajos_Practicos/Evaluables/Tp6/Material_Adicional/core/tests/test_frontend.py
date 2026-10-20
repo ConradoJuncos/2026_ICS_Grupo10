@@ -252,6 +252,16 @@ def test_formulario_rechazado_conserva_los_datos_de_los_participantes(
 
 
 @pytest.mark.django_db
+def test_formulario_rechazado_conserva_el_horario_elegido(
+    client: Client, horario_tirolesa: Horario
+) -> None:
+    """Mantiene seleccionado el turno que había elegido el visitante."""
+    contenido = envio_rechazado(client, horario_tirolesa)
+
+    assert f'value="{horario_tirolesa.pk}" data-cupos="10" selected>' in contenido
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "edad",
     [
