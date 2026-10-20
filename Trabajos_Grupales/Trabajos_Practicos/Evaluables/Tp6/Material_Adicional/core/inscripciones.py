@@ -3,6 +3,9 @@
 import re
 from dataclasses import dataclass
 
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+
 from core.consulta_horarios import consultar_horarios_por_actividad
 from core.models import Horario, Inscripcion, Participante
 from core.validacion_edad import validar_edad_para_actividad
@@ -102,6 +105,10 @@ def registrar_inscripcion(
         raise HorarioNoReservableError("El horario elegido ya no admite inscripciones.")
     if not acepta_terminos:
         raise TerminosNoAceptadosError("Aceptá los términos de la actividad.")
+    try:
+        validate_email(correo)
+    except ValidationError as error:
+        raise CorreoInvalidoError("Ingresá un correo electrónico válido.") from error
     if not participantes:
         raise InscripcionSinParticipantesError("Agregá al menos un participante.")
     for participante in participantes:
