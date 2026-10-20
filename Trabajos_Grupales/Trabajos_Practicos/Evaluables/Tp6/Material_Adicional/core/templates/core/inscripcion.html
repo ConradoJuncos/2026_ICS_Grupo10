@@ -82,7 +82,7 @@
         </div>
         <div class="registration-field">
           <label for="cantidad-personas">Cantidad de participantes <span aria-hidden="true">*</span></label>
-          <input id="cantidad-personas" name="cantidad_personas" type="number" min="1" step="1" inputmode="numeric" placeholder="Seleccioná la actividad primero" required>
+          <input id="cantidad-personas" name="cantidad_personas" type="number" value="{{ envio.cantidad_personas }}" min="1" step="1" inputmode="numeric" placeholder="Seleccioná la actividad primero" required>
           <small id="participant-capacity-note">Elegí un horario para ver los lugares disponibles.</small>
         </div>
       </div>
@@ -130,7 +130,7 @@
       </div>
       <div class="registration-field registration-email">
         <label for="correo">Correo electrónico <span aria-hidden="true">*</span></label>
-        <input id="correo" name="correo" type="email" autocomplete="email" placeholder="nombre@correo.com" required>
+        <input id="correo" name="correo" type="email" value="{{ envio.correo }}" autocomplete="email" placeholder="nombre@correo.com" required>
       </div>
     </section>
 

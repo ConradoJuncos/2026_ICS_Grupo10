@@ -221,6 +221,7 @@ def _mostrar_formulario(request: HttpRequest, error: str = "") -> HttpResponse:
             "horarios_disponibles": horarios_disponibles,
             "sin_turnos": sin_turnos,
             "error": error,
+            "envio": request.POST,
             "participantes": range(1, max(CUPO_MAXIMO_POR_ACTIVIDAD.values()) + 1),
         },
     )

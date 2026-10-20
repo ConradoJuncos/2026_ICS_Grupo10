@@ -104,7 +104,6 @@
       const select = field.querySelector("select");
       select.disabled = !requiresSize;
     });
-    participantCount.value = "";
     setCapacity(capacity);
     showTimeAvailability();
   }
@@ -118,6 +117,7 @@
     const url = new URL(window.location.href);
     url.searchParams.set("actividad", activitySelect.value);
     window.history.pushState({}, "", url);
+    participantCount.value = "";
     showActivity(activitySelect.selectedOptions[0]);
     dateInput.value = "";
     refreshTimeOptions();
@@ -126,6 +126,7 @@
   window.addEventListener("popstate", () => {
     const activity = new URLSearchParams(window.location.search).get("actividad");
     activitySelect.value = options.some((option) => option.value === activity) ? activity : "";
+    participantCount.value = "";
     showActivity(activitySelect.selectedOptions[0]);
     dateInput.value = "";
     refreshTimeOptions();
