@@ -130,3 +130,7 @@ MAILERS = {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
 }
+
+# Servidor SMTP al que core.email entrega los correos de confirmación.
+CORREO_SMTP_HOST = "localhost"
+CORREO_SMTP_PUERTO = 1025

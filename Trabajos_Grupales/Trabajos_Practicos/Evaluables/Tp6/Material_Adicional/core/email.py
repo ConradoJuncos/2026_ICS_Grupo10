@@ -2,6 +2,8 @@ import smtplib
 from email.message import EmailMessage
 from html import escape
 
+from django.conf import settings
+
 
 def enviar_mail_confirmacion_registro_a_actividad(
     destinatario: str, qr: bytes, resumen: str = ""
@@ -29,5 +31,5 @@ def enviar_mail_confirmacion_registro_a_actividad(
     # El cid permite que el HTML muestre el QR inline en lugar de adjunto.
     msg.add_related(qr, maintype="image", subtype="png", cid="qr_code")
 
-    with smtplib.SMTP("localhost", 1025) as server:
+    with smtplib.SMTP(settings.CORREO_SMTP_HOST, settings.CORREO_SMTP_PUERTO) as server:
         server.send_message(msg)
