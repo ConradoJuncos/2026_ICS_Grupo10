@@ -82,8 +82,8 @@ def test_una_pagina_de_inscripcion_preselecciona_actividad_por_query(
     assert "inscripcion.js" in contenido
 
 
-def test_formulario_inscripcion_no_acepta_envios(client: Client) -> None:
-    respuesta = client.post("/inscripcion/")
+def test_formulario_inscripcion_rechaza_metodos_no_admitidos(client: Client) -> None:
+    respuesta = client.put("/inscripcion/")
     assert respuesta.status_code == 405
 
 
