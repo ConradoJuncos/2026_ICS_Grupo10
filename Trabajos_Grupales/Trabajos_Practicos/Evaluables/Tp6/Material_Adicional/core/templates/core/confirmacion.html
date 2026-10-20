@@ -35,6 +35,7 @@
       <li>{{ participante.nombre }} · DNI {{ participante.dni }}</li>
       {% endfor %}
     </ul>
+    <img src="data:image/png;base64,{{ qr }}" alt="Código QR de la inscripción" width="200" height="200">
   </section>
 </main>
 <footer><a class="footer-brand" href="{% url 'catalogo' %}">EcoHarmony Park <span aria-hidden="true">✳</span></a><span>Un lugar para conectar con la naturaleza.</span></footer>

@@ -1,5 +1,6 @@
 """Catálogo público de actividades del parque."""
 
+import base64
 import logging
 from datetime import timedelta
 
@@ -150,12 +151,12 @@ def _resumen_de_inscripcion(inscripcion: Inscripcion) -> str:
     return "\n".join(lineas)
 
 
-def _enviar_confirmacion(inscripcion: Inscripcion) -> None:
+def _enviar_confirmacion(inscripcion: Inscripcion, qr: bytes) -> None:
     """Envía al visitante el resumen y el código QR de su inscripción."""
     try:
         enviar_mail_confirmacion_registro_a_actividad(
             inscripcion.correo,
-            GenerarQr().generate(f"EcoHarmony-Inscripcion-{inscripcion.pk}"),
+            qr,
             resumen=_resumen_de_inscripcion(inscripcion),
         )
     except OSError:
@@ -173,11 +174,15 @@ def inscripcion(request: HttpRequest) -> HttpResponse:
             inscripcion_registrada = _registrar_envio(request.POST)
         except ValueError as rechazo:
             return _mostrar_formulario(request, error=str(rechazo))
-        _enviar_confirmacion(inscripcion_registrada)
+        qr = GenerarQr().generate(f"EcoHarmony-Inscripcion-{inscripcion_registrada.pk}")
+        _enviar_confirmacion(inscripcion_registrada, qr)
         return render(
             request,
             "core/confirmacion.html",
-            {"inscripcion": inscripcion_registrada},
+            {
+                "inscripcion": inscripcion_registrada,
+                "qr": base64.b64encode(qr).decode(),
+            },
         )
     return _mostrar_formulario(request)
 
