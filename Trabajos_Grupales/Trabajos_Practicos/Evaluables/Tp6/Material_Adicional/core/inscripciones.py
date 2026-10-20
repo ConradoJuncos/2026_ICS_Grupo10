@@ -27,6 +27,10 @@ class TalleInvalidoError(ValueError):
     """Indica que el talle informado no pertenece a los talles disponibles."""
 
 
+class TerminosNoAceptadosError(ValueError):
+    """Indica que el visitante no aceptó los términos de la actividad."""
+
+
 @dataclass(frozen=True)
 class DatosParticipante:
     """Datos que el visitante informa por cada participante."""
@@ -41,6 +45,7 @@ def registrar_inscripcion(
     horario: Horario,
     correo: str,
     participantes: list[DatosParticipante],
+    acepta_terminos: bool,
 ) -> Inscripcion:
     """Valida y guarda la inscripción de los participantes en el horario."""
     if not participantes:
