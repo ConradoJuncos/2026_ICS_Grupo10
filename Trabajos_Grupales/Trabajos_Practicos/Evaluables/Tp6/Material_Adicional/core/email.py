@@ -16,8 +16,9 @@ def enviar_mail_confirmacion_registro_a_actividad(
         f"""\
     <html>
         <body>
+            <p>Tu inscripción a EcoHarmony Park está confirmada.</p>
             <p>{resumen_html}</p>
-            <p>Test qr codigo:</p>
+            <p>Presentá este código QR al llegar a la actividad.</p>
             <img src="cid:qr_code" alt="Código QR">
         </body>
     </html>
