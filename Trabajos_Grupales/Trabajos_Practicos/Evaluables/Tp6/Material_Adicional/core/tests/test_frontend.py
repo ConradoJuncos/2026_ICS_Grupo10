@@ -71,12 +71,11 @@ def test_catalogo_no_acepta_envios_de_formulario(client: Client) -> None:
     assert respuesta.status_code == 405
 
 
-def test_catalogo_muestra_capacidad_por_actividad(client: Client) -> None:
+def test_catalogo_no_presenta_la_capacidad_como_disponibilidad(client: Client) -> None:
+    """Deja los lugares disponibles para el turno elegido en la inscripción."""
     respuesta = client.get("/")
-    contenido = respuesta.content.decode()
-    assert "8 personas por turno" in contenido
-    assert "10 personas por turno" in contenido
-    assert contenido.count("12 personas por turno") == 2
+
+    assert "personas por turno" not in respuesta.content.decode()
 
 
 @pytest.mark.django_db
