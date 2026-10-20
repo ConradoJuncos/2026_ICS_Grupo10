@@ -40,3 +40,10 @@ def test_enviar_mail_escapa_el_html_del_resumen() -> None:
     cuerpo = cuerpo_del_correo_enviado("Ana <b>Pérez</b>")
 
     assert "Ana &lt;b&gt;Pérez&lt;/b&gt;" in cuerpo
+
+
+def test_enviar_mail_conserva_los_saltos_de_linea_del_resumen() -> None:
+    """Muestra cada línea del resumen en un renglón propio."""
+    cuerpo = cuerpo_del_correo_enviado("Ana Pérez\nJuan Pérez")
+
+    assert "Ana Pérez<br>Juan Pérez" in cuerpo
