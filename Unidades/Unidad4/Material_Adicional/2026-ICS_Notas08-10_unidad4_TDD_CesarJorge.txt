@@ -1,0 +1,109 @@
+CLASE 08-10 ISW
+
+TDD
+
+Sobre taxi mobile para entender el tema
+
+La antesala del testing
+
+Acoplamiento incidental: Ocurre cuando dos partes del sistema terminan atadas la una a la otra no por una necesidad real del dominio o de la lógica de negocio, sino como un efecto secundario de cómo se implementó el código o cómo se escribieron las pruebas. Si el acoplamiento incidental no se corrige durante la fase de Refactor, el sistema se vuelve rígido
+
+Deuda técnica y miedo al cambio: introducir cambios le daba miedo a los programadores porque se podia romper algo
+
+Costo asintótico del error: a medida que pasa el tiempo la dificultad y costos de arreglar un bug crece de manera exponencial
+
+TDD es una practica de desarrollo que utiliza el testing para desarrollar
+
+Por medio de test unitarios definimos "que" debe hacer el software para luego definir el "como", cambio el momento en el cual voy a probar para después definir las pruebas de lo que voy a probar
+
+3 Leyes:
+
+"No escribirás una linea de código de producción sin antes haber escrito un test unitario que falle"
+
+"No escribas mas código de prueba que el necesario para provocar un fallo, no compilar cuenta como fallo"
+
+"No escribirás mas código de producción que el mínimo indispensable para que pase"
+
+Ciclo RED-GREEN-REFACTOR
+
+RED:
+Escribimos una prueba que falla(declaramos la intención) ej: 
+Quiero que al pasarle estos datos, el sistema me devuelva este resultado
+
+GREEN:
+Escribimos el código mínimo para que la prueba pase, aca nos enfocamos en el código mínimo, no debe ser la manera mas eficiente necesariamente (PATRON FAKE IT = HARCODEAR)
+
+REFACTORIZAR:
+Modificar la estructura interna del software sin alterar su comportamiento externo, es una reestructuración de buenas practicas, no una reestructuración de funcionamiento.
+
+La idea de cada ciclo es ir mejorando el código para optimizar su funcionamiento(de soluciones particulares a soluciones genéricas)
+
+PATRONES DE RED
+
+-STARTER TEST: Desde donde comienzo el desarrollo de estas pruebas, el camino mas fácil/obvio para comenzar el flujo
+-ONE STEP TEST: Avanza con el siguiente en la linea de complejidad, no des un salto grande
+-EXPLANATION TEST: En una etapa madura del ciclo, pueden surgir debates del funcionamiento o discrepancia en el equipo, lo podemos resolver por medio de un test
+-LEARNING TEST: Cuando quiero conectarme con código externo, representalo como un test para entender el funcionamiento y como reacciona nuestro sistema con esa conexión.
+-ANOTHER TEST: No perder de vista lo que se quiere desarrollar en el momento y anotar si surge un camino alternativo que me saque del punto de vista actual.
+-REGRESSION TEST: Surge un problema y defino un test con los pasos que me llevaron a ese problema.
+
+PATRONES GREEN
+FAKE IT: Harcodeo el código para devolverme lo que quiero en la prueba
+TRIANGULACION: Armar varios casos de falla para asegurarme que efectivamente la falla esta en el código que desarrolle, asegurarnos de que esta bien o mal
+OBVIOUS IMPLEMENTACION: Si ya conoces la solución, no hace falta que hagas los pasos por seguir el método, directamente escribí el código como debe ser.
+ONE TO MANY: SI tengo una función para un conjunto de datos, primero nos enfoquemos en lo básico(un parámetro) y después trabajemos en una colección mas compleja
+
+DISEÑO DE TEST
+TEST LIST: Listado de pruebas que tengo que realizar
+ISOLATED TEST: Los patrones deben ser independientes del resto
+TEST FIRST: No escribas código hasta que no escribas la prubea
+ASSERT TEST: Cuando cuesta escribir un test por la problemática/complejidad que tiene, nos propone arrancar desde lo que quiero probar, por ejemplo, el resultado. Ir desde el final al principio(estilo ing. inversa)
+TEST DATA: La información que usamos debe ser lo mas sencillo de entender
+EVIDENT DATA: técnica o patrón que asegura que la simplicidad y claridad de la información de prueba (TEST DATA) no sea abstracta ni engañosa.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
