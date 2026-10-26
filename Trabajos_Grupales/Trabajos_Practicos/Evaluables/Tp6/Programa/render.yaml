@@ -4,7 +4,7 @@ services:
     name: ecoharmony-park
     runtime: python
     plan: free
-    rootDir: Trabajos_Grupales/Trabajos_Practicos/Evaluables/Tp6/Material_Adicional
+    rootDir: Trabajos_Grupales/Trabajos_Practicos/Evaluables/Tp6/Programa
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
     # El disco del plan gratuito no persiste: cada arranque recrea la base y los turnos.
     startCommand: python manage.py migrate --noinput && python manage.py cargar_horarios && gunicorn config.wsgi --bind 0.0.0.0:$PORT

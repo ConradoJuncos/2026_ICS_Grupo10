@@ -1,6 +1,6 @@
 # Entorno de desarrollo del TP6
 
-Ejecutar los comandos siguientes desde esta carpeta (`Material_Adicional`).
+Ejecutar los comandos siguientes desde esta carpeta (`Programa`).
 El entorno verificado usa **CPython 3.14.8 en macOS ARM64**. CodeStyle menciona
 Python 3.15: esa diferencia sigue pendiente de acuerdo del grupo. No se ha
 verificado esta instalacion en Python 3.15 ni en otros sistemas operativos.
