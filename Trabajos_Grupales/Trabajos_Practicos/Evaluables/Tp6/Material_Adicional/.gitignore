@@ -9,3 +9,5 @@ venv/
 
 # Archivos de pytest
 .pytest_cache/
+# Estaticos reunidos por collectstatic
+staticfiles/

@@ -1,0 +1,17 @@
+# Blueprint de Render para la demo del TP6 (Inscribirme a actividad).
+services:
+  - type: web
+    name: ecoharmony-park
+    runtime: python
+    plan: free
+    rootDir: Trabajos_Grupales/Trabajos_Practicos/Evaluables/Tp6/Material_Adicional
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    # El disco del plan gratuito no persiste: cada arranque recrea la base y los turnos.
+    startCommand: python manage.py migrate --noinput && python manage.py cargar_horarios && gunicorn config.wsgi --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.8
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
